@@ -10,7 +10,7 @@ public class JDBCConnector {
     public JDBCConnector() {
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:D:\\project\\file-manager\\src\\test.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:..\\file-manager\\src\\test.db");
             connection.setAutoCommit(false);
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
