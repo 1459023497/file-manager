@@ -46,14 +46,19 @@ public class FileService {
      * 打开文件夹
      *
      * @param path
+     * @return true-打开路径, false-路径不存在
      */
-    public void openDir(String path) {
+    public boolean openDir(String path) {
+        File file = new File(path);
+        //该路径不存在就返回
+        if(!file.exists()) return false;
         try {
-            //Desktop.getDesktop().open(new File("D:\\文件夹"));
-            Desktop.getDesktop().open(new File(path));
+            //打开文件
+            Desktop.getDesktop().open(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return true;
     }
 
     /**
