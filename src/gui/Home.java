@@ -95,7 +95,7 @@ public class Home {
             //显示结果
             fileMap.forEach((dir, files) -> {
                 center.add(new FileLabel(dir));
-                files.forEach(file -> center.add(new JLabel(file.getName())));
+                files.forEach(file -> center.add(new FileLabel(file)));
             });
             label1.setText("扫描完成");
             center.reload();

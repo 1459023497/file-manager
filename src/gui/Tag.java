@@ -43,6 +43,7 @@ public class Tag {
         JButton all =  new JButton("全部");
         top.add(all);
         all.addActionListener(e -> {
+            //获取所有文件，按文件夹：文件的方式输出，带上文件的标签
             HashMap<String,Set<File>> files = fileService.getAllFiles();
             center.removeAll();
             files.forEach((dir,set)->{
@@ -50,7 +51,7 @@ public class Tag {
                 set.forEach(file -> {
                     Box row = Box.createHorizontalBox();
                     row.setAlignmentX(JComponent.LEFT_ALIGNMENT);//要设置左对齐才能正确布局
-                    row.add(new JLabel(file.getName()));
+                    row.add(new FileLabel(file));
                     ArrayList<String> tags = tagService.getTagsByFile(file);
                     TagColor color = TagColor.RED;
                     tags.forEach(s -> {
