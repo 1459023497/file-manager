@@ -33,7 +33,7 @@ public class FileLabel extends JLabel implements MouseListener {
 
     // 文件
     public FileLabel(File file) {
-        super(file.getName() + " " + FileUtils.getFileSizeString(String.valueOf(file.length())));
+        super(file.getName());
         path = file.getPath();
         isDir = false;
         this.addMouseListener(this);
@@ -45,7 +45,7 @@ public class FileLabel extends JLabel implements MouseListener {
             // 左键点击打开文件夹if
             fileService = new FileService();
             // 路径不存在于本地
-            if (!fileService.openDir(this.getText()) && firstTap) {
+            if (!fileService.openDir(path) && firstTap) {
                 firstTap = false;
                 this.setText(this.getText() + "     该路径不存在！");
             }

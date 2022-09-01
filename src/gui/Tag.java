@@ -1,5 +1,6 @@
 package gui;
 
+import gui.component.FileBox;
 import gui.component.FileLabel;
 import gui.component.IPanel;
 import gui.component.TagLabel;
@@ -40,23 +41,18 @@ public class Tag {
         //顶部加载项
         IPanel top = new IPanel(new Dimension(0, 80));
         //显示全部文件按钮，点击事件
-        JButton all =  new JButton("全部");
+        JButton all = new JButton("全部");
         top.add(all);
         all.addActionListener(e -> {
             //获取所有文件，按文件夹：文件的方式输出，带上文件的标签
-            HashMap<String,Set<File>> files = fileService.getAllFiles();
+            HashMap<String, Set<File>> files = fileService.getAllFiles();
             center.removeAll();
-            files.forEach((dir,set)->{
-                center.add(new FileLabel(dir));
+            files.forEach((dir, set) -> {
+                FileBox dirRow = new FileBox(new File(dir),center);
+                center.add(dirRow);
                 set.forEach(file -> {
-                    Box row = Box.createHorizontalBox();
-                    row.setAlignmentX(JComponent.LEFT_ALIGNMENT);//要设置左对齐才能正确布局
-                    row.add(new FileLabel(file));
-                    ArrayList<String> tags = tagService.getTagsByFile(file);
-                    TagColor color = TagColor.RED;
-                    tags.forEach(s -> {
-                        row.add(new TagLabel(s,color.next(),center));
-                    });
+                    //文件行
+                    FileBox row = new FileBox(file, center);
                     center.add(row);
                 });
             });
@@ -66,9 +62,9 @@ public class Tag {
         HashMap<String, Set<String>> tagMap = tagService.getTagsMap();
         TagColor color = TagColor.RED;
         tagMap.forEach((group, set) -> {
-            top.add(new TagLabel(group, color.next(),center));
+            top.add(new TagLabel(group, color.next(), center,1));
             top.add(new JLabel(":"));
-            set.forEach(name -> top.add(new TagLabel(name, color.next(), center)));
+            set.forEach(name -> top.add(new TagLabel(name, color.next(), center,1)));
         });
         content.add(top, BorderLayout.NORTH);
         //创建下方结果滚动面板，用于显示文件

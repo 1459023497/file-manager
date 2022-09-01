@@ -1,6 +1,7 @@
 package service;
 
 import jdbc.JDBCConnector;
+import org.ibex.nestedvm.util.Seekable;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -120,23 +121,42 @@ public class TagService {
 
 
     /**
-     * 给文件打标签,支持多文件
+     * 给文件打标签
      *
      * @param tag
-     * @param files
+     * @param file
      */
-    public void tag(String tag, File... files) {
-        for (File file : files) {
+    public void tag(String tag, File file) {
+        if (!file.isDirectory()) {
+            //单个文件
             String sql = "INSERT into file_tag(file_id,tag_id) VALUES(\n" +
                     "(SELECT id from file where file.path = '" + file.getPath() + "'),\n" +
                     "(SELECT id FROM tag where tag.name = '" + tag + "'));";
             conn.update(sql);
+        } else {
+            //文件夹
+            tag(tag, file.getPath());
         }
     }
 
+    /**
+     * 给文件夹下的文件打标签
+     *
+     * @param tag
+     * @param dir
+     */
     public void tag(String tag, String dir) {
         // TODO: 2022/8/30 给文件夹下的所有加便签
-        
+        String sql = "SELECT * FROM file WHERE file.belong ='" + dir + "'";
+        ResultSet rs = conn.select(sql);
+        while (true) {
+            try {
+                if (!rs.next()) break;
+                tag(tag, new File(rs.getString("path")));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
