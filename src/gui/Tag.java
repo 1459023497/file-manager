@@ -1,7 +1,6 @@
 package gui;
 
 import gui.component.FileBox;
-import gui.component.FileLabel;
 import gui.component.IPanel;
 import gui.component.TagLabel;
 import jdbc.JDBCConnector;
@@ -12,15 +11,12 @@ import tool.TagColor;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
 public class Tag {
     private JFrame frame;
     private IPanel content;
-
-    private JDBCConnector conn;
 
     private TagService tagService;
 
@@ -79,6 +75,4 @@ public class Tag {
         frame.setSize(400, 500);
         frame.setVisible(true);
     }
-
-
 }
