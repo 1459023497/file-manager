@@ -34,9 +34,8 @@ public class Tag {
         IPanel center = new IPanel();
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));//新增行布局
         //打开数据库，链接标签服务
-        conn = new JDBCConnector();
-        tagService = new TagService(conn);
-        fileService = new FileService(conn);
+        tagService = new TagService();
+        fileService = new FileService();
 
         //顶部加载项
         IPanel top = new IPanel(new Dimension(0, 80));
@@ -46,6 +45,7 @@ public class Tag {
         all.addActionListener(e -> {
             //获取所有文件，按文件夹：文件的方式输出，带上文件的标签
             HashMap<String, Set<File>> files = fileService.getAllFiles();
+            fileService.close();
             center.removeAll();
             files.forEach((dir, set) -> {
                 FileBox dirRow = new FileBox(new File(dir),center);
@@ -60,6 +60,7 @@ public class Tag {
         });
         //加载全部标签
         HashMap<String, Set<String>> tagMap = tagService.getTagsMap();
+        tagService.close();
         TagColor color = TagColor.RED;
         tagMap.forEach((group, set) -> {
             top.add(new TagLabel(group, color.next(), center,1));
@@ -73,7 +74,7 @@ public class Tag {
         content.add(scrollPane, BorderLayout.CENTER);
 
         frame.setContentPane(content);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setSize(400, 500);
         frame.setVisible(true);

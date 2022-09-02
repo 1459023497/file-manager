@@ -1,0 +1,13 @@
+
+b	java:S101"MRename this class name to match the regular expression '^[A-Z][a-zA-Z0-9]*$'.(¶©»İ
+s	java:S116
+"YRename this field "æ–‡ä»¶å¤¹Label" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¤¤úÿÿÿÿ
+N
+java:S1117"8Rename "frame" which hides the field declared at line 6.(ïûŸ€
+?
+java:S1068")Remove this unused "frame" private field.(ñğ‰Í
+D
+java:S1068".Remove this unused "textField1" private field.(×ŒàÌ
+M
+java:S1068
+"2Remove this unused "æ–‡ä»¶å¤¹Label" private field.(¤¤úÿÿÿÿ

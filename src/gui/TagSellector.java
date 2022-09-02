@@ -3,20 +3,17 @@ package gui;
 import gui.component.AddLabel;
 import gui.component.IPanel;
 import gui.component.TagLabel;
-import jdbc.JDBCConnector;
 import service.TagService;
 import tool.TagColor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 public class TagSellector {
-    private JDBCConnector conn;
     private TagService tagService;
     //添加标签时的选择窗口
     public TagSellector(File file, AddLabel addLabel){
@@ -37,8 +34,7 @@ public class TagSellector {
         down.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
         down.setTags(new HashSet<>());
         //顶部查询加载全部标签
-        conn = new JDBCConnector();
-        tagService = new TagService(conn);
+        tagService = new TagService();
         HashMap<String, Set<String>> tagMap = tagService.getTagsMap();
         TagColor color = TagColor.RED;
         tagMap.forEach((group, set) -> {
@@ -53,25 +49,21 @@ public class TagSellector {
             //获取待添加的标签
             HashSet<String> tags = down.getTags();
             if(tags.isEmpty()) return;
-            tags.forEach(t->{
+            tags.forEach(t->
                 //打标签
-                tagService.tag(t,file);
-                //System.out.print(t+"--");
-            });
+                tagService.tag(t,file)
+            );
         });
         //点击取消关闭选择窗口
         JButton cancel = new JButton("取消");
         cancel.addActionListener(e -> {
-            window.dispose();
+            tagService.close();//关闭数据库连接
+            window.dispose();//关闭窗口
         });
-
-        //关闭数据库连接
-        conn.close();
 
         window.add(top);
         window.add(down);
         window.add(confirm);
         window.add(cancel);
-
     }
 }

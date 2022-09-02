@@ -82,15 +82,14 @@ public class Starter {
      */
     public void init() {
         // 开启数据库链接
-        JDBCConnector conn = new JDBCConnector();
-        FileService service = new FileService(conn);
+        FileService service = new FileService();
         for (Map.Entry<String, Set<File>> entry : fileMap.entrySet()) {
             for (File file : entry.getValue()) {
                 service.addFile(file, entry.getKey());
             }
         }
         // 关闭数据库链接
-        conn.close();
+        service.close();
     }
 
     public HashMap<String, Set<File>> getFileMap() {

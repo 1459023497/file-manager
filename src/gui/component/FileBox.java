@@ -6,10 +6,6 @@ import tool.FileUtils;
 import tool.TagColor;
 
 import javax.swing.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -30,14 +26,11 @@ public class FileBox extends Box{
             String fileSize = FileUtils.getFileSizeString(String.valueOf(file.length()));
             this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
         }
-        JDBCConnector conn = new JDBCConnector();
-        TagService tagService = new TagService(conn);
+        TagService tagService = new TagService();
         ArrayList<String> tags = tagService.getTagsByFile(file);
-        conn.close();
+        tagService.close();
         TagColor color = TagColor.RED;
-        tags.forEach(s -> {
-            this.add(new TagLabel(s,color.next(),panel,1));
-        });
+        tags.forEach(s -> this.add(new TagLabel(s,color.next(),panel,1)));
         //添加标签功能
         addLabel = new AddLabel(file);
         //addLabel.setVisible(false);

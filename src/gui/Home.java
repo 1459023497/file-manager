@@ -21,6 +21,7 @@ public class Home {
     public Home() {
         //窗口，面版初始化
         frame = new JFrame("文件管理");
+        //frame.setIconImage(new ImageIcon("con\\add.jpeg").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
         content = new IPanel(new BorderLayout());
         content.setBackground(new Color(142, 147, 147));
         starter = new Starter();
@@ -84,7 +85,7 @@ public class Home {
                     center.reload();
                 });
                 top.add(label1);
-                top.add(button3);
+                top.add(button2);
                 top.add(button3);
             }
             //获取路径，开始扫描

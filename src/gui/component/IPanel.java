@@ -2,11 +2,11 @@ package gui.component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public class IPanel extends JPanel {
     //标签列表
-    private ArrayList<String> tags;
+    private HashSet<String> tags;
 
     public IPanel(){
         super();
@@ -30,11 +30,11 @@ public class IPanel extends JPanel {
         this.repaint();//重绘
     }
 
-    public ArrayList<String> getTags() {
+    public HashSet<String> getTags() {
         return tags;
     }
 
-    public void setTags(ArrayList<String> tags) {
+    public void setTags(HashSet<String> tags) {
         this.tags = tags;
     }
 }

@@ -52,8 +52,7 @@ public class TagLabel extends JLabel implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         if(event==1){
             //打开数据库链接
-            JDBCConnector conn = new JDBCConnector();
-            tagService = new TagService(conn);
+            tagService = new TagService();
             //找到标签下的文件
             HashMap<String, Set<File>> files = tagService.getFilesByTag(getText());
             //显示结果
@@ -67,7 +66,7 @@ public class TagLabel extends JLabel implements MouseListener {
             });
             panel.reload();
             //关闭链接
-            conn.close();
+            tagService.close();
         }else if(event==2){
             //将标签添加到待选列表
             panel.getTags().add(this.getText());

@@ -1,7 +1,6 @@
 package service;
 
 import jdbc.JDBCConnector;
-import org.ibex.nestedvm.util.Seekable;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -20,10 +19,11 @@ public class TagService {
     private HashMap<String, Set<String>> tagMap = new HashMap<>();
 
     public TagService() {
+        conn = new JDBCConnector();
     }
 
-    public TagService(JDBCConnector conn) {
-        this.conn = conn;
+    public void close(){
+        conn.close();
     }
 
     /**
@@ -146,7 +146,6 @@ public class TagService {
      * @param dir
      */
     public void tag(String tag, String dir) {
-        // TODO: 2022/8/30 给文件夹下的所有加便签
         String sql = "SELECT * FROM file WHERE file.belong ='" + dir + "'";
         ResultSet rs = conn.select(sql);
         while (true) {
