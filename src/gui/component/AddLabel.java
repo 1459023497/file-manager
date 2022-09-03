@@ -11,7 +11,10 @@ import java.io.File;
 public class AddLabel extends JLabel implements MouseListener {
     private File file;
 
-    //绑定文件的添加标签按钮
+    /**
+     * 绑定文件的添加标签按钮，可以给文件添加标签
+     * @param file
+     */
     public AddLabel(File file){
         super("+++");
         this.file = file;
@@ -20,7 +23,8 @@ public class AddLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        new TagSellector(file, this);
+        Point point = e.getPoint();
+        new TagSellector(file, this, point);
     }
 
     @Override

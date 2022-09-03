@@ -14,9 +14,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TagSellector {
-    private TagService tagService;
     //添加标签时的选择窗口
-    public TagSellector(File file, AddLabel addLabel){
+    public TagSellector(File file, AddLabel addLabel, Point point){
         //窗口初始化
         JWindow window = new JWindow();
         IPanel content = new IPanel(new Dimension(200,300));
@@ -25,16 +24,19 @@ public class TagSellector {
         window.setSize(200,300);
         window.setLocationRelativeTo(addLabel);
         window.setVisible(true);
+        window.setLocation(point);
         // TODO: 2022/9/1  窗口边框，背景，定位
-        //顶部显示全部标签
+        //顶部显示全部标签和操作按钮
         IPanel top = new IPanel(new Dimension(200,100));
         top.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
+        // TODO: 2022/9/3 新增标签和全部标签
+        IPanel subTop = new IPanel(new Dimension(200,50));
         //底部显示选择的标签
         IPanel down  = new IPanel(new Dimension(200,100));
         down.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
         down.setTags(new HashSet<>());
         //顶部查询加载全部标签
-        tagService = new TagService();
+        TagService tagService = new TagService();
         HashMap<String, Set<String>> tagMap = tagService.getTagsMap();
         TagColor color = TagColor.RED;
         tagMap.forEach((group, set) -> {

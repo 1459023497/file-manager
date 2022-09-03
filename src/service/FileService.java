@@ -1,6 +1,7 @@
 package service;
 
 import jdbc.JDBCConnector;
+import tool.IdGenerator;
 
 import java.awt.*;
 import java.io.File;
@@ -13,9 +14,11 @@ import java.util.Set;
 
 public class FileService {
     private JDBCConnector conn;
+    private IdGenerator id;
 
     public FileService() {
         conn = new JDBCConnector();
+        id = new IdGenerator();
     }
 
     public void close(){
@@ -29,7 +32,7 @@ public class FileService {
      * @param belong 所属文件夹
      */
     public void addFile(File file, String belong) {
-        String sql = "INSERT or ignore into file(name,path,size,belong) values('" + file.getName() + "','" + file + "','" + file.length() + "','" + belong + "');";
+        String sql = "INSERT or ignore into file(id,name,path,size,belong) values('"+id.next()+"','" + file.getName() + "','" + file + "','" + file.length() + "','" + belong + "');";
         System.out.println(sql);
         conn.update(sql);
     }

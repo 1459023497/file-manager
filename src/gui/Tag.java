@@ -3,7 +3,6 @@ package gui;
 import gui.component.FileBox;
 import gui.component.IPanel;
 import gui.component.TagLabel;
-import jdbc.JDBCConnector;
 import service.FileService;
 import service.TagService;
 import tool.TagColor;
@@ -15,23 +14,16 @@ import java.util.HashMap;
 import java.util.Set;
 
 public class Tag {
-    private JFrame frame;
-    private IPanel content;
-
-    private TagService tagService;
-
-    private FileService fileService;
-
     public Tag() {
         //窗口，面版初始化
-        frame = new JFrame("文件管理");
-        content = new IPanel(new BorderLayout());
+        JFrame frame = new JFrame("文件管理");
+        IPanel content = new IPanel(new BorderLayout());
         content.setBackground(new Color(142, 147, 147));
         IPanel center = new IPanel();
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));//新增行布局
-        //打开数据库，链接标签服务
-        tagService = new TagService();
-        fileService = new FileService();
+        //数据库服务初始化
+        TagService tagService = new TagService();
+        FileService fileService = new FileService();
 
         //顶部加载项
         IPanel top = new IPanel(new Dimension(0, 80));
@@ -70,7 +62,7 @@ public class Tag {
         content.add(scrollPane, BorderLayout.CENTER);
 
         frame.setContentPane(content);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setSize(400, 500);
         frame.setVisible(true);

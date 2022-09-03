@@ -1,6 +1,7 @@
 package service;
 
 import jdbc.JDBCConnector;
+import tool.IdGenerator;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -13,10 +14,9 @@ import java.util.Set;
 //文件标签服务，复制标签增删改查
 public class TagService {
     private JDBCConnector conn;
-
-
     //标签组：标签
     private HashMap<String, Set<String>> tagMap = new HashMap<>();
+    private IdGenerator id;
 
     public TagService() {
         conn = new JDBCConnector();
@@ -30,9 +30,10 @@ public class TagService {
      * 新建标签
      *
      * @param tag
+     * @param group
      */
     public void newTag(String tag, String group) {
-        conn.update("insert into tag values('" + tag + "','" + group + "');");
+        conn.update("insert into tag values('"+id.next()+"',''" + tag + "','" + group + "');");
     }
 
     /**
@@ -102,6 +103,11 @@ public class TagService {
         return files;
     }
 
+    /**
+     * 获取文件的标签
+     * @param file
+     * @return
+     */
     public ArrayList<String> getTagsByFile(File file) {
         String sql = "SELECT * FROM tag WHERE id IN (\n" +
                 "SELECT tag_id FROM file_tag WHERE file_id=(\n" +
@@ -129,7 +135,7 @@ public class TagService {
     public void tag(String tag, File file) {
         if (!file.isDirectory()) {
             //单个文件
-            String sql = "INSERT into file_tag(file_id,tag_id) VALUES(\n" +
+            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('"+id.next()+"','\n" +
                     "(SELECT id from file where file.path = '" + file.getPath() + "'),\n" +
                     "(SELECT id FROM tag where tag.name = '" + tag + "'));";
             conn.update(sql);
