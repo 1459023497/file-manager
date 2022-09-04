@@ -1,17 +1,23 @@
 package gui;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
+
 import gui.component.AddLabel;
 import gui.component.IPanel;
 import gui.component.TagLabel;
 import service.TagService;
 import tool.TagColor;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 public class TagSellector {
     //添加标签时的选择窗口
@@ -29,8 +35,6 @@ public class TagSellector {
         //顶部显示全部标签和操作按钮
         IPanel top = new IPanel(new Dimension(200,100));
         top.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
-        // TODO: 2022/9/3 新增标签和全部标签
-        IPanel subTop = new IPanel(new Dimension(200,50));
         //底部显示选择的标签
         IPanel down  = new IPanel(new Dimension(200,100));
         down.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
@@ -68,4 +72,5 @@ public class TagSellector {
         window.add(confirm);
         window.add(cancel);
     }
+
 }

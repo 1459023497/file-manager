@@ -1,15 +1,16 @@
 package gui.component;
 
-import jdbc.JDBCConnector;
-import service.TagService;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+
+import service.TagService;
 
 public class TagLabel extends JLabel implements MouseListener {
     private TagService tagService;

@@ -1,12 +1,21 @@
 package jdbc;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Logger;
 
 public class JDBCConnector {
     private Connection connection;
     private Statement statement = null;
     private ResultSet resultSet = null;
+    private static final Logger logger = Logger.getLogger("JDBCConnector.class");
 
+    /**
+     * 新建数据库链接
+     */
     public JDBCConnector() {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -22,6 +31,7 @@ public class JDBCConnector {
      * @param sql
      */
     public void update(String sql) {
+        logger.info("SQL语句： "+sql);
         try {
             statement = connection.createStatement();
             statement.executeUpdate(sql);
@@ -37,6 +47,7 @@ public class JDBCConnector {
      * @return
      */
     public ResultSet select(String sql) {
+        logger.info("SQL语句： "+sql);
         try {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
@@ -47,6 +58,9 @@ public class JDBCConnector {
         }
     }
 
+    /**
+     * 关闭库连接
+     */
     public void close() {
         try {
             if (resultSet != null) resultSet.close();

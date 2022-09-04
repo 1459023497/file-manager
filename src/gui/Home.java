@@ -1,15 +1,26 @@
 package gui;
 
-import gui.component.FileLabel;
-import gui.component.IPanel;
-import tool.FileUtils;
-import main.Starter;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
+import gui.component.FileBox;
+import gui.component.FileLabel;
+import gui.component.IPanel;
+import main.Starter;
+import service.FileService;
+import tool.FileUtils;
 
 public class Home {
     private JFrame frame;
@@ -30,12 +41,14 @@ public class Home {
         JLabel label = new JLabel("文件夹");
         JTextField textField = new JTextField(15);
         JButton button = new JButton("扫描");
+        JButton all = new JButton("全部");
         JButton button1 =new JButton("标签");
         JLabel label1 = new JLabel("扫描成功");
         label1.setVisible(false);
         top.add(label);
         top.add(textField);
         top.add(button);
+        top.add(all);
         top.add(button1);
         top.add(label1);
         content.add(top, BorderLayout.NORTH);
@@ -103,7 +116,26 @@ public class Home {
             content.reload();
         });
 
-        //标签按钮点击事件
+        //全部按钮点击事件，展示数据库全部文件
+        all.addActionListener(e -> {
+            // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
+            FileService fileService = new FileService();
+            HashMap<String, Set<File>> files = fileService.getAllFiles();
+            fileService.close();
+            center.removeAll();
+            files.forEach((dir, set) -> {
+                FileBox dirRow = new FileBox(new File(dir), center);
+                center.add(dirRow);
+                set.forEach(file -> {
+                    // 文件行
+                    FileBox row = new FileBox(file, center);
+                    center.add(row);
+                });
+            });
+            center.reload();
+        });
+
+        //标签按钮点击事件，打开标签面板
         button1.addActionListener(e -> {
             new Tag();
         });

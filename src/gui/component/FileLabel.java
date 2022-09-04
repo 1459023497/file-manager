@@ -1,13 +1,14 @@
 package gui.component;
 
-import service.FileService;
-import tool.FileUtils;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+
+import service.FileService;
 
 /**
  * 实现了鼠标监听的自定义文件标签
@@ -25,7 +26,7 @@ public class FileLabel extends JLabel implements MouseListener {
 
     // 文件夹
     public FileLabel(String text) {
-        super(text);
+        super("<--"+text+"-->");
         isDir = true;
         path = text;
         this.addMouseListener(this);

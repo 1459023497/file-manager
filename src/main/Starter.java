@@ -1,14 +1,13 @@
 package main;
 
-import jdbc.JDBCConnector;
-import service.FileService;
-
 import java.io.File;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+
+import service.FileService;
 
 //初始化
 public class Starter {
@@ -41,7 +40,6 @@ public class Starter {
                     fileList.add(singleFile);
                     // 记录大小相同的重复文件
                     String fileSize = String.valueOf(singleFile.length());
-                    // System.out.println("文件：" + singleFile + ",大小：" + fileSize);
                     if (refileMap.get(fileSize) == null) {
                         Set<File> refileList = new HashSet<>();
                         refileList.add(singleFile);

@@ -1,13 +1,15 @@
 package gui.component;
 
+import java.awt.Component;
+import java.io.File;
+import java.util.ArrayList;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+
 import service.TagService;
 import tool.FileUtils;
 import tool.TagColor;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.util.ArrayList;
 
 public class FileBox extends Box{
     /**
@@ -19,11 +21,13 @@ public class FileBox extends Box{
         //默认构造为水平排列,左对齐, 形式=文件名+大小+标签
         super(BoxLayout.X_AXIS);
         this.setAlignmentX(Component.LEFT_ALIGNMENT);
-        this.add(new FileLabel(file));
         //只有文件才展示大小
         if(!file.isDirectory()){
+            this.add(new FileLabel(file));
             String fileSize = FileUtils.getFileSizeString(String.valueOf(file.length()));
             this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
+        }else{
+            this.add(new FileLabel(file.getPath()));
         }
         TagService tagService = new TagService();
         ArrayList<String> tags = tagService.getTagsByFile(file);

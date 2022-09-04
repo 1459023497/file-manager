@@ -1,8 +1,5 @@
 package service;
 
-import jdbc.JDBCConnector;
-import tool.IdGenerator;
-
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,18 +8,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import jdbc.JDBCConnector;
+import tool.IdGenerator;
+
 //文件标签服务，复制标签增删改查
 public class TagService {
     private JDBCConnector conn;
-    //标签组：标签
+    // 标签组：标签
     private HashMap<String, Set<String>> tagMap = new HashMap<>();
-    private IdGenerator id;
+    private IdGenerator id = new IdGenerator();
 
     public TagService() {
         conn = new JDBCConnector();
     }
 
-    public void close(){
+    public void close() {
         conn.close();
     }
 
@@ -33,7 +33,11 @@ public class TagService {
      * @param group
      */
     public void newTag(String tag, String group) {
-        conn.update("insert into tag values('"+id.next()+"',''" + tag + "','" + group + "');");
+        if (group == null) {
+            conn.update("insert into tag(id,name) values('" + id.next() + "','" + tag + "');");
+        } else {
+            conn.update("insert into tag values('" + id.next() + "','" + tag + "','" + group + "');");
+        }
     }
 
     /**
@@ -42,7 +46,25 @@ public class TagService {
      * @return
      */
     public ResultSet getAllTags() {
-        return conn.select("select * from tag where \"group\" NOTNULL;");
+        return conn.select("select * from tag;");
+    }
+
+    /**
+     * 获取所有标签组
+     * 
+     * @return
+     */
+    public ArrayList<String> getAllGroups() {
+        ResultSet rs = conn.select("SELECT * FROM tag;");
+        ArrayList<String> groups = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                groups.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return groups;
     }
 
     /**
@@ -54,16 +76,22 @@ public class TagService {
         ResultSet rs = getAllTags();
         while (true) {
             try {
-                if (!rs.next()) break;
-                String group = rs.getString("group");
+                if (!rs.next())
+                    break;
                 String name = rs.getString("name");
-                //set不为空
+                String group = rs.getString("group");
+                // set不为空
                 if (tagMap.get(group) != null) {
                     tagMap.get(group).add(name);
                 } else {
                     HashSet<String> set = new HashSet<>();
-                    set.add(name);
-                    tagMap.put(group, set);
+                    // 如果是顶级便签（无分组）,放入名,空集
+                    if (group.equals("无分组")) {
+                        tagMap.put(name, set);
+                    } else {
+                        set.add(name);
+                        tagMap.put(group, set);
+                    }
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -86,7 +114,8 @@ public class TagService {
         HashMap<String, Set<File>> files = new HashMap<>();
         while (true) {
             try {
-                if (!rs.next()) break;
+                if (!rs.next())
+                    break;
                 String dir = rs.getString("belong");
                 String path = rs.getString("path");
                 if (files.get(dir) == null) {
@@ -105,6 +134,7 @@ public class TagService {
 
     /**
      * 获取文件的标签
+     * 
      * @param file
      * @return
      */
@@ -116,7 +146,8 @@ public class TagService {
         ArrayList<String> tags = new ArrayList<>();
         while (true) {
             try {
-                if (!rs.next()) break;
+                if (!rs.next())
+                    break;
                 tags.add(rs.getString("name"));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -124,7 +155,6 @@ public class TagService {
         }
         return tags;
     }
-
 
     /**
      * 给文件打标签
@@ -134,13 +164,13 @@ public class TagService {
      */
     public void tag(String tag, File file) {
         if (!file.isDirectory()) {
-            //单个文件
-            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('"+id.next()+"','\n" +
+            // 单个文件
+            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + id.next() + "','\n" +
                     "(SELECT id from file where file.path = '" + file.getPath() + "'),\n" +
                     "(SELECT id FROM tag where tag.name = '" + tag + "'));";
             conn.update(sql);
         } else {
-            //文件夹
+            // 文件夹
             tag(tag, file.getPath());
         }
     }
@@ -156,7 +186,8 @@ public class TagService {
         ResultSet rs = conn.select(sql);
         while (true) {
             try {
-                if (!rs.next()) break;
+                if (!rs.next())
+                    break;
                 tag(tag, new File(rs.getString("path")));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -179,6 +210,5 @@ public class TagService {
         }
 
     }
-
 
 }
