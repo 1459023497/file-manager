@@ -44,7 +44,7 @@ public class Tag {
         reloadGroups(groups);
         top.add(groups);
         // 标签子面板,加载全部标签
-        IPanel subTop = new IPanel(new Dimension(200, 50));
+        IPanel subTop = new IPanel(new Dimension(400, 50));
         reloadTags(subTop, center);
         // 添加标签按钮，事件
         // 标签有上下级关系，可以进行分组，如 水果是一个标签，默认分组为空，即为最高级，下级可以为苹果，香蕉等标签

@@ -165,7 +165,7 @@ public class TagService {
     public void tag(String tag, File file) {
         if (!file.isDirectory()) {
             // 单个文件
-            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + id.next() + "','\n" +
+            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + id.next() + "',\n" +
                     "(SELECT id from file where file.path = '" + file.getPath() + "'),\n" +
                     "(SELECT id FROM tag where tag.name = '" + tag + "'));";
             conn.update(sql);

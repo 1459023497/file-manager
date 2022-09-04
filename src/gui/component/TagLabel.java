@@ -73,10 +73,12 @@ public class TagLabel extends JLabel implements MouseListener {
             panel.getTags().add(this.getText());
             this.setEvent(3);
             panel.add(this);
+            panel.reload();
         }else if(event ==3){
             //将标签从待选移除
             panel.getTags().remove(this.getText());
             panel.remove(this);
+            panel.reload();
         }
     }
 
