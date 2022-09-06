@@ -1,23 +1,26 @@
 package gui.component;
 
-import gui.TagSellector;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+
+import entity.IFile;
+import gui.window.TagSellector;
 
 public class AddLabel extends JLabel implements MouseListener {
-    private File file;
+    private IFile file;
 
     /**
      * 绑定文件的添加标签按钮，可以给文件添加标签
-     * @param file
+     * @param file2
      */
-    public AddLabel(File file){
+    public AddLabel(IFile file2){
         super("+++");
-        this.file = file;
+        this.file = file2;
         this.addMouseListener(this);
     }
 

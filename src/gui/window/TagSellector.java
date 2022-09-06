@@ -1,9 +1,8 @@
-package gui;
+package gui.window;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
+import entity.IFile;
 import gui.component.AddLabel;
 import gui.component.IPanel;
 import gui.component.TagLabel;
@@ -22,7 +22,7 @@ import tool.TagColor;
 
 public class TagSellector {
     // 添加标签时的选择窗口
-    public TagSellector(File file, AddLabel addLabel, Point point) {
+    public TagSellector(IFile file, AddLabel addLabel, Point point) {
         // 窗口初始化
         JWindow window = new JWindow();
         IPanel content = new IPanel(new Dimension(200, 300));

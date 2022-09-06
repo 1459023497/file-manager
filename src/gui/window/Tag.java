@@ -1,9 +1,8 @@
-package gui;
+package gui.window;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -18,6 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import entity.IFile;
+import entity.ITag;
 import gui.component.FileBox;
 import gui.component.IPanel;
 import gui.component.TagLabel;
@@ -64,7 +65,7 @@ public class Tag {
             // 确认添加新标签
             if (confirm == JOptionPane.YES_OPTION) {
                 TagService tagService = new TagService();
-                tagService.newTag(tagName, groupName);
+                tagService.newTag(new ITag(tagName, groupName));
                 tagService.close();
                 reloadGroups(groups);
                 reloadTags(subTop, center);
@@ -76,11 +77,11 @@ public class Tag {
         all.addActionListener(e -> {
             // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
             FileService fileService = new FileService();
-            HashMap<String, Set<File>> files = fileService.getAllFiles();
+            HashMap<String, Set<IFile>> files = fileService.getAllFiles();
             fileService.close();
             center.removeAll();
             files.forEach((dir, set) -> {
-                FileBox dirRow = new FileBox(new File(dir), center);
+                FileBox dirRow = new FileBox(new IFile(dir), center);
                 center.add(dirRow);
                 set.forEach(file -> {
                     // 文件行
@@ -137,10 +138,10 @@ public class Tag {
     public void reloadGroups(JComboBox<String> groups) {
         groups.removeAllItems();
         TagService tagService = new TagService();
-        ArrayList<String> groupList = tagService.getAllGroups();
+        ArrayList<ITag> groupList = tagService.getAllTags();
         groups.addItem("无分组");
         groupList.forEach(g -> {
-            groups.addItem(g);
+            groups.addItem(g.getName());
         });
         tagService.close();
     }
