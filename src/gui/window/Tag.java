@@ -41,7 +41,7 @@ public class Tag {
         JTextField newTag = new JTextField(10);
         top.add(newTag);
         // 加载分组下拉列表
-        JComboBox<String> groups = new JComboBox<>();
+        JComboBox<ITag> groups = new JComboBox<>();
         reloadGroups(groups);
         top.add(groups);
         // 标签子面板,加载全部标签
@@ -52,20 +52,20 @@ public class Tag {
         JButton addTag = new JButton("新建标签");
         top.add(addTag);
         addTag.addActionListener((a) -> {
-            String tagName = newTag.getText();
-            String groupName = (String) groups.getSelectedItem();
+            String name = newTag.getText();
+            String group = ((ITag)groups.getSelectedItem()).getId();
             // 判断标签输入是否为空
-            if (tagName.length() == 0) {
+            if (name.length() == 0) {
                 JOptionPane.showMessageDialog(addTag, "输入为空！");
                 return;
             }
             // 提示信息
-            String tap = "新建标签：" + tagName + "  分组：" + groupName + "?";
+            String tap = "新建标签：" + name + "  分组：" + group + "?";
             int confirm = JOptionPane.showConfirmDialog(addTag, tap, "确认", JOptionPane.YES_NO_OPTION);
             // 确认添加新标签
             if (confirm == JOptionPane.YES_OPTION) {
                 TagService tagService = new TagService();
-                tagService.newTag(new ITag(tagName, groupName));
+                tagService.newTag(new ITag(name, group));
                 tagService.close();
                 reloadGroups(groups);
                 reloadTags(subTop, center);
@@ -107,7 +107,7 @@ public class Tag {
     }
 
     /**
-     * 加载全部标签
+     * 加载全部标签，以分组的类型展示：【父标签：子标签。。。】
      * 
      * @param subTop 标签面板
      * @param center 文件面板
@@ -115,17 +115,28 @@ public class Tag {
     public void reloadTags(IPanel subTop, IPanel center) {
         subTop.removeAll();
         TagService tagService = new TagService();
-        HashMap<String, Set<String>> tagMap = tagService.getTagsMap();
+        //获取标签和标签组的字典
+        HashMap<String, ITag> tagMap = tagService.getTagsMap();
+        HashMap<String, Set<String>> groupMap = tagService.getGroupsMap();
         tagService.close();
         TagColor color = TagColor.RED;
-        tagMap.forEach((group, tagSet) -> {
-            subTop.add(new JLabel("["));
-            subTop.add(new TagLabel(group, color.next(), center, 1));
+        groupMap.forEach((groupId, tagSet) -> {
+            subTop.add(new JLabel("【"));
+            //获取父标签名,判断是否是顶级标签
+            if(groupId.equals("无分组")){
+                subTop.add(new TagLabel(groupId, color.next(), center, 1));
+                subTop.add(new JLabel("】"));
+                return;
+            }
+            String groupName = tagMap.get(groupId).getName();
+            subTop.add(new TagLabel(groupName, color.next(), center, 1));
             if (tagSet.size() != 0) {
                 subTop.add(new JLabel(":"));
-                tagSet.forEach(name -> subTop.add(new TagLabel(name, color.next(), center, 1)));
+                tagSet.forEach(tagId -> {
+                    String tagName  = tagMap.get(tagId).getName();
+                    subTop.add(new TagLabel(tagName, color.next(), center, 1));});
             }
-            subTop.add(new JLabel("]"));
+            subTop.add(new JLabel("】"));
         });
         subTop.reload();
     }
@@ -135,13 +146,17 @@ public class Tag {
      * 
      * @param groups 下拉选择列表
      */
-    public void reloadGroups(JComboBox<String> groups) {
+    public void reloadGroups(JComboBox<ITag> groups) {
         groups.removeAllItems();
         TagService tagService = new TagService();
-        ArrayList<ITag> groupList = tagService.getAllTags();
-        groups.addItem("无分组");
-        groupList.forEach(g -> {
-            groups.addItem(g.getName());
+        ArrayList<ITag> tags = tagService.getAllTags();
+        //无分组的顶级标签
+        ITag blankTag = new ITag();
+        blankTag.setId("无分组");
+        blankTag.setName("无分组");
+        groups.addItem(blankTag);
+        tags.forEach(tag -> {
+            groups.addItem(tag);
         });
         tagService.close();
     }

@@ -17,6 +17,7 @@ public class TagLabel extends JLabel implements MouseListener {
     private TagService tagService;
     private IPanel panel;//绘制点击结果的面板
     private int event;
+    private ITag tag;//关联的标签
 
     /**
      * 带颜色的事件标签

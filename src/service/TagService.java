@@ -42,7 +42,6 @@ public class TagService {
      * @return
      */
     public ArrayList<ITag> getAllTags() {
-
         ResultSet rs = conn.select("select * from tag;");
         ArrayList<ITag> tags = new ArrayList<>();
         try {
@@ -60,48 +59,51 @@ public class TagService {
     }
 
     /**
-     * 获取所有标签组
-     * 
+     * 标签字典《id，标签》
      * @return
-     *
-     *         public ArrayList<String> getAllGroups() {
-     *         ResultSet rs = conn.select("SELECT * FROM tag;");
-     *         ArrayList<String> groups = new ArrayList<>();
-     *         try {
-     *         while (rs.next()) {
-     *         groups.add(rs.getString("name"));
-     *         }
-     *         } catch (SQLException e) {
-     *         e.printStackTrace();
-     *         }
-     *         return groups;
-     *         }
-     * 
-     *         /**
-     *         标签字典
+     */
+    public HashMap<String, ITag> getTagsMap(){
+        ResultSet rs = conn.select("select * from tag;");
+        HashMap<String,ITag> tagMap = new HashMap<>();
+        try {
+            while (rs.next()) {
+                String id = rs.getString("id");
+                String name = rs.getString("name");
+                String group = rs.getString("group");
+                ITag tag = new ITag(id, name, group);
+                tagMap.put(id, tag);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tagMap;
+        
+    }
+    /**
+     *标签分组字典《id，set《id》》
      *
      * @return
      */
-    public HashMap<String, Set<String>> getTagsMap() {
-        ArrayList<ITag> tags = getAllTags();
-        HashMap<String, Set<String>> tagMap = new HashMap<>();
-        tags.forEach(tag -> {
-            String name = tag.getName();
+    public HashMap<String, Set<String>> getGroupsMap() {
+        HashMap<String, ITag> tagMap = getTagsMap();
+        HashMap<String, Set<String>> grouMap = new HashMap<>();
+        tagMap.values().forEach(tag->{
+            String id = tag.getId();
             String group = tag.getGroup();
-            if (tagMap.get(group) != null) {
-                tagMap.get(group).add(name);
-            } else {
+            if(grouMap.get(group) != null){
+                grouMap.get(group).add(id);
+            }else{
                 HashSet<String> set = new HashSet<>();
-                // 如果是顶级便签（无分组）,放入名,空集
-                if (group.equals("无分组")) {
-                    tagMap.put(name, set);
-                } else {
-                    set.add(name);
-                    tagMap.put(group, set);
+                 // 如果是顶级便签（无分组）,id作为key,值为空集
+                if(group.equals("无分组")){
+                    grouMap.put(id, set);
+                }else{
+                    set.add(id);
+                    grouMap.put(group, set);
                 }
             }
         });
-        return tagMap;
+        return grouMap;
     }
 
     /**

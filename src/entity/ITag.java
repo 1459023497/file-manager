@@ -20,6 +20,9 @@ public class ITag {
         this.group = group;
     }
 
+    public ITag() {
+    }
+
     public String getId() {
         return id;
     }

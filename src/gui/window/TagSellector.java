@@ -42,7 +42,7 @@ public class TagSellector {
         down.setTags(new HashSet<>());
         // 顶部查询加载全部标签
         TagService tagService = new TagService();
-        HashMap<String, Set<String>> tagMap = tagService.getTagsMap();
+        HashMap<String, Set<String>> tagMap = tagService.getGroupsMap();
         TagColor color = TagColor.RED;
         tagMap.forEach((group, set) -> {
             // 每次选择的标签会添加到下方的待选面板
