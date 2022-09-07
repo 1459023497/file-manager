@@ -7,4 +7,5 @@ out
 test-output
 atlassian-ide-plugin.xml
 .gradletasknamecache
+file-manager.iml
 
