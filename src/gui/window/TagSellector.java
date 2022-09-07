@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
 import entity.IFile;
+import entity.ITag;
 import gui.component.AddLabel;
 import gui.component.IPanel;
 import gui.component.TagLabel;
@@ -42,32 +43,32 @@ public class TagSellector {
         down.setTags(new HashSet<>());
         // 顶部查询加载全部标签
         TagService tagService = new TagService();
-        HashMap<String, Set<String>> tagMap = tagService.getGroupsMap();
+        HashMap<String,ITag> tagMap = tagService.getTagsMap();
+        HashMap<String, Set<String>> groupMap = tagService.getGroupsMap();
         TagColor color = TagColor.RED;
-        tagMap.forEach((group, set) -> {
+        groupMap.forEach((group, set) -> {
             // 每次选择的标签会添加到下方的待选面板
-            top.add(new TagLabel(group, color.next(), down, 2));
+            top.add(new TagLabel(tagMap.get(group), color.next(), down, 2));
             if (set.isEmpty())
                 return;
             top.add(new JLabel(":"));
-            set.forEach(name -> top.add(new TagLabel(name, color.next(), down, 2)));
+            set.forEach(son -> top.add(new TagLabel(tagMap.get(son), color.next(), down, 2)));
         });
         // 点击确定按钮后给文件添加标签
         JButton confirm = new JButton("确定");
         confirm.addActionListener(e -> {
             // 获取待添加的标签
-            HashSet<String> tags = down.getTags();
+            HashSet<ITag> tags = down.getTags();
             if (tags.isEmpty()) {
                 JOptionPane.showMessageDialog(confirm, "你未选择标签！", "错误", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             // 提示用户确认
-            String tap = "确认给【" + file.getName() + "】添加标签【" + tags + "】吗？";
+            String tap = "确认给[" + file.getName() + "] 添加标签 " + tags + " 吗？";
             int confirmTag = JOptionPane.showConfirmDialog(confirm, tap, "确认信息", JOptionPane.YES_NO_OPTION);
             if (confirmTag == 0) {
                 // 打标签
                 tags.forEach(t -> tagService.tag(t, file));
-
             }
             window.dispose();
         });

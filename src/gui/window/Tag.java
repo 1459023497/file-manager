@@ -1,11 +1,23 @@
 package gui.window;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import entity.IFile;
 import entity.ITag;
@@ -17,7 +29,7 @@ import service.TagService;
 import tool.TagColor;
 
 public class Tag {
-    public Tag() {
+    public Tag(JFrame father) {
         // 窗口，面版初始化
         JFrame frame = new JFrame("文件管理");
         IPanel content = new IPanel(new BorderLayout());
@@ -42,8 +54,10 @@ public class Tag {
         JButton addTag = new JButton("新建标签");
         top.add(addTag);
         addTag.addActionListener((a) -> {
+            //获取新标签名和选择的父标签
+            ITag selectedTag  = (ITag) groups.getSelectedItem();
             String name = newTag.getText();
-            String group = ((ITag)groups.getSelectedItem()).getId();
+            String group = selectedTag.getName();
             // 判断标签输入是否为空
             if (name.length() == 0) {
                 JOptionPane.showMessageDialog(addTag, "输入为空！");
@@ -55,8 +69,9 @@ public class Tag {
             // 确认添加新标签
             if (confirm == JOptionPane.YES_OPTION) {
                 TagService tagService = new TagService();
-                tagService.newTag(new ITag(name, group));
+                tagService.newTag(new ITag(name, selectedTag.getId()));
                 tagService.close();
+                //重新加载标签列表和面板
                 reloadGroups(groups);
                 reloadTags(subTop, center);
             }
@@ -90,10 +105,11 @@ public class Tag {
         content.add(scrollPane, BorderLayout.CENTER);
 
         frame.setContentPane(content);
-        frame.setIconImage(new ImageIcon("\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
+        frame.setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setSize(400, 500);
+        frame.setLocationRelativeTo(father);
         frame.setVisible(true);
     }
 
@@ -113,19 +129,15 @@ public class Tag {
         TagColor color = TagColor.RED;
         groupMap.forEach((groupId, tagSet) -> {
             subTop.add(new JLabel("【"));
-            //获取父标签名,判断是否是顶级标签
-            if(groupId.equals("无分组")){
-//                subTop.add(new TagLabel(groupId, color.next(), center, 1));
-//                subTop.add(new JLabel("】"));
-                return;
-            }
-            String groupName = tagMap.get(groupId).getName();
-            subTop.add(new TagLabel(groupName, color.next(), center, 1));
+            //获取父标签
+            ITag father = tagMap.get(groupId);
+            subTop.add(new TagLabel(father, color.next(), center, 1));
+            //获取子标签
             if (!tagSet.isEmpty()) {
                 subTop.add(new JLabel(":"));
                 tagSet.forEach(tagId -> {
-                    String tagName  = tagMap.get(tagId).getName();
-                    subTop.add(new TagLabel(tagName, color.next(), center, 1));});
+                    ITag son = tagMap.get(tagId);
+                    subTop.add(new TagLabel(son, color.next(), center, 1));});
             }
             subTop.add(new JLabel("】"));
         });
@@ -148,7 +160,7 @@ public class Tag {
         groups.addItem(blankTag);
         tags.forEach(tag -> {
             groups.addItem(tag);
-        });
+        }); 
         tagService.close();
     }
 }

@@ -1,11 +1,20 @@
 package gui.window;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 import entity.IFile;
 import gui.component.FileBox;
@@ -25,7 +34,6 @@ public class Home {
     public Home() {
         //窗口，面版初始化
         frame = new JFrame("文件管理");
-        frame.setIconImage(new ImageIcon("\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
         content = new IPanel(new BorderLayout());
         content.setBackground(new Color(142, 147, 147));
         starter = new Starter();
@@ -56,6 +64,8 @@ public class Home {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setSize(400, 500);
+        frame.setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage());
+        frame.setLocationRelativeTo(null);//居中显示
         frame.setVisible(true);
 
         //以下为事件处理
@@ -130,11 +140,7 @@ public class Home {
 
         //标签按钮点击事件，打开标签面板
         button1.addActionListener(e -> {
-            new Tag();
+            new Tag(frame);
         });
-    }
-
-    public static void main(String[] args) {
-        new Home();
     }
 }

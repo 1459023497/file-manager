@@ -92,10 +92,14 @@ public class TagService {
             } else {
                 //还未放入组
                 HashSet<String> set = new HashSet<>();
-                if (!group.equals("无分组")) {
+                if (group.equals("无分组")) {
+                    //这步判断是为了避免=》顶级标签后放入id会覆盖之前group对应的集合
+                    if(groupMap.containsKey(id)) return;
+                    groupMap.put(id, set);
+                }else{
                     set.add(id);
-                }
-                groupMap.put(group, set);
+                    groupMap.put(group, set);
+                }  
             }
         });
         return groupMap;
@@ -109,7 +113,7 @@ public class TagService {
      */
     public HashMap<String, Set<IFile>> getFilesByTag(ITag tag) {
         String sql = "SELECT * FROM file WHERE id IN (\n" +
-                "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "';";
+                "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
         HashMap<String, Set<IFile>> files = new HashMap<>();
         while (true) {
@@ -119,7 +123,7 @@ public class TagService {
                 String id = rs.getString("id");
                 String name = rs.getString("name");
                 String path = rs.getString("path");
-                String size = rs.getString("path");
+                String size = rs.getString("size");
                 String dir = rs.getString("belong");
                 IFile file = new IFile(id, name, path, size, dir);
                 if (files.get(dir) == null) {
@@ -142,16 +146,20 @@ public class TagService {
      * @param file
      * @return
      */
-    public ArrayList<String> getTagsByFile(IFile file) {
+    public HashSet<ITag> getTagsByFile(IFile file) {
         String sql = "SELECT * FROM tag WHERE id IN (\n" +
                 "SELECT tag_id FROM file_tag WHERE file_id='" + file.getId() + "');";
         ResultSet rs = conn.select(sql);
-        ArrayList<String> tags = new ArrayList<>();
+        HashSet<ITag> tags = new HashSet<>();
         while (true) {
             try {
                 if (!rs.next())
                     break;
-                tags.add(rs.getString("name"));
+                String id = rs.getString("id");
+                String name = rs.getString("name");
+                String group = rs.getString("group");
+                ITag tag = new ITag(id, name, group);
+                tags.add(tag);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -165,11 +173,10 @@ public class TagService {
      * @param tag
      * @param file
      */
-    public void tag(String tag, IFile file) {
+    public void tag(ITag tag, IFile file) {
         if (!file.isDirectory()) {
             // 单个文件
-            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','" + file.getId() + "'),\n" +
-                    "(SELECT id FROM tag where tag.name = '" + tag + "'));";
+            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','" + file.getId() + "','"+tag.getId()+"');";
             conn.update(sql);
         } else {
             // 文件夹
@@ -183,7 +190,7 @@ public class TagService {
      * @param tag
      * @param dir
      */
-    public void tag(String tag, String dir) {
+    public void tag(ITag tag, String dir) {
         String sql = "SELECT id FROM file WHERE file.belong ='" + dir + "'";
         ResultSet rs = conn.select(sql);
         while (true) {

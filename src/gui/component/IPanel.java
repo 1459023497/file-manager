@@ -1,12 +1,16 @@
 package gui.component;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.LayoutManager;
 import java.util.HashSet;
+
+import javax.swing.JPanel;
+
+import entity.ITag;
 
 public class IPanel extends JPanel {
     //标签列表
-    private HashSet<String> tags;
+    private HashSet<ITag> tags;
 
     public IPanel(){
         super();
@@ -30,11 +34,11 @@ public class IPanel extends JPanel {
         this.repaint();//重绘
     }
 
-    public HashSet<String> getTags() {
+    public HashSet<ITag> getTags() {
         return tags;
     }
 
-    public void setTags(HashSet<String> tags) {
+    public void setTags(HashSet<ITag> tags) {
         this.tags = tags;
     }
 }
