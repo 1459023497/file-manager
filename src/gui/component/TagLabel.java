@@ -36,6 +36,8 @@ public class TagLabel extends JLabel implements MouseListener {
         this.addMouseListener(this);
     }
 
+    //TODO: 删除标签事件
+
     /**
      * 无事件标签
      * @param text
