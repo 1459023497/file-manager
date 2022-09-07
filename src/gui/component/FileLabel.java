@@ -3,11 +3,11 @@ package gui.component;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
+import entity.IFile;
 import service.FileService;
 
 /**
@@ -25,15 +25,15 @@ public class FileLabel extends JLabel implements MouseListener {
     private boolean firstTap = true;
 
     // 文件夹
-    public FileLabel(String text) {
-        super("<--"+text+"-->");
+    public FileLabel(String file) {
+        super("<--"+file+"-->");
         isDir = true;
-        path = text;
+        path = file;
         this.addMouseListener(this);
     }
 
     // 文件
-    public FileLabel(File file) {
+    public FileLabel(IFile file) {
         super(file.getName());
         path = file.getPath();
         isDir = false;
