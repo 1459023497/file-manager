@@ -3,7 +3,7 @@
 *.ipr
 *.iws
 .idea
-out
+out/*
 test-output
 atlassian-ide-plugin.xml
 .gradletasknamecache

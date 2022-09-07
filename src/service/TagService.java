@@ -16,7 +16,7 @@ import tool.IdGenerator;
 //文件标签服务，复制标签增删改查
 public class TagService {
     private JDBCConnector conn;
-    private IdGenerator id = new IdGenerator();
+    private IdGenerator idGenerator = new IdGenerator();
 
     public TagService() {
         conn = new JDBCConnector();
@@ -29,17 +29,14 @@ public class TagService {
     /**
      * 新建标签
      *
-     * @param tag
-     * @param group
      */
     public void newTag(ITag tag) {
-        conn.update("insert into tag values('" + id.next() + "','" + tag.getName() + "','" + tag.getGroup() + "');");
+        conn.update("insert into tag values('" + idGenerator.next() + "','" + tag.getName() + "','" + tag.getGroup() + "');");
     }
 
     /**
      * 查所有标签
      *
-     * @return
      */
     public ArrayList<ITag> getAllTags() {
         ResultSet rs = conn.select("select * from tag;");
@@ -60,11 +57,11 @@ public class TagService {
 
     /**
      * 标签字典《id，标签》
-     * @return
+     *
      */
-    public HashMap<String, ITag> getTagsMap(){
+    public HashMap<String, ITag> getTagsMap() {
         ResultSet rs = conn.select("select * from tag;");
-        HashMap<String,ITag> tagMap = new HashMap<>();
+        HashMap<String, ITag> tagMap = new HashMap<>();
         try {
             while (rs.next()) {
                 String id = rs.getString("id");
@@ -77,33 +74,31 @@ public class TagService {
             e.printStackTrace();
         }
         return tagMap;
-        
+
     }
+
     /**
-     *标签分组字典《id，set《id》》
-     *
-     * @return
+     * 标签分组字典《id，set《id》》
      */
     public HashMap<String, Set<String>> getGroupsMap() {
         HashMap<String, ITag> tagMap = getTagsMap();
-        HashMap<String, Set<String>> grouMap = new HashMap<>();
-        tagMap.values().forEach(tag->{
+        HashMap<String, Set<String>> groupMap = new HashMap<>();
+        tagMap.values().forEach(tag -> {
             String id = tag.getId();
             String group = tag.getGroup();
-            if(grouMap.get(group) != null){
-                grouMap.get(group).add(id);
-            }else{
+            if (groupMap.containsKey(group)) {
+                //已经放入该组
+                groupMap.get(group).add(id);
+            } else {
+                //还未放入组
                 HashSet<String> set = new HashSet<>();
-                 // 如果是顶级便签（无分组）,id作为key,值为空集
-                if(group.equals("无分组")){
-                    grouMap.put(id, set);
-                }else{
+                if (!group.equals("无分组")) {
                     set.add(id);
-                    grouMap.put(group, set);
                 }
+                groupMap.put(group, set);
             }
         });
-        return grouMap;
+        return groupMap;
     }
 
     /**
@@ -143,7 +138,7 @@ public class TagService {
 
     /**
      * 获取文件的标签
-     * 
+     *
      * @param file
      * @return
      */
@@ -173,7 +168,7 @@ public class TagService {
     public void tag(String tag, IFile file) {
         if (!file.isDirectory()) {
             // 单个文件
-            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + id.next() + "','" +file.getId() + "'),\n" +
+            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','" + file.getId() + "'),\n" +
                     "(SELECT id FROM tag where tag.name = '" + tag + "'));";
             conn.update(sql);
         } else {

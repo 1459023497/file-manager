@@ -3,6 +3,11 @@ package tool;
 import java.text.SimpleDateFormat;
 
 public class IdGenerator {
+
+    public IdGenerator(){
+
+    }
+
     /**
      * 根据当前时间戳(精确到毫秒)生成id
      * @return

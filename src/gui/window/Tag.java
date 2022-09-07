@@ -1,21 +1,11 @@
 package gui.window;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import entity.IFile;
 import entity.ITag;
@@ -100,6 +90,7 @@ public class Tag {
         content.add(scrollPane, BorderLayout.CENTER);
 
         frame.setContentPane(content);
+        frame.setIconImage(new ImageIcon("\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setSize(400, 500);
@@ -124,13 +115,13 @@ public class Tag {
             subTop.add(new JLabel("【"));
             //获取父标签名,判断是否是顶级标签
             if(groupId.equals("无分组")){
-                subTop.add(new TagLabel(groupId, color.next(), center, 1));
-                subTop.add(new JLabel("】"));
+//                subTop.add(new TagLabel(groupId, color.next(), center, 1));
+//                subTop.add(new JLabel("】"));
                 return;
             }
             String groupName = tagMap.get(groupId).getName();
             subTop.add(new TagLabel(groupName, color.next(), center, 1));
-            if (tagSet.size() != 0) {
+            if (!tagSet.isEmpty()) {
                 subTop.add(new JLabel(":"));
                 tagSet.forEach(tagId -> {
                     String tagName  = tagMap.get(tagId).getName();

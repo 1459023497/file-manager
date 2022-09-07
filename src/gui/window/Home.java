@@ -1,19 +1,11 @@
 package gui.window;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import entity.IFile;
 import gui.component.FileBox;
@@ -33,7 +25,7 @@ public class Home {
     public Home() {
         //窗口，面版初始化
         frame = new JFrame("文件管理");
-        //frame.setIconImage(new ImageIcon("con\\add.jpeg").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
+        frame.setIconImage(new ImageIcon("\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
         content = new IPanel(new BorderLayout());
         content.setBackground(new Color(142, 147, 147));
         starter = new Starter();
