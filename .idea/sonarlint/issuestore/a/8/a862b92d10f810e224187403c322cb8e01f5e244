@@ -1,8 +1,0 @@
-
-‡
-java:S1130"lRemove the declaration of thrown exception 'java.io.IOException', as it cannot be thrown from method's body.(‚á€Îþÿÿÿÿ
-‰
-java:S1130"nRemove the declaration of thrown exception 'java.sql.SQLException', as it cannot be thrown from method's body.(‚á€Îþÿÿÿÿ
-Q	java:S125"<This block of commented-out lines of code should be removed.(Áª¤ç
-W
-java:S1075"ARefactor your code to get this URI from a customizable parameter.(è‰»å

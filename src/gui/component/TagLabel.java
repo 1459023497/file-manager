@@ -14,10 +14,9 @@ import entity.ITag;
 import service.TagService;
 
 public class TagLabel extends JLabel implements MouseListener {
-    private TagService tagService;
     private IPanel panel;//绘制点击结果的面板
     private int event;
-    private ITag tag;//关联的标签
+    private ITag iTag;//关联的标签
 
     /**
      * 带颜色的事件标签
@@ -55,7 +54,7 @@ public class TagLabel extends JLabel implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         if(event==1){
             //打开数据库链接
-            tagService = new TagService();
+            TagService tagService = new TagService();
             //找到标签下的文件
             ITag tag = new ITag(getText());
             HashMap<String, Set<IFile>> files = tagService.getFilesByTag(tag);
