@@ -32,7 +32,7 @@ public class TagSellector {
         window.setSize(200, 300);
         window.setLocationRelativeTo(addLabel);
         window.setVisible(true);
-        window.setLocation(point);
+        //window.setLocation(point);
         // TODO: 2022/9/1 窗口边框，背景，定位
         // 顶部显示全部标签和操作按钮
         IPanel top = new IPanel(new Dimension(200, 100));
@@ -64,7 +64,8 @@ public class TagSellector {
                 return;
             }
             // 提示用户确认
-            String tap = "确认给[" + file.getName() + "] 添加标签 " + tags + " 吗？";
+            String name = file.getName() == null ? file.getPath() : file.getName();
+            String tap = "确认给[" + name + "] 添加标签 " + tags + " 吗？";
             int confirmTag = JOptionPane.showConfirmDialog(confirm, tap, "确认信息", JOptionPane.YES_NO_OPTION);
             if (confirmTag == 0) {
                 // 打标签

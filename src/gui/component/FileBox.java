@@ -20,12 +20,13 @@ public class FileBox extends Box {
      * @param panel
      */
     public FileBox(IFile file, IPanel panel) {
-        // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签
+        // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
         super(BoxLayout.X_AXIS);
         this.setAlignmentX(Component.LEFT_ALIGNMENT);
         // 文件夹只展示路径
         if (file.isDirectory()) {
             this.add(new FileLabel(file.getPath()));
+            this.add(new AddLabel(file));
             return;
         }
         // 只有文件才展示大小和标签

@@ -16,11 +16,11 @@ public class AddLabel extends JLabel implements MouseListener {
 
     /**
      * 绑定文件的添加标签按钮，可以给文件添加标签
-     * @param file2
+     * @param file
      */
-    public AddLabel(IFile file2){
+    public AddLabel(IFile file){
         super("+++");
-        this.file = file2;
+        this.file = file;
         this.addMouseListener(this);
     }
 
