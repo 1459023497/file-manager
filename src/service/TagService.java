@@ -35,6 +35,17 @@ public class TagService {
     }
 
     /**
+     * 删除标签，注意：需要相关标签的组设为无分组，移除相关文件的该标签
+     * @param tag
+     */
+    public void deleteTag(ITag tag){
+        String sql="DELETE FROM tag WHERE id = '"+tag.getId()+"';\n" +
+                "DELETE FROM file_tag WHERE tag_id = '"+tag.getId()+"';\n"+
+                "UPDATE tag set group = '无分组' WHERE \"group\" = '"+tag.getId()+"';";
+        conn.update(sql);
+    }
+
+    /**
      * 查所有标签
      *
      */
