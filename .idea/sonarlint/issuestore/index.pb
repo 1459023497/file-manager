@@ -1,8 +1,4 @@
 
-@
-file-manager.iml,3\8\38678268aa1c4294656d45b1cd2c4aef81856fcb
-P
- src/gui/component/FileLabel.java,1\6\16b5cbaf1b6341d848d9169fb1e16380251c3d55
 O
 src/gui/component/AddLabel.java,e\0\e0b84154a93a94217addc97c89cb727d82beb68b
 U
