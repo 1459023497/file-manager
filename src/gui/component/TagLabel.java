@@ -89,7 +89,7 @@ public class TagLabel extends JLabel implements MouseListener {
             //右键删除标签，提示信息
             String tap = "你真的要删除["+ tag.getName() +"]标签吗?";
             int confirmDel = JOptionPane.showConfirmDialog(this, tap, "确认信息", JOptionPane.YES_NO_OPTION);
-            if (confirmDel == 1){
+            if (confirmDel == JOptionPane.YES_OPTION){
                 TagService tagService = new TagService();
                 tagService.deleteTag(tag);
                 tagService.close();
