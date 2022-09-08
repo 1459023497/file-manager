@@ -55,6 +55,7 @@ public class TagLabel extends JLabel implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1){
+            //左键点击
             if(event==1){
                 //打开数据库链接
                 TagService tagService = new TagService();
@@ -84,7 +85,7 @@ public class TagLabel extends JLabel implements MouseListener {
                 panel.remove(this);
                 panel.reload();
             }
-        }else if(e.getButton() == MouseEvent.BUTTON2){
+        }else if(e.getButton() == MouseEvent.BUTTON3){
             //右键删除标签，提示信息
             String tap = "你真的要删除["+ tag.getName() +"]标签吗?";
             int confirmDel = JOptionPane.showConfirmDialog(this, tap, "确认信息", JOptionPane.YES_NO_OPTION);
