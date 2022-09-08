@@ -27,6 +27,7 @@ public class FileLabel extends JLabel implements MouseListener {
     // 文件夹
     public FileLabel(String file) {
         super("<--"+file+"-->");
+        setForeground(Color.MAGENTA);//字体颜色
         isDir = true;
         path = file;
         this.addMouseListener(this);

@@ -1,6 +1,5 @@
 package service;
 
-import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ public class TagService {
     public void deleteTag(ITag tag){
         String sql="DELETE FROM tag WHERE id = '"+tag.getId()+"';\n" +
                 "DELETE FROM file_tag WHERE tag_id = '"+tag.getId()+"';\n"+
-                "UPDATE tag set group = '无分组' WHERE \"group\" = '"+tag.getId()+"';";
+                "UPDATE tag set \"group\" = '无分组' WHERE \"group\" = '"+tag.getId()+"';";
         conn.update(sql);
     }
 
@@ -115,12 +114,43 @@ public class TagService {
         });
         return groupMap;
     }
+    //TODO:批量查询优化
+    /**
+     * 批量查询该标签下的文件及其标签，组成字典
+     * @param tag
+     * @return map 【文件id,【标签】】
+     */
+    public HashMap<String, Set<ITag>> getFileMapByTag(ITag tag){
+        String sql = "SELECT f.file_id,f.tag_id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"+
+                "SELECT file_id FROM file_tag WHERE tag_id='"+tag.getId()+"');";
+        ResultSet rs = conn.select(sql);
+        HashMap<String, Set<ITag>> map = new HashMap<>();
+        try {
+            while(rs.next()){
+                String fileId = rs.getString("file_id");
+                String tagId = rs.getString("tag_id");
+                String name = rs.getString("name");
+                String group = rs.getString("group");
+                ITag tag2 = new ITag(tagId, name, group);
+                if(map.containsKey(fileId)){
+                    map.get(fileId).add(tag2);
+                }else{
+                    HashSet<ITag> set = new HashSet<>();
+                    set.add(tag2);
+                    map.put(fileId, set);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
 
     /**
      * 根据标签查文件
      *
      * @param tag
-     * @return
+     * @return map 【目录,【文件】】
      */
     public HashMap<String, Set<IFile>> getFilesByTag(ITag tag) {
         String sql = "SELECT * FROM file WHERE id IN (\n" +
@@ -223,14 +253,11 @@ public class TagService {
      * @param tag
      * @param files
      */
-    public void removeTag(String tag, File... files) {
-        for (File file : files) {
-            String sql = "DELETE FROM file_tag WHERE file_id=\n" +
-                    "(SELECT id from file where file.path = '" + file + "') AND tag_id =\n" +
-                    "(SELECT id FROM tag where tag.name = '" + tag + "');";
+    public void removeTag(ITag tag, IFile... files) {
+        for (IFile file : files) {
+            String sql = "DELETE FROM file_tag WHERE file_id='" + file.getId() + "' AND tag_id ='" + tag.getId()+ "';";
             conn.update(sql);
         }
-
     }
 
 }
