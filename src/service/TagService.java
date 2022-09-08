@@ -41,7 +41,7 @@ public class TagService {
     public void deleteTag(ITag tag){
         String sql="DELETE FROM tag WHERE id = '"+tag.getId()+"';\n" +
                 "DELETE FROM file_tag WHERE tag_id = '"+tag.getId()+"';\n"+
-                "UPDATE tag set group = '无分组' WHERE \"group\" = '"+tag.getId()+"';";
+                "UPDATE tag set \"group\" = '无分组' WHERE \"group\" = '"+tag.getId()+"';";
         conn.update(sql);
     }
 
