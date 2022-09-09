@@ -33,7 +33,7 @@ public class FileService {
      * @param belong 所属文件夹
      */
     public void addFile(File file, String belong) {
-        String regex = "/\''/g"; //去掉所有单引号
+        //String regex = "/\''/g"; //去掉所有单引号
         String name = file.getName().replace('\'', ' ');
         String path = file.getPath().replace('\'', ' ');
         String sql = "INSERT or ignore into file(id,name,path,size,belong) values('" + id.next() + "','"
