@@ -13,17 +13,16 @@ import tool.FileUtils;
 import tool.TagColor;
 
 public class FileBox extends Box {
-    //文件标签字典
-    private HashMap<String,Set<ITag>> fileMap;
 
 
     /**
      * 生成一个文件行，包括文件信息，标签，和添加标签按钮
      * 
-     * @param file
-     * @param panel
+     * @param file 文件
+     * @param panel 承载面板
+     * @param fileMap 文件标签字典
      */
-    public FileBox(IFile file, IPanel panel) {
+    public FileBox(IFile file, IPanel panel, HashMap<String, Set<ITag>> fileMap) {
         // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
         super(BoxLayout.X_AXIS);
         this.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -41,14 +40,13 @@ public class FileBox extends Box {
         //展示标签
         Set<ITag> tags = fileMap.get(file.getId());
         TagColor color = TagColor.RED;
-        tags.forEach(t -> this.add(new TagLabel(t, color.next(), panel, 1, file)));
+        if(tags != null){
+            tags.forEach(t -> this.add(new TagLabel(t, color.next(), panel, 1, file)));
+        }
         // 添加标签按钮
         AddLabel addLabel = new AddLabel(file);
         // TODO: 2022/9/3 文件获取焦点时才展示添加
         this.add(addLabel);
-    }
-    public void setMap(HashMap<String, Set<ITag>> fileMap){
-        this.fileMap = fileMap;
-    }
+    } 
 
 }

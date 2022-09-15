@@ -8,6 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 import entity.IFile;
+import gui.window.FileMune;
 import service.FileService;
 
 /**
@@ -20,7 +21,8 @@ public class FileLabel extends JLabel implements MouseListener {
     private Boolean isDir;
 
     private String path;
-
+    
+    private IFile file;
     // 是否第一次提示路径不存在
     private boolean firstTap = true;
 
@@ -36,9 +38,16 @@ public class FileLabel extends JLabel implements MouseListener {
     // 文件
     public FileLabel(IFile file) {
         super(file.getName());
+        this.file = file;
         path = file.getPath();
         isDir = false;
         this.addMouseListener(this);
+    }
+
+    //刷新文件
+    public void setFile(IFile file){
+        this.file = file;
+        this.setText(file.getName());
     }
 
     @Override
@@ -51,6 +60,10 @@ public class FileLabel extends JLabel implements MouseListener {
                 firstTap = false;
                 this.setText(this.getText() + "     该路径不存在！");
             }
+        }
+        if((e.getButton() == MouseEvent.BUTTON3) && !isDir){
+            //文件右键菜单
+            new FileMune(file, this);
         }
     }
 

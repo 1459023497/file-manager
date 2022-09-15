@@ -66,7 +66,7 @@ public class TagService {
     }
 
     /**
-     * 标签字典《id，标签》
+     * 标签字典《标签id，标签》
      *
      */
     public HashMap<String, ITag> getTagsMap() {
@@ -85,6 +85,35 @@ public class TagService {
         }
         return tagMap;
 
+    }
+
+    /**
+     * 全部文件标签字典，map<文件id, set<ITag>>
+     * @return
+     */
+    public HashMap<String, Set<ITag>> getFilesTagsMap(){
+        HashMap<String, Set<ITag>> map = new HashMap<>();
+        String sql = "SELECT f.file_id,f.tag_id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id; ";
+        ResultSet rs = conn.select(sql);
+        try {
+            while(rs.next()){
+                String fileId = rs.getString("file_id");
+                String tag_id = rs.getString("tag_id");
+                String name = rs.getString("name");
+                String group = rs.getString("group");
+                ITag tag = new ITag(tag_id, name, group);
+                if(map.containsKey(fileId)){
+                    map.get(fileId).add(tag);
+                }else{
+                    HashSet<ITag> set = new HashSet<>();
+                    set.add(tag);
+                    map.put(fileId, set);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 
     /**

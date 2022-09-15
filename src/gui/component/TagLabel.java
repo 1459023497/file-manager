@@ -111,8 +111,7 @@ public class TagLabel extends JLabel implements MouseListener {
                 files.forEach((dir, fileSet) -> {
                     panel.add(new FileLabel(dir));
                     fileSet.forEach(file ->{
-                        FileBox row = new FileBox(file, panel);
-                        row.setMap(fileMap);
+                        FileBox row = new FileBox(file, panel,fileMap);
                         panel.add(row);
                     });
                 });

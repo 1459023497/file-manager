@@ -43,12 +43,23 @@ public class FileService {
     }
 
     /**
+     * 重命名
+     * @param file
+     */
+    public void renameFile(IFile file){
+        String name = file.getName();
+        String id = file.getId();
+        String sql = "UPDATE file SET name = '"+name+"' WHERE id = '"+id+"';";
+        conn.update(sql);
+    }
+
+    /**
      * 删除文件
      *
      * @param file
      */
-    public void removeFile(File file) {
-        String sql = "DELETE FROM file WHERE path = '" + file + "';";
+    public void removeFile(IFile file) {
+        String sql = "DELETE FROM file WHERE id = '" + file.getId() + "';";
         conn.update(sql);
     }
 

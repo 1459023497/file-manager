@@ -88,13 +88,17 @@ public class Tag {
             FileService fileService = new FileService();
             HashMap<String, Set<IFile>> files = fileService.getAllFiles();
             fileService.close();
+            // 获取文件标签字典
+            TagService tagService = new TagService();
+            HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
+            tagService.close();
             center.removeAll();
             files.forEach((dir, set) -> {
-                FileBox dirRow = new FileBox(new IFile(dir), center);
+                FileBox dirRow = new FileBox(new IFile(dir), center,fileMap);
                 center.add(dirRow);
                 set.forEach(file -> {
                     // 文件行
-                    FileBox row = new FileBox(file, center);
+                    FileBox row = new FileBox(file, center,fileMap);
                     center.add(row);
                 });
             });
@@ -106,6 +110,7 @@ public class Tag {
         // 创建下方结果滚动面板，用于显示点击标签后的文件
         JScrollPane scrollPane = new JScrollPane(center);
         scrollPane.setOpaque(false);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);//设置滚轮速度
         content.add(scrollPane, BorderLayout.CENTER);
 
         frame.setContentPane(content);
