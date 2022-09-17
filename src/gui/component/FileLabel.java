@@ -8,7 +8,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 import entity.IFile;
-import gui.window.FileMune;
 import service.FileService;
 
 /**
@@ -63,7 +62,7 @@ public class FileLabel extends JLabel implements MouseListener {
         }
         if((e.getButton() == MouseEvent.BUTTON3) && !isDir){
             //文件右键菜单
-            new FileMune(file, this);
+            new FileMenu(file, this).show(this, e.getX(), e.getY());;
         }
     }
 

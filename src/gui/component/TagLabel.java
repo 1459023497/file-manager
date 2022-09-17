@@ -6,7 +6,6 @@ import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -37,6 +36,7 @@ public class TagLabel extends JLabel implements MouseListener {
         this.event = event;
         this.setOpaque(true);//背景不透明
         this.setBackground(color);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));//圆角边框
         this.addMouseListener(this);
     }
 
@@ -57,6 +57,7 @@ public class TagLabel extends JLabel implements MouseListener {
         this.type = 2;
         this.setOpaque(true);//背景不透明
         this.setBackground(color);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));//圆角边框
         this.addMouseListener(this);
     }
 
@@ -78,6 +79,7 @@ public class TagLabel extends JLabel implements MouseListener {
         this.type = 1;
         this.setOpaque(true);//背景不透明
         this.setBackground(color);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));//圆角边框
         this.addMouseListener(this);
     }
 
@@ -89,8 +91,15 @@ public class TagLabel extends JLabel implements MouseListener {
     public  TagLabel(String text, Color color){
         super(text);
         this.setOpaque(true);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));//圆角边框
         this.setBackground(color);
     }
+
+    // //标签重绘,圆角背景
+    // @Override
+    // protected void paintComponent(Graphics g){
+
+    // }
 
     public void setEvent(int event) {
         this.event = event;
@@ -171,12 +180,12 @@ public class TagLabel extends JLabel implements MouseListener {
     @Override
     public void mouseEntered(MouseEvent e) {
         //线条边框
-        this.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
+        this.setBorder(new RoundedBorder(Color.red, 5));
 
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        this.setBorder(BorderFactory.createEmptyBorder());
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
     }
 }

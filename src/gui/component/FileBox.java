@@ -29,19 +29,23 @@ public class FileBox extends Box {
         // 文件夹只展示路径
         if (file.isDirectory()) {
             this.add(new FileLabel(file.getPath()));
+            this.add(Box.createHorizontalStrut(5)); //占位的隐藏间距
             this.add(new AddLabel(file));
             return;
         }
         // 只有文件才展示大小和标签
         this.add(new FileLabel(file));
+        this.add(Box.createHorizontalStrut(5)); //占位的隐藏间距
         //展示大小
         String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
         this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
+        this.add(Box.createHorizontalStrut(5)); //占位的隐藏间距
         //展示标签
         Set<ITag> tags = fileMap.get(file.getId());
         TagColor color = TagColor.RED;
         if(tags != null){
             tags.forEach(t -> this.add(new TagLabel(t, color.next(), panel, 1, file)));
+            this.add(Box.createHorizontalStrut(5)); //占位的隐藏间距
         }
         // 添加标签按钮
         AddLabel addLabel = new AddLabel(file);
