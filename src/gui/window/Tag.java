@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -69,7 +70,7 @@ public class Tag {
             }
             // 提示信息
             String tap = "新建标签：" + name + "  分组：" + group + "?";
-            int confirm = JOptionPane.showConfirmDialog(addTag, tap, "确认", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(frame, tap, "确认", JOptionPane.YES_NO_OPTION);
             // 确认添加新标签
             if (confirm == JOptionPane.YES_OPTION) {
                 TagService tagService = new TagService();
@@ -96,10 +97,12 @@ public class Tag {
             files.forEach((dir, set) -> {
                 FileBox dirRow = new FileBox(new IFile(dir), center,fileMap);
                 center.add(dirRow);
+                center.add(Box.createVerticalStrut(3));//垂直間距
                 set.forEach(file -> {
                     // 文件行
                     FileBox row = new FileBox(file, center,fileMap);
                     center.add(row);
+                    center.add(Box.createVerticalStrut(3));//垂直間距
                 });
             });
             center.reload();

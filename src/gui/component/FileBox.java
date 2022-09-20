@@ -1,6 +1,7 @@
 package gui.component;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -26,15 +27,17 @@ public class FileBox extends Box {
         // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
         super(BoxLayout.X_AXIS);
         this.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //this.setPreferredSize(new Dimension(0,5));
+        this.setMaximumSize(new Dimension(3000,20));//设置组件变化的最大大小
         // 文件夹只展示路径
         if (file.isDirectory()) {
-            this.add(new FileLabel(file.getPath()));
+            this.add(new FileLabel(file.getPath(), this));
             this.add(Box.createHorizontalStrut(5)); //占位的隐藏间距
             this.add(new AddLabel(file));
             return;
         }
         // 只有文件才展示大小和标签
-        this.add(new FileLabel(file));
+        this.add(new FileLabel(file,this));
         this.add(Box.createHorizontalStrut(5)); //占位的隐藏间距
         //展示大小
         String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
@@ -44,8 +47,10 @@ public class FileBox extends Box {
         Set<ITag> tags = fileMap.get(file.getId());
         TagColor color = TagColor.RED;
         if(tags != null){
-            tags.forEach(t -> this.add(new TagLabel(t, color.next(), panel, 1, file)));
-            this.add(Box.createHorizontalStrut(5)); //占位的隐藏间距
+            tags.forEach(t -> {
+                this.add(new TagLabel(t, color.next(), panel, 1, file));
+                this.add(Box.createHorizontalStrut(5)); //占位的隐藏间距}
+            });
         }
         // 添加标签按钮
         AddLabel addLabel = new AddLabel(file);

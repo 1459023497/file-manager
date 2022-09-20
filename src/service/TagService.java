@@ -30,17 +30,19 @@ public class TagService {
      *
      */
     public void newTag(ITag tag) {
-        conn.update("insert into tag values('" + idGenerator.next() + "','" + tag.getName() + "','" + tag.getGroup() + "');");
+        conn.update("insert into tag values('" + idGenerator.next() + "','" + tag.getName() + "','" + tag.getGroup()
+                + "');");
     }
 
     /**
      * 删除标签，注意：需要相关标签的组设为无分组，移除相关文件的该标签
+     * 
      * @param tag
      */
-    public void deleteTag(ITag tag){
-        String sql="DELETE FROM tag WHERE id = '"+tag.getId()+"';\n" +
-                "DELETE FROM file_tag WHERE tag_id = '"+tag.getId()+"';\n"+
-                "UPDATE tag set \"group\" = '无分组' WHERE \"group\" = '"+tag.getId()+"';";
+    public void deleteTag(ITag tag) {
+        String sql = "DELETE FROM tag WHERE id = '" + tag.getId() + "';\n" +
+                "DELETE FROM file_tag WHERE tag_id = '" + tag.getId() + "';\n" +
+                "UPDATE tag set \"group\" = '无分组' WHERE \"group\" = '" + tag.getId() + "';";
         conn.update(sql);
     }
 
@@ -89,22 +91,23 @@ public class TagService {
 
     /**
      * 全部文件标签字典，map<文件id, set<ITag>>
+     * 
      * @return
      */
-    public HashMap<String, Set<ITag>> getFilesTagsMap(){
+    public HashMap<String, Set<ITag>> getFilesTagsMap() {
         HashMap<String, Set<ITag>> map = new HashMap<>();
         String sql = "SELECT f.file_id,f.tag_id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id; ";
         ResultSet rs = conn.select(sql);
         try {
-            while(rs.next()){
+            while (rs.next()) {
                 String fileId = rs.getString("file_id");
                 String tag_id = rs.getString("tag_id");
                 String name = rs.getString("name");
                 String group = rs.getString("group");
                 ITag tag = new ITag(tag_id, name, group);
-                if(map.containsKey(fileId)){
+                if (map.containsKey(fileId)) {
                     map.get(fileId).add(tag);
-                }else{
+                } else {
                     HashSet<ITag> set = new HashSet<>();
                     set.add(tag);
                     map.put(fileId, set);
@@ -117,7 +120,7 @@ public class TagService {
     }
 
     /**
-     * 标签分组字典《id，set《id》》
+     * 标签分组字典《标签id，set《标签id》》
      */
     public HashMap<String, Set<String>> getGroupsMap() {
         HashMap<String, ITag> tagMap = getTagsMap();
@@ -126,44 +129,48 @@ public class TagService {
             String id = tag.getId();
             String group = tag.getGroup();
             if (groupMap.containsKey(group)) {
-                //已经放入该组
+                // 已经放入该组
                 groupMap.get(group).add(id);
             } else {
-                //还未放入组
+                // 还未放入组
                 HashSet<String> set = new HashSet<>();
                 if (group.equals("无分组")) {
-                    //这步判断是为了避免=》顶级标签后放入id会覆盖之前group对应的集合
-                    if(groupMap.containsKey(id)) return;
+                    // 这步判断是为了避免=》顶级标签后放入id会覆盖之前group对应的集合
+                    if (groupMap.containsKey(id))
+                        return;
                     groupMap.put(id, set);
-                }else{
+                } else {
                     set.add(id);
                     groupMap.put(group, set);
-                }  
+                }
             }
         });
         return groupMap;
     }
-    //TODO:批量查询优化
+
+    // TODO:批量查询优化
     /**
      * 批量查询该标签下的文件及其标签，组成字典
+     * 
      * @param tag
      * @return map 【文件id,【标签】】
      */
-    public HashMap<String, Set<ITag>> getFileMapByTag(ITag tag){
-        String sql = "SELECT f.file_id,f.tag_id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"+
-                "SELECT file_id FROM file_tag WHERE tag_id='"+tag.getId()+"');";
+    public HashMap<String, Set<ITag>> getFileMapByTag(ITag tag) {
+        String sql = "SELECT f.file_id,f.tag_id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
+                +
+                "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
         HashMap<String, Set<ITag>> map = new HashMap<>();
         try {
-            while(rs.next()){
+            while (rs.next()) {
                 String fileId = rs.getString("file_id");
                 String tagId = rs.getString("tag_id");
                 String name = rs.getString("name");
                 String group = rs.getString("group");
                 ITag tag2 = new ITag(tagId, name, group);
-                if(map.containsKey(fileId)){
+                if (map.containsKey(fileId)) {
                     map.get(fileId).add(tag2);
-                }else{
+                } else {
                     HashSet<ITag> set = new HashSet<>();
                     set.add(tag2);
                     map.put(fileId, set);
@@ -238,7 +245,7 @@ public class TagService {
     }
 
     /**
-     * 给文件打标签
+     * 给单个文件打标签
      *
      * @param tag
      * @param file
@@ -246,7 +253,8 @@ public class TagService {
     public void tag(ITag tag, IFile file) {
         if (!file.isDirectory()) {
             // 单个文件
-            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','" + file.getId() + "','"+tag.getId()+"');";
+            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','" + file.getId()
+                    + "','" + tag.getId() + "');";
             conn.update(sql);
         } else {
             // 文件夹
@@ -255,25 +263,27 @@ public class TagService {
     }
 
     /**
-     * 给文件夹下的文件打标签
+     * 给文件夹下的文件打标签，批量操作
      *
      * @param tag
      * @param dir
      */
     public void tag(ITag tag, String dir) {
-        String sql = "SELECT id FROM file WHERE file.belong ='" + dir + "'";
+        String sql = "SELECT id FROM file WHERE file.belong ='" + dir + "';";
         ResultSet rs = conn.select(sql);
+
+        StringBuffer batch = new StringBuffer();
         while (true) {
             try {
                 if (!rs.next())
                     break;
-                IFile file = new IFile();
-                file.setId(rs.getString("id"));
-                tag(tag, file);
+                // 新增值
+                batch.append("INSERT INTO file_tag VALUES ('" + idGenerator.next() + "','" + rs.getString("id") + "','" + tag.getId() + "');");
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }
+        conn.update(batch.toString());
     }
 
     /**
@@ -284,7 +294,7 @@ public class TagService {
      */
     public void removeTag(ITag tag, IFile... files) {
         for (IFile file : files) {
-            String sql = "DELETE FROM file_tag WHERE file_id='" + file.getId() + "' AND tag_id ='" + tag.getId()+ "';";
+            String sql = "DELETE FROM file_tag WHERE file_id='" + file.getId() + "' AND tag_id ='" + tag.getId() + "';";
             conn.update(sql);
         }
     }

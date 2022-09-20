@@ -90,10 +90,18 @@ public class Starter {
         service.close();
     }
 
+    /**
+     * 获取刚刚扫描的文件
+     * @return 文件字典 <文件夹，set<文件>>
+     */
     public HashMap<String, Set<File>> getFileMap() {
         return fileMap;
     }
 
+    /**
+     * 获取查重文件的字典map<文件大小，set<文件>>
+     * @return
+     */
     public HashMap<String,Set<File>> getRefileMap(){
         HashMap<String,Set<File>> result = new HashMap<>();
         refileMap.entrySet().forEach(e->{

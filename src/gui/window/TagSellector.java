@@ -37,7 +37,7 @@ public class TagSellector {
         // 顶部显示全部标签和操作按钮
         IPanel top = new IPanel(new Dimension(200, 100));
         top.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
-        // 底部显示选择的标签
+        // 底部显示已选择的标签
         IPanel down = new IPanel(new Dimension(200, 100));
         down.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
         down.setTags(new HashSet<>());
@@ -71,6 +71,7 @@ public class TagSellector {
                 // 打标签
                 tags.forEach(t -> tagService.tag(t, file));
             }
+            JOptionPane.showMessageDialog(confirm, "添加成功，请点击全部刷新！");
             window.dispose();
         });
         // 点击取消关闭选择窗口

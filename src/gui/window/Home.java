@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -136,10 +137,12 @@ public class Home {
             files.forEach((dir, set) -> {
                 FileBox dirRow = new FileBox(new IFile(dir), center,fileMap);
                 center.add(dirRow);
+                center.add(Box.createVerticalStrut(3));//垂直間距
                 set.forEach(file -> {
                     // 文件行
                     FileBox row = new FileBox(file, center,fileMap);
                     center.add(row);
+                    center.add(Box.createVerticalStrut(3));//垂直間距
                 });
             });
             center.reload();

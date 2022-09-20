@@ -16,8 +16,9 @@ public class FileMenu extends JPopupMenu {
      * 
      * @param file      文件
      * @param fileLabel 文件标签
+     * @param fileBox 该文件行
      */
-    public FileMenu(IFile file, FileLabel fileLabel) {
+    public FileMenu(IFile file, FileLabel fileLabel, FileBox fileBox) {
         //菜单选项
         JMenuItem rename = new JMenuItem("重命名");
         JMenuItem delete = new JMenuItem("删除");
@@ -49,7 +50,7 @@ public class FileMenu extends JPopupMenu {
                     fileService.removeFile(file);
                     fileService.close();
                     // 移除文件
-                    fileLabel.setVisible(false);
+                    fileBox.setVisible(false);
                 }
             }
         });

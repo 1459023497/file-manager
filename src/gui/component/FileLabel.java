@@ -20,15 +20,17 @@ public class FileLabel extends JLabel implements MouseListener {
     private Boolean isDir;
 
     private String path;
-    
+
     private IFile file;
     // 是否第一次提示路径不存在
     private boolean firstTap = true;
 
+    private FileBox fileBox;
+
     // 文件夹
     public FileLabel(String file) {
-        super("<--"+file+"-->");
-        setForeground(Color.MAGENTA);//字体颜色
+        super("<--" + file + "-->");
+        setForeground(Color.MAGENTA);// 字体颜色
         isDir = true;
         path = file;
         this.addMouseListener(this);
@@ -43,8 +45,28 @@ public class FileLabel extends JLabel implements MouseListener {
         this.addMouseListener(this);
     }
 
-    //刷新文件
-    public void setFile(IFile file){
+    // 文件夹
+    public FileLabel(String file, FileBox fileBox) {
+        super("<--" + file + "-->");
+        setForeground(Color.MAGENTA);// 字体颜色
+        isDir = true;
+        path = file;
+        this.fileBox = fileBox;
+        this.addMouseListener(this);
+    }
+
+    // 文件
+    public FileLabel(IFile file, FileBox fileBox) {
+        super(file.getName());
+        this.file = file;
+        path = file.getPath();
+        isDir = false;
+        this.fileBox = fileBox;
+        this.addMouseListener(this);
+    }
+
+    // 刷新文件
+    public void setFile(IFile file) {
         this.file = file;
         this.setText(file.getName());
     }
@@ -60,9 +82,10 @@ public class FileLabel extends JLabel implements MouseListener {
                 this.setText(this.getText() + "     该路径不存在！");
             }
         }
-        if((e.getButton() == MouseEvent.BUTTON3) && !isDir){
-            //文件右键菜单
-            new FileMenu(file, this).show(this, e.getX(), e.getY());;
+        if ((e.getButton() == MouseEvent.BUTTON3) && !isDir && fileBox != null) {
+            // 文件右键菜单
+            new FileMenu(file, this, fileBox).show(this, e.getX(), e.getY());
+            ;
         }
     }
 
