@@ -61,7 +61,7 @@ public class Home {
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(center);
         scrollPane.setOpaque(false);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);//设置滚轮速度
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);// 设置滚轮速度
         content.add(scrollPane, BorderLayout.CENTER);
 
         frame.setContentPane(content);
@@ -135,14 +135,11 @@ public class Home {
             tagService.close();
             center.removeAll();
             files.forEach((dir, set) -> {
-                FileBox dirRow = new FileBox(new IFile(dir), center,fileMap);
-                center.add(dirRow);
-                center.add(Box.createVerticalStrut(3));//垂直間距
+                // 目录行
+                center.addFileBox(dir, center, fileMap);
                 set.forEach(file -> {
                     // 文件行
-                    FileBox row = new FileBox(file, center,fileMap);
-                    center.add(row);
-                    center.add(Box.createVerticalStrut(3));//垂直間距
+                    center.addFileBox(file, center, fileMap);
                 });
             });
             center.reload();
