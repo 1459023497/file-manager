@@ -28,11 +28,12 @@ public class FileLabel extends JLabel implements MouseListener {
     private FileBox fileBox;
 
     // 文件夹
-    public FileLabel(String file) {
-        super("<--" + file + "-->");
+    public FileLabel(String dir) {
+        super("<--" + dir + "-->");
         setForeground(Color.MAGENTA);// 字体颜色
         isDir = true;
-        path = file;
+        path = dir;
+        file = new IFile(dir);
         this.addMouseListener(this);
     }
 
@@ -46,11 +47,12 @@ public class FileLabel extends JLabel implements MouseListener {
     }
 
     // 文件夹
-    public FileLabel(String file, FileBox fileBox) {
-        super("<--" + file + "-->");
+    public FileLabel(String dir, FileBox fileBox) {
+        super("<--" + dir + "-->");
         setForeground(Color.MAGENTA);// 字体颜色
         isDir = true;
-        path = file;
+        path = dir;
+        file = new IFile(dir);
         this.fileBox = fileBox;
         this.addMouseListener(this);
     }
@@ -82,7 +84,7 @@ public class FileLabel extends JLabel implements MouseListener {
                 this.setText(this.getText() + "     该路径不存在！");
             }
         }
-        if ((e.getButton() == MouseEvent.BUTTON3) && !isDir && fileBox != null) {
+        if ((e.getButton() == MouseEvent.BUTTON3) && fileBox != null) {
             // 文件右键菜单
             new FileMenu(file, this, fileBox).show(this, e.getX(), e.getY());
             ;

@@ -15,9 +15,9 @@ import gui.component.FileLabel;
 import gui.component.IPanel;
 import service.FileService;
 
-public class FileMune {
+public class FileMenu {
     // 文件右键的菜单
-    public FileMune(IFile file, FileLabel fileLabel) {
+    public FileMenu(IFile file, FileLabel fileLabel) {
         // 窗口初始化
         JWindow window = new JWindow();
         IPanel content = new IPanel(new Dimension(50, 70));

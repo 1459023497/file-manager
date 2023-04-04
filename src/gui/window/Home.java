@@ -28,8 +28,10 @@ import service.TagService;
 import tool.FileUtils;
 
 public class Home {
+    public final static String WIN_NAME  = "Home";
     private JFrame frame;
     private IPanel content;
+    private IPanel center;
     private Starter starter;
 
     private Boolean firstClick = true;
@@ -58,6 +60,7 @@ public class Home {
         content.add(top, BorderLayout.NORTH);
         // 创建结果滚动面板
         IPanel center = new IPanel();
+        this.center = center;
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(center);
         scrollPane.setOpaque(false);
@@ -124,30 +127,30 @@ public class Home {
         });
 
         // 全部按钮点击事件，展示数据库全部文件
-        all.addActionListener(e -> {
-            // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
-            FileService fileService = new FileService();
-            HashMap<String, Set<IFile>> files = fileService.getAllFiles();
-            fileService.close();
-            // 获取文件标签字典
-            TagService tagService = new TagService();
-            HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
-            tagService.close();
-            center.removeAll();
-            files.forEach((dir, set) -> {
-                // 目录行
-                center.addFileBox(dir, center, fileMap);
-                set.forEach(file -> {
-                    // 文件行
-                    center.addFileBox(file, center, fileMap);
-                });
-            });
-            center.reload();
-        });
+        all.addActionListener(e -> queryAll());
 
         // 标签按钮点击事件，打开标签面板
-        button1.addActionListener(e -> {
-            new Tag(frame);
+        button1.addActionListener(e -> new Tag(frame));
+    }
+
+    public void queryAll() {
+        // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
+        FileService fileService = new FileService();
+        HashMap<String, Set<IFile>> files = fileService.getAllFiles();
+        fileService.close();
+        // 获取文件标签字典
+        TagService tagService = new TagService();
+        HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
+        tagService.close();
+        center.removeAll();
+        files.forEach((dir, set) -> {
+            // 目录行
+            center.addFileBox(dir, center, fileMap);
+            set.forEach(file -> {
+                // 文件行
+                center.addFileBox(file, center, fileMap);
+            });
         });
+        center.reload();
     }
 }

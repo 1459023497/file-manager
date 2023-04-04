@@ -59,8 +59,22 @@ public class FileService {
      * @param file
      */
     public void removeFile(IFile file) {
-        String sql = "DELETE FROM file WHERE id = '" + file.getId() + "';";
+        if(file.isDirectory()){
+            removeDir(file.getPath());
+        }else{
+            String sql = "DELETE FROM file WHERE id = '" + file.getId() + "';";
+            conn.update(sql);
+        }
+    }
+
+    /**
+     * 删除文件夹
+     * @param dir
+     */
+    public void removeDir(String dir){
+        String sql = "DELETE FROM file WHERE belong = '"+dir+"';";
         conn.update(sql);
+
     }
 
     /**

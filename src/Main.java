@@ -2,6 +2,7 @@
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import common.AppContext;
 import gui.window.Home;
 
 public class Main {
@@ -14,6 +15,10 @@ public class Main {
                 | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-        new Home();
+        //初始化程序上下文
+        AppContext.init();
+        Home home = new Home();
+        //添加到上下文
+        AppContext.setKey(Home.WIN_NAME, home);
     }
 }

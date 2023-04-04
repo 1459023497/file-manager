@@ -7,7 +7,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import common.AppContext;
 import entity.IFile;
+import gui.window.Home;
 import service.FileService;
 
 public class FileMenu extends JPopupMenu {
@@ -44,17 +46,23 @@ public class FileMenu extends JPopupMenu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 弹出确认框
-                int confirm = JOptionPane.showConfirmDialog(fileLabel, "确认删除该文件吗？", "确认", JOptionPane.YES_NO_OPTION);
+                String message  = file.isDirectory() ? "确认删除该文件夹吗？":"确认删除该文件吗？";
+                int confirm = JOptionPane.showConfirmDialog(fileLabel, message, "确认", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     FileService fileService = new FileService();
                     fileService.removeFile(file);
                     fileService.close();
                     // 移除文件
                     fileBox.setVisible(false);
+                    //删除文件夹需要刷新界面
+                    Home home = (Home) AppContext.getKey(Home.WIN_NAME);
+                    home.queryAll();
                 }
             }
         });
-        this.add(rename);
+        if(file != null && !file.isDirectory()){
+            this.add(rename);
+        }
         this.add(delete);
     }
 }
