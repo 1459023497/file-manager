@@ -6,20 +6,20 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
+import java.lang.reflect.Field;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import entity.IFile;
 import entity.ITag;
-import gui.component.FileBox;
 import gui.component.FileLabel;
 import gui.component.IPanel;
 import main.Starter;
@@ -40,7 +40,6 @@ public class Home {
         // 窗口，面版初始化
         frame = new JFrame("文件管理");
         content = new IPanel(new BorderLayout());
-        content.setBackground(new Color(142, 147, 147));
         starter = new Starter();
 
         IPanel top = new IPanel(new Dimension(0, 80));
@@ -69,6 +68,18 @@ public class Home {
 
         frame.setContentPane(content);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //TODO: 背景透明化
+        //frame.setUndecorated(true);
+        //Field undecoratedField;
+        // try {
+        //     undecoratedField = JFrame.class.getDeclaredField("undecorated");
+        //     undecoratedField.setAccessible(true);
+        //     undecoratedField.set(frame, true);
+        // } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e ) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // } 
+        //frame.setOpacity(0.3f);
         frame.pack();
         frame.setSize(400, 500);
         frame.setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage());

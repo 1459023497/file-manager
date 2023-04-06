@@ -1,6 +1,7 @@
 package gui.component;
 
 import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.LayoutManager;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,7 +9,6 @@ import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.JPanel;
-import gui.component.FileBox;
 
 import entity.IFile;
 import entity.ITag;
@@ -19,19 +19,26 @@ public class IPanel extends JPanel {
 
     public IPanel(){
         super();
-        //背景透明
-        this.setOpaque(false);
+        init();
     }
 
     public IPanel(Dimension d){
         super();
         this.setPreferredSize(d);
-        this.setOpaque(false);
+        init();
     }
 
     public IPanel(LayoutManager layoutManager) {
         super(layoutManager);
-        this.setOpaque(false);
+        init();
+    }
+
+    /*
+     * 面板初始化
+     */
+    private void init(){
+        this.setBackground(Color.WHITE);
+        this.setOpaque(false);//背景透明
     }
 
     public void reload(){

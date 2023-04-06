@@ -148,7 +148,6 @@ public class TagService {
         return groupMap;
     }
 
-    // TODO:批量查询优化
     /**
      * 批量查询该标签下的文件及其标签，组成字典
      * 
