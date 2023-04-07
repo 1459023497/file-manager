@@ -1,12 +1,12 @@
 package gui.window;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.lang.reflect.Field;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -14,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -28,7 +27,7 @@ import service.TagService;
 import tool.FileUtils;
 
 public class Home {
-    public final static String WIN_NAME  = "Home";
+    public final static String WIN_NAME = "Home";
     private JFrame frame;
     private IPanel content;
     private IPanel center;
@@ -43,19 +42,23 @@ public class Home {
         starter = new Starter();
 
         IPanel top = new IPanel(new Dimension(0, 80));
-        JLabel label = new JLabel("文件夹");
+        JLabel l_path = new JLabel("文件夹");
         JTextField textField = new JTextField(15);
-        JButton button = new JButton("扫描");
-        JButton all = new JButton("全部");
-        JButton button1 = new JButton("标签");
-        JLabel label1 = new JLabel("扫描成功");
-        label1.setVisible(false);
-        top.add(label);
+        JButton b_scan = new JButton("扫描");
+        JButton b_all = new JButton("全部");
+        JButton b_tag = new JButton("标签");
+        JLabel b_success = new JLabel("扫描成功");
+        JButton b_ini = new JButton("初始化");
+        JButton b_check = new JButton("查重");
+        b_success.setVisible(false);
+        top.add(l_path);
         top.add(textField);
-        top.add(button);
-        top.add(all);
-        top.add(button1);
-        top.add(label1);
+        top.add(b_scan);
+        top.add(b_all);
+        top.add(b_tag);
+        top.add(b_success);
+        top.add(b_ini);
+        top.add(b_check);
         content.add(top, BorderLayout.NORTH);
         // 创建结果滚动面板
         IPanel center = new IPanel();
@@ -68,18 +71,9 @@ public class Home {
 
         frame.setContentPane(content);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //TODO: 背景透明化
-        //frame.setUndecorated(true);
-        //Field undecoratedField;
-        // try {
-        //     undecoratedField = JFrame.class.getDeclaredField("undecorated");
-        //     undecoratedField.setAccessible(true);
-        //     undecoratedField.set(frame, true);
-        // } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e ) {
-        //     // TODO Auto-generated catch block
-        //     e.printStackTrace();
-        // } 
-        //frame.setOpacity(0.3f);
+        // TODO: 背景透明化
+        frame.setUndecorated(true);
+        frame.setOpacity(0.1f);
         frame.pack();
         frame.setSize(400, 500);
         frame.setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage());
@@ -88,39 +82,16 @@ public class Home {
 
         // 以下为事件处理
         // 扫描按钮点击事件
-        button.addActionListener(e -> {
+        b_scan.addActionListener(e -> {
             // 空路径
             if (textField.getText().equals("")) {
                 JOptionPane.showMessageDialog(frame, "输入错误", "提示", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // 添加操作按钮,只有第一次点击添加
-            label1.setVisible(true);
+            b_success.setVisible(true);
             if (firstClick) {
                 firstClick = false;
-                // 文件写入数据库
-                JButton button2 = new JButton("初始化");
-                button2.addActionListener(e1 -> {
-                    starter.init();
-                    label1.setText("写入完成");
-                });
-                // 展示重复文件
-                JButton button3 = new JButton("查重");
-                button3.addActionListener(e1 -> {
-                    HashMap<String, Set<File>> refileMap = starter.getRefileMap();
-                    center.removeAll();
-                    refileMap.forEach((size, files) -> {
-                        center.add(new JLabel("大小：" + FileUtils.getFileSizeString(size)));
-                        files.forEach(file -> {
-                            center.add(new JLabel(file.getPath()));
-                        });
-                    });
-                    label1.setText("查重完成");
-                    center.reload();
-                });
-                top.add(label1);
-                top.add(button2);
-                top.add(button3);
             }
             // 获取路径，开始扫描
             center.removeAll();
@@ -132,16 +103,44 @@ public class Home {
                 center.add(new FileLabel(dir));
                 files.forEach(file -> center.add(new FileLabel(new IFile(file))));
             });
-            label1.setText("扫描完成");
+            b_success.setText("扫描完成");
             center.reload();
             content.reload();
         });
 
         // 全部按钮点击事件，展示数据库全部文件
-        all.addActionListener(e -> queryAll());
+        b_all.addActionListener(e -> queryAll());
 
         // 标签按钮点击事件，打开标签面板
-        button1.addActionListener(e -> new Tag(frame));
+        b_tag.addActionListener(e -> new Tag(frame));
+
+        // 文件写入数据库
+        b_ini.addActionListener(e1 -> {
+            starter.init();
+            b_success.setText("写入完成");
+        });
+
+        // 点击查重，展示重复文件
+        b_check.addActionListener(e1 -> {
+            FileService service = new FileService();
+            Map<String, List<IFile>> repMap = service.getRepeatMap();
+            service.close();
+            TagService tagService = new TagService();
+            HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
+            tagService.close();
+
+            // 输出大小相同的文件
+            center.removeAll();
+            repMap.forEach((size, list) -> {
+                center.add(new JLabel("大小：" + FileUtils.getFileSizeString(size)));
+                list.forEach(file -> {
+                    // 文件行
+                    center.addFileBox(file, center, fileMap);
+                });
+            });
+            b_success.setText("查重完成");
+            center.reload();
+        });
     }
 
     public void queryAll() {

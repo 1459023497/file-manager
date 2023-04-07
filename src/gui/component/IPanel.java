@@ -37,7 +37,7 @@ public class IPanel extends JPanel {
      * 面板初始化
      */
     private void init(){
-        this.setBackground(Color.WHITE);
+        this.setBackground(new Color(0,0,0,0));
         this.setOpaque(false);//背景透明
     }
 

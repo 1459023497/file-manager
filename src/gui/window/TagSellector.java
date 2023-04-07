@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
+import common.AppContext;
 import entity.IFile;
 import entity.ITag;
 import gui.component.AddLabel;
@@ -28,8 +29,9 @@ public class TagSellector {
         JWindow window = new JWindow();
         IPanel content = new IPanel(new Dimension(210, 300));
         content.setBorder(BorderFactory.createLineBorder(Color.black, 1, true));
-        // 窗口标题
         window.setContentPane(content);
+        //透明化
+        window.setOpacity(0.2f);
         window.pack();
         window.setSize(200, 300);
         window.setLocationRelativeTo(addLabel);
@@ -73,7 +75,8 @@ public class TagSellector {
                 // 打标签
                 tags.forEach(t -> tagService.tag(t, file));
             }
-            JOptionPane.showMessageDialog(confirm, "添加成功，请点击全部刷新！");
+            JOptionPane.showMessageDialog(confirm, "添加成功！");
+            AppContext.getHome().queryAll();
             window.dispose();
         });
         // 点击取消关闭选择窗口

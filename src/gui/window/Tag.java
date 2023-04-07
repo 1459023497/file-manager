@@ -95,14 +95,10 @@ public class Tag {
             tagService.close();
             center.removeAll();
             files.forEach((dir, set) -> {
-                FileBox dirRow = new FileBox(new IFile(dir), center,fileMap);
-                center.add(dirRow);
-                center.add(Box.createVerticalStrut(3));//垂直間距
+                center.addFileBox(dir, center, fileMap);
                 set.forEach(file -> {
                     // 文件行
-                    FileBox row = new FileBox(file, center,fileMap);
-                    center.add(row);
-                    center.add(Box.createVerticalStrut(3));//垂直間距
+                    center.addFileBox(file, center,fileMap);
                 });
             });
             center.reload();
@@ -117,8 +113,7 @@ public class Tag {
         content.add(scrollPane, BorderLayout.CENTER);
 
         frame.setContentPane(content);
-        frame.setIconImage(
-                new ImageIcon("src\\gui\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
+        frame.setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setSize(400, 500);

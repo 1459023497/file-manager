@@ -5,9 +5,14 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import entity.IFile;
 import jdbc.JDBCConnector;
@@ -78,7 +83,7 @@ public class FileService {
     }
 
     /**
-     * 打开文件夹
+     * 打开文件
      *
      * @param path
      * @return true-打开路径, false-路径不存在
@@ -98,9 +103,9 @@ public class FileService {
     }
 
     /**
-     * 查所有文件
+     * 查所有文件，按文件夹分类
      *
-     * @return
+     * @return <文件夹，文件>
      */
     public HashMap<String, Set<IFile>> getAllFiles() {
         String sql = "SELECT * FROM file;";
@@ -129,5 +134,44 @@ public class FileService {
             }
         }
         return files;
+    }
+
+    /*
+     * 查所有文件
+     */
+    public List<IFile> getFiles(){
+        String sql = "SELECT * FROM file;";
+        ResultSet rs = conn.select(sql);
+        List<IFile> files = new ArrayList<IFile>();
+        while (true) {
+            try {
+                if (!rs.next())
+                    break;
+                String id = rs.getString("id");
+                String name = rs.getString("name");
+                String path = rs.getString("path");
+                String size = rs.getString("size");
+                String dir = rs.getString("belong");
+                IFile file = new IFile(id, name, path, size, dir);
+                files.add(file);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return files;
+    }
+
+    /*
+     * 查重
+     * @return <大小，文件>
+     */
+    public Map<String, List<IFile>> getRepeatMap(){
+        Map<String, List<IFile>> map = new HashMap<String, List<IFile>>();
+        List<IFile> files = getFiles();
+        if(!files.isEmpty()){
+            map = files.stream().collect(Collectors.groupingBy(IFile::getSize));
+            map = map.entrySet().stream().filter(e -> e.getValue().size() > 1).collect(Collectors.toMap(k->k.getKey(), v->v.getValue()));
+        }
+        return map;
     }
 }

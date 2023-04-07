@@ -75,8 +75,8 @@ public class FileLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if ((e.getButton() == MouseEvent.BUTTON1) && isDir) {
-            // 左键点击打开文件夹if
+        if ((e.getButton() == MouseEvent.BUTTON1) ) {
+            // 左键点击打开文件
             fileService = new FileService();
             // 路径不存在于本地
             if (!fileService.openDir(path) && firstTap) {
