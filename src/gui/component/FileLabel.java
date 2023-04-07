@@ -87,7 +87,6 @@ public class FileLabel extends JLabel implements MouseListener {
         if ((e.getButton() == MouseEvent.BUTTON3) && fileBox != null) {
             // 文件右键菜单
             new FileMenu(file, this, fileBox).show(this, e.getX(), e.getY());
-            ;
         }
     }
 

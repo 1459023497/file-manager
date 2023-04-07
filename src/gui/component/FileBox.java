@@ -54,7 +54,6 @@ public class FileBox extends Box {
         }
         // 添加标签按钮
         AddLabel addLabel = new AddLabel(file);
-        // TODO: 2022/9/3 文件获取焦点时才展示添加
         this.add(addLabel);
     } 
 

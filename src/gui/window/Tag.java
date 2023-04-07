@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -22,7 +21,6 @@ import javax.swing.WindowConstants;
 
 import entity.IFile;
 import entity.ITag;
-import gui.component.FileBox;
 import gui.component.IPanel;
 import gui.component.TagLabel;
 import service.FileService;

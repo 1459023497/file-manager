@@ -36,8 +36,7 @@ public class TagSellector {
         window.setSize(200, 300);
         window.setLocationRelativeTo(addLabel);
         window.setVisible(true);
-        //window.setLocation(point);
-        // TODO: 2022/9/1 窗口边框，背景，定位
+    
         // 顶部显示全部标签和操作按钮
         IPanel top = new IPanel(new Dimension(200, 100));
         top.setBorder(BorderFactory.createLineBorder(Color.gray, 1, true));

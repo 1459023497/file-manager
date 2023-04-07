@@ -38,22 +38,6 @@ public class FileMenu {
         content.add(delete);
         content.add(cancel);
 
-
-        //TODO：不点击自动关闭
-        // 窗口失去焦点自动关闭
-        // window.addFocusListener(new FocusListener() {
-
-        //     @Override
-        //     public void focusGained(FocusEvent e) {
-        //         System.out.println("获取焦点");
-        //     }
-
-        //     @Override
-        //     public void focusLost(FocusEvent e) {
-        //         window.dispose();
-        //     }
-        // });
-
         // 重命名事件
         rename.addMouseListener(new MouseAdapter() {
 

@@ -10,8 +10,8 @@ public class Main {
         //切换window风格ui
         String lookAndFeel ="com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         try {
-            //UIManager.setLookAndFeel(lookAndFeel);
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(lookAndFeel);
+            //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
