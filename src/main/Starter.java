@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
+import common.AppContext;
 import service.FileService;
 
 //初始化
@@ -22,12 +25,16 @@ public class Starter {
      * 
      * @param path
      */
-    public void scan(String path) {
+    public boolean scan(String path) {
         File file = new File(path);
         File[] tempList = file.listFiles();
-        assert tempList != null;
+        //路径为空的话，提示错误
+        if(tempList == null) {
+            JOptionPane.showMessageDialog(AppContext.getHome().getFrame(), "输入路径有误，请检查！", "提示", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
         if (tempList.length == 0) {
-            System.out.println("文件夹:" + path + " 对象个数：0");
+            System.out.println("文件夹:" + path + " 对象个数: 0");
         } else {
             System.out.println("文件夹:" + path + " 对象个数：" + tempList.length);
             Set<File> fileList = new HashSet<>();
@@ -51,6 +58,7 @@ public class Starter {
             }
             fileMap.put(path, fileList);
         }
+        return true;
     }
 
     /**

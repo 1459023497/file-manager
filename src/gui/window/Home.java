@@ -48,19 +48,21 @@ public class Home {
         JLabel l_path = new JLabel("文件夹");
         JTextField textField = new JTextField(15);
         JButton b_scan = new JButton("扫描");
+        JButton b_search = new JButton("搜索");
         JButton b_all = new JButton("全部");
         JButton b_tag = new JButton("标签");
         JLabel b_success = new JLabel("扫描成功");
-        JButton b_ini = new JButton("初始化");
+        JButton b_init = new JButton("初始化");
         JButton b_check = new JButton("查重");
         b_success.setVisible(false);
         top.add(l_path);
         top.add(textField);
         top.add(b_scan);
+        top.add(b_search);
         top.add(b_all);
         top.add(b_tag);
         top.add(b_success);
-        top.add(b_ini);
+        top.add(b_init);
         top.add(b_check);
         content.add(top, BorderLayout.NORTH);
         // 创建结果滚动面板
@@ -131,28 +133,37 @@ public class Home {
         b_scan.addActionListener(e -> {
             // 空路径
             if (textField.getText().equals("")) {
-                JOptionPane.showMessageDialog(frame, "输入错误", "提示", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "输入为空，请重试！", "提示", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            // 添加操作按钮,只有第一次点击添加
-            b_success.setVisible(true);
-            if (firstClick) {
-                firstClick = false;
-            }
-            // 获取路径，开始扫描
-            center.removeAll();
 
+            // 获取路径，开始扫描
             String path = textField.getText();
-            starter.scan(path);
-            HashMap<String, Set<File>> fileMap = starter.getFileMap();
-            // 显示结果
-            fileMap.forEach((dir, files) -> {
-                center.add(new FileLabel(dir));
-                files.forEach(file -> center.add(new FileLabel(new IFile(file))));
-            });
-            b_success.setText("扫描完成");
-            center.reload();
-            content.reload();
+            if(starter.scan(path)){
+                //扫描成功
+                center.removeAll();
+                HashMap<String, Set<File>> fileMap = starter.getFileMap();
+                // 显示结果
+                fileMap.forEach((dir, files) -> {
+                    center.add(new FileLabel(dir));
+                    files.forEach(file -> center.add(new FileLabel(new IFile(file))));
+                });
+                b_success.setVisible(true);
+                center.reload();
+                content.reload();
+        
+            }
+        });
+
+        // 搜索文件
+        b_search.addActionListener(e-> {
+            String text = textField.getText();
+            if (text.equals("")) {
+                JOptionPane.showMessageDialog(frame, "输入为空，请重试！", "提示", JOptionPane.ERROR_MESSAGE);
+                return;
+            }else{
+                search(text);
+            }
         });
 
         // 全部按钮点击事件，展示数据库全部文件
@@ -162,7 +173,7 @@ public class Home {
         b_tag.addActionListener(e -> new Tag(frame));
 
         // 文件写入数据库
-        b_ini.addActionListener(e1 -> {
+        b_init.addActionListener(e1 -> {
             starter.init();
             b_success.setText("写入完成");
         });
@@ -188,6 +199,18 @@ public class Home {
             b_success.setText("查重完成");
             center.reload();
         });
+    }
+
+    private void search(String text) {
+        
+    }
+
+    /**
+     * 获取主窗口
+     * @return
+     */
+    public JFrame getFrame(){
+        return frame;
     }
 
     public void queryAll() {
