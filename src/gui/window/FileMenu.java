@@ -16,9 +16,14 @@ import gui.component.IPanel;
 import service.FileService;
 
 public class FileMenu {
+    private FileService fileService;
+
     // 文件右键的菜单
     public FileMenu(IFile file, FileLabel fileLabel) {
         // 窗口初始化
+        fileService = new FileService();
+        // 获取焦点
+        //window.requestFocus();
         JWindow window = new JWindow();
         IPanel content = new IPanel(new Dimension(50, 70));
         content.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -47,9 +52,7 @@ public class FileMenu {
                 String input = JOptionPane.showInputDialog(rename, "新命名",file.getName());
                 if (input != null && !input.equals("")) {
                     file.setName(input);
-                    FileService fileService = new FileService();
                     fileService.renameFile(file);
-                    fileService.close();
                     // 刷新文件
                     fileLabel.setFile(file);
                 }
@@ -76,9 +79,7 @@ public class FileMenu {
                 // 弹出确认框
                 int confirm = JOptionPane.showConfirmDialog(delete, "确认删除该文件吗？", "确认", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    FileService fileService = new FileService();
                     fileService.removeFile(file);
-                    fileService.close();
                     // 移除文件
                     fileLabel.setVisible(false);
                 }

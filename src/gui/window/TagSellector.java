@@ -23,6 +23,8 @@ import service.TagService;
 import tool.TagColor;
 
 public class TagSellector {
+    private TagService tagService;
+
     // 添加标签时的选择窗口
     public TagSellector(IFile file, AddLabel addLabel, Point point) {
         // 窗口初始化
@@ -45,7 +47,7 @@ public class TagSellector {
         down.setBorder(BorderFactory.createLineBorder(Color.gray, 1, true));
         down.setTags(new HashSet<>());
         // 顶部查询加载全部标签
-        TagService tagService = new TagService();
+        tagService = new TagService();
         HashMap<String,ITag> tagMap = tagService.getTagsMap();
         HashMap<String, Set<String>> groupMap = tagService.getGroupsMap();
         TagColor color = TagColor.RED;
@@ -81,7 +83,6 @@ public class TagSellector {
         // 点击取消关闭选择窗口
         JButton cancel = new JButton("取消");
         cancel.addActionListener(e -> {
-            tagService.close();// 关闭数据库连接
             window.dispose();// 关闭窗口
         });
 

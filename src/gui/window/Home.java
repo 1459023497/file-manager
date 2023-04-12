@@ -35,11 +35,13 @@ public class Home {
     private IPanel content;
     private IPanel center;
     private Starter starter;
-
-    private Boolean firstClick = true;
+    private FileService fileService;
+    private TagService tagService;
 
     public Home() {
         // 窗口，面版初始化
+        fileService = new FileService();
+        tagService = new TagService();
         frame = new JFrame("文件管理");
         content = new IPanel(new BorderLayout());
         starter = new Starter();
@@ -180,12 +182,8 @@ public class Home {
 
         // 点击查重，展示重复文件
         b_check.addActionListener(e1 -> {
-            FileService service = new FileService();
-            Map<String, List<IFile>> repMap = service.getRepeatMap();
-            service.close();
-            TagService tagService = new TagService();
+            Map<String, List<IFile>> repMap = fileService.getRepeatMap();
             HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
-            tagService.close();
 
             // 输出大小相同的文件
             center.removeAll();
@@ -215,13 +213,9 @@ public class Home {
 
     public void queryAll() {
         // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
-        FileService fileService = new FileService();
         HashMap<String, Set<IFile>> files = fileService.getAllFiles();
-        fileService.close();
         // 获取文件标签字典
-        TagService tagService = new TagService();
         HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
-        tagService.close();
         center.removeAll();
         files.forEach((dir, set) -> {
             // 目录行

@@ -31,6 +31,8 @@ public class Tag {
     private IPanel subTop;
     private IPanel center;
     private JComboBox<ITag> groups;
+    private FileService fileService;
+    private TagService  tagService;
 
     public Tag(JFrame father) {
         // 窗口，面版初始化
@@ -71,9 +73,7 @@ public class Tag {
             int confirm = JOptionPane.showConfirmDialog(frame, tap, "确认", JOptionPane.YES_NO_OPTION);
             // 确认添加新标签
             if (confirm == JOptionPane.YES_OPTION) {
-                TagService tagService = new TagService();
                 tagService.newTag(new ITag(name, selectedTag.getId()));
-                tagService.close();
                 // 重新加载标签列表和面板
                 reloadGroups();
                 reloadTags();
@@ -84,13 +84,9 @@ public class Tag {
         top.add(all);
         all.addActionListener(e -> {
             // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
-            FileService fileService = new FileService();
             HashMap<String, Set<IFile>> files = fileService.getAllFiles();
-            fileService.close();
             // 获取文件标签字典
-            TagService tagService = new TagService();
             HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
-            tagService.close();
             center.removeAll();
             files.forEach((dir, set) -> {
                 center.addFileBox(dir, center, fileMap);
@@ -124,7 +120,6 @@ public class Tag {
      */
     public void reloadTags() {
         subTop.removeAll();
-        TagService tagService = new TagService();
         // 获取标签和标签组的字典
         HashMap<String, ITag> tagMap = tagService.getTagsMap();
         HashMap<String, Set<String>> groupMap = tagService.getGroupsMap();
@@ -155,7 +150,6 @@ public class Tag {
      */
     public void reloadGroups() {
         groups.removeAllItems();
-        TagService tagService = new TagService();
         ArrayList<ITag> tags = tagService.getAllTags();
         // 无分组的顶级标签
         ITag blankTag = new ITag();
@@ -165,6 +159,5 @@ public class Tag {
         tags.forEach(tag -> {
             groups.addItem(tag);
         });
-        tagService.close();
     }
 }

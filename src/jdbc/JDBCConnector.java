@@ -58,6 +58,7 @@ public class JDBCConnector {
         logger.info("SQL语句: " + sql);
         try {
             connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             statement.executeUpdate(sql);
             connection.commit();
@@ -76,6 +77,7 @@ public class JDBCConnector {
         logger.info("SQL语句: " + sql);
         try {
             connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             connection.commit();
