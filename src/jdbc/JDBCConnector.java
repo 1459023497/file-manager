@@ -15,8 +15,8 @@ import com.alibaba.druid.pool.DruidDataSourceFactory;
 
 public class JDBCConnector {
     private Connection connection;
-    private Statement statement = null;
-    private ResultSet resultSet = null;
+    private Statement statement;
+    private ResultSet resultSet;
     private DataSource dataSource;
     private static final Logger logger = Logger.getLogger("JDBCConnector.class");
 

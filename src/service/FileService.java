@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import entity.IFile;
+import entity.ITag;
 import jdbc.JDBCConnector;
 import tool.IdGenerator;
 
@@ -37,7 +38,7 @@ public class FileService {
      * @param belong 所属文件夹
      */
     public void addFile(File file, String belong) {
-        //String regex = "/\''/g"; //去掉所有单引号
+        // String regex = "/\''/g"; //去掉所有单引号
         String name = file.getName().replace('\'', ' ');
         String path = file.getPath().replace('\'', ' ');
         String sql = "INSERT or ignore into file(id,name,path,size,belong) values('" + id.next() + "','"
@@ -48,12 +49,13 @@ public class FileService {
 
     /**
      * 重命名
+     * 
      * @param file
      */
-    public void renameFile(IFile file){
+    public void renameFile(IFile file) {
         String name = file.getName();
         String id = file.getId();
-        String sql = "UPDATE file SET name = '"+name+"' WHERE id = '"+id+"';";
+        String sql = "UPDATE file SET name = '" + name + "' WHERE id = '" + id + "';";
         conn.update(sql);
     }
 
@@ -63,9 +65,9 @@ public class FileService {
      * @param file
      */
     public void removeFile(IFile file) {
-        if(file.isDirectory()){
+        if (file.isDirectory()) {
             removeDir(file.getPath());
-        }else{
+        } else {
             String sql = "DELETE FROM file WHERE id = '" + file.getId() + "';";
             conn.update(sql);
         }
@@ -73,10 +75,11 @@ public class FileService {
 
     /**
      * 删除文件夹
+     * 
      * @param dir
      */
-    public void removeDir(String dir){
-        String sql = "DELETE FROM file WHERE belong = '"+dir+"';";
+    public void removeDir(String dir) {
+        String sql = "DELETE FROM file WHERE belong = '" + dir + "';";
         conn.update(sql);
 
     }
@@ -111,10 +114,9 @@ public class FileService {
         ResultSet rs = conn.select(sql);
         // 字典《目录：文件》
         HashMap<String, Set<IFile>> files = new HashMap<>();
-        while (true) {
-            try {
-                if (!rs.next())
-                    break;
+
+        try {
+            while (rs.next()) {
                 String id = rs.getString("id");
                 String name = rs.getString("name");
                 String path = rs.getString("path");
@@ -128,9 +130,11 @@ public class FileService {
                 } else {
                     files.get(dir).add(file);
                 }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            conn.close();
         }
         return files;
     }
@@ -138,7 +142,7 @@ public class FileService {
     /*
      * 查所有文件
      */
-    public List<IFile> getFiles(){
+    public List<IFile> getFiles() {
         String sql = "SELECT * FROM file;";
         ResultSet rs = conn.select(sql);
         List<IFile> files = new ArrayList<IFile>();
@@ -155,6 +159,8 @@ public class FileService {
                 files.add(file);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
+            } finally {
+                conn.close();
             }
         }
         return files;
@@ -162,15 +168,63 @@ public class FileService {
 
     /*
      * 查重
+     * 
      * @return <大小，文件>
      */
-    public Map<String, List<IFile>> getRepeatMap(){
+    public Map<String, List<IFile>> getRepeatMap() {
         Map<String, List<IFile>> map = new HashMap<String, List<IFile>>();
         List<IFile> files = getFiles();
-        if(!files.isEmpty()){
+        if (!files.isEmpty()) {
             map = files.stream().collect(Collectors.groupingBy(IFile::getSize));
-            map = map.entrySet().stream().filter(e -> e.getValue().size() > 1).collect(Collectors.toMap(k->k.getKey(), v->v.getValue()));
+            map = map.entrySet().stream().filter(e -> e.getValue().size() > 1)
+                    .collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue()));
         }
         return map;
+    }
+
+    /*
+     * 模糊搜索
+     */
+    public List<IFile> search(String text) {
+        Map<String, IFile> map = new HashMap<>();
+        String sql = "SELECT * FROM file WHERE name LIKE '%" + text + "%';";
+        ResultSet rs = conn.select(sql);
+        try {
+            while (rs.next()) {
+                String id = rs.getString("id");
+                String name = rs.getString("name");
+                String path = rs.getString("path");
+                String size = rs.getString("size");
+                String dir = rs.getString("belong");
+                IFile file = new IFile(id, name, path, size, dir);
+                map.put(id, file);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            conn.close();
+        }
+        if (!map.isEmpty()) {
+            String sqlFormat = "SELECT ft.file_id, ft.tag_id, t.name, t.'group' FROM file_tag ft LEFT JOIN tag t ON ft.tag_id = t.id WHERE file_id in (%s);";
+            String sql2 = String.format(sqlFormat, map.keySet().stream().collect(Collectors.joining(",")));
+            ResultSet rs2 = conn.select(sql2);
+            try {
+                while (rs2.next()) {
+                    String file_id = rs2.getString("file_id");
+                    String tag_id = rs2.getString("tag_id");
+                    String name = rs2.getString("name");
+                    String group = rs2.getString("group");
+                    ITag tag = new ITag(tag_id, name, group);
+                    map.get(file_id).add(tag);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                conn.close();
+            }
+            return map.values().stream().collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 }

@@ -1,6 +1,8 @@
 package entity;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IFile {
     private String id;
@@ -9,6 +11,7 @@ public class IFile {
     private String size;
     private String belong;
     private boolean isDirectory = false;//默认是文件夹
+    private List<ITag> tags;
 
     public IFile(){
         id = new String();
@@ -16,6 +19,7 @@ public class IFile {
         path = new String();
         size = new String();
         belong = new String();
+        tags = new ArrayList<ITag>();
     }
 
     /**
@@ -41,6 +45,7 @@ public class IFile {
         this.path = path;
         this.size = size;
         this.belong = belong;
+        tags = new ArrayList<ITag>();
     }
 
     /**
@@ -100,6 +105,17 @@ public class IFile {
     public void setDirectory(boolean isDirectory) {
         this.isDirectory = isDirectory;
     }
-    
+
+    public List<ITag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<ITag> tags) {
+        this.tags = tags;
+    }
+
+    public void add(ITag tag){
+        tags.add(tag);
+    }
     
 }

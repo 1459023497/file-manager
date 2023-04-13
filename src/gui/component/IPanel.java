@@ -63,6 +63,13 @@ public class IPanel extends JPanel {
     public void addFileBox(IFile file, IPanel center, HashMap<String, Set<ITag>> fileMap) {
         FileBox dirRow = new FileBox(file, center, fileMap);
         this.add(dirRow);
-        this.add(Box.createVerticalStrut(3));//垂直間距
+        this.add(Box.createVerticalStrut(3));
     }
+
+    public void addFileBox(IFile file, IPanel center) {
+        FileBox dirRow = new FileBox(file, center);
+        this.add(dirRow);
+        this.add(Box.createVerticalStrut(3));
+    }
+
 }

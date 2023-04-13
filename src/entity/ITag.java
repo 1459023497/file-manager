@@ -1,5 +1,8 @@
 package entity;
 
+/* 
+ * 标签
+ */
 public class ITag {
     private String id;
     private String name;

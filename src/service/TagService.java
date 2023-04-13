@@ -3,6 +3,7 @@ package service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,6 +64,8 @@ public class TagService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            conn.close();
         }
         return tags;
     }
@@ -84,6 +87,8 @@ public class TagService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            conn.close();
         }
         return tagMap;
 
@@ -115,6 +120,8 @@ public class TagService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            conn.close();
         }
         return map;
     }
@@ -177,6 +184,8 @@ public class TagService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            conn.close();
         }
         return map;
     }
@@ -211,6 +220,8 @@ public class TagService {
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
+            } finally {
+                conn.close();
             }
         }
         return files;
@@ -238,6 +249,8 @@ public class TagService {
                 tags.add(tag);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
+            } finally {
+                conn.close();
             }
         }
         return tags;
@@ -257,7 +270,26 @@ public class TagService {
             conn.update(sql);
         } else {
             // 文件夹
-            tag(tag, file.getPath());
+            // tag(tag, file.getPath());
+        }
+    }
+
+    /*
+     * 批量打标签
+     */
+    public void tags(Collection<ITag> tags, IFile file) {
+        if (!file.isDirectory()) {
+            // 单个文件
+            StringBuffer sb = new StringBuffer();
+            tags.forEach(tag -> {
+                String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','"
+                        + file.getId() + "','" + tag.getId() + "');";
+                sb.append(sql);
+            });
+            conn.update(sb.toString());
+        } else {
+            // 文件夹
+            tag(tags, file.getPath());
         }
     }
 
@@ -267,20 +299,23 @@ public class TagService {
      * @param tag
      * @param dir
      */
-    public void tag(ITag tag, String dir) {
+    public void tag(Collection<ITag> tags, String dir) {
         String sql = "SELECT id FROM file WHERE file.belong ='" + dir + "';";
         ResultSet rs = conn.select(sql);
 
         StringBuffer batch = new StringBuffer();
-        while (true) {
-            try {
-                if (!rs.next())
-                    break;
-                // 新增值
-                batch.append("INSERT INTO file_tag VALUES ('" + idGenerator.next() + "','" + rs.getString("id") + "','" + tag.getId() + "');");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+        try {
+            while (rs.next()) {
+                String fileId = rs.getString("id");
+                tags.forEach(tag -> {
+                    batch.append("INSERT INTO file_tag VALUES ('" + idGenerator.next() + "','" + fileId + "','"
+                            + tag.getId() + "');");
+                });
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            conn.close();
         }
         conn.update(batch.toString());
     }

@@ -74,7 +74,7 @@ public class TagSellector {
             int confirmTag = JOptionPane.showConfirmDialog(confirm, tap, "确认信息", JOptionPane.YES_NO_OPTION);
             if (confirmTag == 0) {
                 // 打标签
-                tags.forEach(t -> tagService.tag(t, file));
+                tagService.tags(tags, file);
             }
             JOptionPane.showMessageDialog(confirm, "添加成功！");
             AppContext.getHome().queryAll();

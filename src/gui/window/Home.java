@@ -6,17 +6,20 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -70,6 +73,8 @@ public class Home {
         // 创建结果滚动面板
         IPanel center = new IPanel();
         this.center = center;
+        //内边距
+        center.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(center);
         scrollPane.setOpaque(false);
@@ -89,7 +94,7 @@ public class Home {
 
         // 以下为事件处理
         // 添加鼠标监听器，支持拖动窗口
-        MouseAdapter ma = new MouseAdapter(){
+        MouseAdapter ma = new MouseAdapter() {
             private int x;
             private int y;
 
@@ -101,7 +106,7 @@ public class Home {
                 x = e.getX();
                 y = e.getY();
             }
-            
+
             /*
              * 鼠标移进标题栏时，设置鼠标图标为移动图标
              */
@@ -141,8 +146,8 @@ public class Home {
 
             // 获取路径，开始扫描
             String path = textField.getText();
-            if(starter.scan(path)){
-                //扫描成功
+            if (starter.scan(path)) {
+                // 扫描成功
                 center.removeAll();
                 HashMap<String, Set<File>> fileMap = starter.getFileMap();
                 // 显示结果
@@ -153,17 +158,17 @@ public class Home {
                 b_success.setVisible(true);
                 center.reload();
                 content.reload();
-        
+
             }
         });
 
         // 搜索文件
-        b_search.addActionListener(e-> {
+        b_search.addActionListener(e -> {
             String text = textField.getText();
             if (text.equals("")) {
                 JOptionPane.showMessageDialog(frame, "输入为空，请重试！", "提示", JOptionPane.ERROR_MESSAGE);
                 return;
-            }else{
+            } else {
                 search(text);
             }
         });
@@ -200,14 +205,28 @@ public class Home {
     }
 
     private void search(String text) {
-        
+        List<IFile> files = fileService.search(text);
+        if (files != null) {
+            center.removeAll();
+            files.forEach(file -> {
+                // 文件行
+                center.addFileBox(file, center);
+            });
+            center.reload();
+        }else{
+            center.removeAll();
+            center.add(new JLabel("没有搜索到相关内容！"));
+            center.reload();
+        }
+
     }
 
     /**
      * 获取主窗口
+     * 
      * @return
      */
-    public JFrame getFrame(){
+    public JFrame getFrame() {
         return frame;
     }
 
