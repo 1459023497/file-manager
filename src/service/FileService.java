@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import entity.IFile;
 import entity.ITag;
 import jdbc.JDBCConnector;
+import tool.BeanUtils;
 import tool.IdGenerator;
 
 public class FileService {
@@ -117,12 +118,8 @@ public class FileService {
 
         try {
             while (rs.next()) {
-                String id = rs.getString("id");
-                String name = rs.getString("name");
-                String path = rs.getString("path");
-                String size = rs.getString("size");
-                String dir = rs.getString("belong");
-                IFile file = new IFile(id, name, path, size, dir);
+                IFile file = BeanUtils.getFile(rs);
+                String dir = file.getBelong();
                 if (files.get(dir) == null) {
                     HashSet<IFile> set = new HashSet<>();
                     set.add(file);
@@ -146,23 +143,18 @@ public class FileService {
         String sql = "SELECT * FROM file;";
         ResultSet rs = conn.select(sql);
         List<IFile> files = new ArrayList<IFile>();
-        while (true) {
-            try {
-                if (!rs.next())
-                    break;
-                String id = rs.getString("id");
-                String name = rs.getString("name");
-                String path = rs.getString("path");
-                String size = rs.getString("size");
-                String dir = rs.getString("belong");
-                IFile file = new IFile(id, name, path, size, dir);
+
+        try {
+            while (rs.next()) {
+                IFile file = BeanUtils.getFile(rs);
                 files.add(file);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } finally {
-                conn.close();
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            conn.close();
         }
+
         return files;
     }
 
@@ -191,13 +183,8 @@ public class FileService {
         ResultSet rs = conn.select(sql);
         try {
             while (rs.next()) {
-                String id = rs.getString("id");
-                String name = rs.getString("name");
-                String path = rs.getString("path");
-                String size = rs.getString("size");
-                String dir = rs.getString("belong");
-                IFile file = new IFile(id, name, path, size, dir);
-                map.put(id, file);
+                IFile file = BeanUtils.getFile(rs);
+                map.put(file.getId(), file);
             }
         } catch (SQLException e) {
             e.printStackTrace();

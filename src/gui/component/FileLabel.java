@@ -16,8 +16,6 @@ import service.FileService;
 public class FileLabel extends JLabel implements MouseListener {
 
     private FileService fileService;
-    // 是否是目录
-    private Boolean isDir;
 
     private String path;
 
@@ -31,7 +29,6 @@ public class FileLabel extends JLabel implements MouseListener {
     public FileLabel(String dir) {
         super("<--" + dir + "-->");
         setForeground(Color.MAGENTA);// 字体颜色
-        isDir = true;
         path = dir;
         file = new IFile(dir);
         this.addMouseListener(this);
@@ -42,7 +39,6 @@ public class FileLabel extends JLabel implements MouseListener {
         super(file.getName());
         this.file = file;
         path = file.getPath();
-        isDir = false;
         this.addMouseListener(this);
     }
 
@@ -50,7 +46,6 @@ public class FileLabel extends JLabel implements MouseListener {
     public FileLabel(String dir, FileBox fileBox) {
         super("<--" + dir + "-->");
         setForeground(Color.MAGENTA);// 字体颜色
-        isDir = true;
         path = dir;
         file = new IFile(dir);
         this.fileBox = fileBox;
@@ -62,7 +57,6 @@ public class FileLabel extends JLabel implements MouseListener {
         super(file.getName());
         this.file = file;
         path = file.getPath();
-        isDir = false;
         this.fileBox = fileBox;
         this.addMouseListener(this);
     }

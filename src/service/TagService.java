@@ -11,6 +11,7 @@ import java.util.Set;
 import entity.IFile;
 import entity.ITag;
 import jdbc.JDBCConnector;
+import tool.BeanUtils;
 import tool.IdGenerator;
 
 //文件标签服务，复制标签增删改查
@@ -56,10 +57,7 @@ public class TagService {
         ArrayList<ITag> tags = new ArrayList<>();
         try {
             while (rs.next()) {
-                String id = rs.getString("id");
-                String name = rs.getString("name");
-                String group = rs.getString("group");
-                ITag tag = new ITag(id, name, group);
+                ITag tag = BeanUtils.getTag(rs);
                 tags.add(tag);
             }
         } catch (SQLException e) {
@@ -79,11 +77,8 @@ public class TagService {
         HashMap<String, ITag> tagMap = new HashMap<>();
         try {
             while (rs.next()) {
-                String id = rs.getString("id");
-                String name = rs.getString("name");
-                String group = rs.getString("group");
-                ITag tag = new ITag(id, name, group);
-                tagMap.put(id, tag);
+                ITag tag = BeanUtils.getTag(rs);
+                tagMap.put(tag.getId(), tag);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -101,22 +96,13 @@ public class TagService {
      */
     public HashMap<String, Set<ITag>> getFilesTagsMap() {
         HashMap<String, Set<ITag>> map = new HashMap<>();
-        String sql = "SELECT f.file_id,f.tag_id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id; ";
+        String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id; ";
         ResultSet rs = conn.select(sql);
         try {
             while (rs.next()) {
                 String fileId = rs.getString("file_id");
-                String tag_id = rs.getString("tag_id");
-                String name = rs.getString("name");
-                String group = rs.getString("group");
-                ITag tag = new ITag(tag_id, name, group);
-                if (map.containsKey(fileId)) {
-                    map.get(fileId).add(tag);
-                } else {
-                    HashSet<ITag> set = new HashSet<>();
-                    set.add(tag);
-                    map.put(fileId, set);
-                }
+                ITag tag = BeanUtils.getTag(rs);
+                map.computeIfAbsent(fileId, k-> new HashSet<>()).add(tag);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -162,25 +148,15 @@ public class TagService {
      * @return map 【文件id,【标签】】
      */
     public HashMap<String, Set<ITag>> getFileMapByTag(ITag tag) {
-        String sql = "SELECT f.file_id,f.tag_id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
-                +
-                "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
+        String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
+                + "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
         HashMap<String, Set<ITag>> map = new HashMap<>();
         try {
             while (rs.next()) {
                 String fileId = rs.getString("file_id");
-                String tagId = rs.getString("tag_id");
-                String name = rs.getString("name");
-                String group = rs.getString("group");
-                ITag tag2 = new ITag(tagId, name, group);
-                if (map.containsKey(fileId)) {
-                    map.get(fileId).add(tag2);
-                } else {
-                    HashSet<ITag> set = new HashSet<>();
-                    set.add(tag2);
-                    map.put(fileId, set);
-                }
+                ITag tag2 = BeanUtils.getTag(rs);
+                map.computeIfAbsent(fileId, key -> new HashSet<>()).add(tag2);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -201,29 +177,20 @@ public class TagService {
                 "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
         HashMap<String, Set<IFile>> files = new HashMap<>();
-        while (true) {
-            try {
-                if (!rs.next())
-                    break;
-                String id = rs.getString("id");
-                String name = rs.getString("name");
-                String path = rs.getString("path");
-                String size = rs.getString("size");
-                String dir = rs.getString("belong");
-                IFile file = new IFile(id, name, path, size, dir);
-                if (files.get(dir) == null) {
-                    Set<IFile> fileSet = new HashSet<>();
-                    fileSet.add(file);
-                    files.put(dir, fileSet);
-                } else {
-                    files.get(dir).add(file);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } finally {
-                conn.close();
+        try {
+            while (rs.next()) {
+                IFile file = BeanUtils.getFile(rs);
+                String dir = file.getBelong();
+
+                // 方法返回set
+                files.computeIfAbsent(dir, k -> new HashSet<>()).add(file);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            conn.close();
         }
+
         return files;
     }
 
@@ -238,20 +205,15 @@ public class TagService {
                 "SELECT tag_id FROM file_tag WHERE file_id='" + file.getId() + "');";
         ResultSet rs = conn.select(sql);
         HashSet<ITag> tags = new HashSet<>();
-        while (true) {
-            try {
-                if (!rs.next())
-                    break;
-                String id = rs.getString("id");
-                String name = rs.getString("name");
-                String group = rs.getString("group");
-                ITag tag = new ITag(id, name, group);
+        try {
+            while (rs.next()) {
+                ITag tag = BeanUtils.getTag(rs);
                 tags.add(tag);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } finally {
-                conn.close();
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            conn.close();
         }
         return tags;
     }

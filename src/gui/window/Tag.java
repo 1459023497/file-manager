@@ -41,6 +41,7 @@ public class Tag {
         content.setBackground(new Color(142, 147, 147));
         center = new IPanel();
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));// 新增行布局
+        tagService = new TagService();
 
         // 顶部加载面板，按钮和标签
         IPanel top = new IPanel(new Dimension(0, 80));
@@ -123,7 +124,6 @@ public class Tag {
         // 获取标签和标签组的字典
         HashMap<String, ITag> tagMap = tagService.getTagsMap();
         HashMap<String, Set<String>> groupMap = tagService.getGroupsMap();
-        tagService.close();
         TagColor color = TagColor.RED;
         groupMap.forEach((groupId, tagSet) -> {
             subTop.add(new JLabel("【"));

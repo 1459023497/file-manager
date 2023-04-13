@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +18,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import entity.IFile;
 import entity.ITag;
 import gui.component.FileLabel;
+import gui.component.FrameBar;
 import gui.component.IPanel;
 import main.Starter;
 import service.FileService;
@@ -49,7 +48,13 @@ public class Home {
         content = new IPanel(new BorderLayout());
         starter = new Starter();
 
-        IPanel top = new IPanel(new Dimension(0, 80));
+        IPanel northPanel = new IPanel(new BorderLayout());
+        FrameBar frameBar = new FrameBar(frame);
+        northPanel.add(frameBar, BorderLayout.NORTH);
+        IPanel top = new IPanel(new Dimension(0, 60));
+        northPanel.add(top, BorderLayout.CENTER);
+        content.add(northPanel, BorderLayout.NORTH);
+
         JLabel l_path = new JLabel("文件夹");
         JTextField textField = new JTextField(15);
         JButton b_scan = new JButton("扫描");
@@ -69,11 +74,10 @@ public class Home {
         top.add(b_success);
         top.add(b_init);
         top.add(b_check);
-        content.add(top, BorderLayout.NORTH);
         // 创建结果滚动面板
         IPanel center = new IPanel();
         this.center = center;
-        //内边距
+        // 内边距
         center.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(center);
@@ -213,7 +217,7 @@ public class Home {
                 center.addFileBox(file, center);
             });
             center.reload();
-        }else{
+        } else {
             center.removeAll();
             center.add(new JLabel("没有搜索到相关内容！"));
             center.reload();
