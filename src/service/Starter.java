@@ -94,8 +94,6 @@ public class Starter {
                 service.addFile(file, entry.getKey());
             }
         }
-        // 关闭数据库链接
-        service.close();
     }
 
     /**

@@ -1,7 +1,6 @@
 package gui.component;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -16,9 +15,10 @@ public class AddLabel extends JLabel implements MouseListener {
 
     /**
      * 绑定文件的添加标签按钮，可以给文件添加标签
+     * 
      * @param file
      */
-    public AddLabel(IFile file){
+    public AddLabel(IFile file) {
         super("+++");
         this.file = file;
         this.addMouseListener(this);
@@ -26,8 +26,7 @@ public class AddLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Point point = e.getPoint();
-        new TagSellector(file, this, point);
+        new TagSellector(file, this);
     }
 
     @Override
@@ -42,7 +41,7 @@ public class AddLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        //线条边框
+        // 线条边框
         this.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
     }
 

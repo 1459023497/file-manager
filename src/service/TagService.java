@@ -236,7 +236,7 @@ public class TagService {
         }
     }
 
-    /*
+    /**
      * 批量打标签
      */
     public void tags(Collection<ITag> tags, IFile file) {

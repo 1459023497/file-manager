@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,6 +22,7 @@ import javax.swing.WindowConstants;
 
 import entity.IFile;
 import entity.ITag;
+import gui.component.FrameBar;
 import gui.component.IPanel;
 import gui.component.TagLabel;
 import service.FileService;
@@ -28,23 +30,35 @@ import service.TagService;
 import tool.TagColor;
 
 public class Tag {
+    public static final String WIN_NAME = "Tag";
     private IPanel subTop;
     private IPanel center;
     private JComboBox<ITag> groups;
     private FileService fileService;
-    private TagService  tagService;
+    private TagService tagService;
+    private JFrame frame;
 
     public Tag(JFrame father) {
         // 窗口，面版初始化
-        JFrame frame = new JFrame("文件管理");
+        frame = new JFrame("文件管理");
         IPanel content = new IPanel(new BorderLayout());
         content.setBackground(new Color(142, 147, 147));
         center = new IPanel();
-        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));// 新增行布局
+        // 新增行布局
+        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+        fileService = new FileService();
         tagService = new TagService();
+        // 去除装饰，设置透明
+        frame.setUndecorated(true);
+        frame.setOpacity(0.1f);
 
+        IPanel north = new IPanel(new BorderLayout());
+        FrameBar bar = new FrameBar(frame);
+        north.add(bar, BorderLayout.NORTH);
         // 顶部加载面板，按钮和标签
         IPanel top = new IPanel(new Dimension(0, 80));
+        north.add(top, BorderLayout.CENTER);
+        content.add(north, BorderLayout.NORTH);
         // 新标签名字输入
         JTextField newTag = new JTextField(10);
         top.add(newTag);
@@ -84,36 +98,41 @@ public class Tag {
         JButton all = new JButton("全部");
         top.add(all);
         all.addActionListener(e -> {
-            // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
-            HashMap<String, Set<IFile>> files = fileService.getAllFiles();
-            // 获取文件标签字典
-            HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
-            center.removeAll();
-            files.forEach((dir, set) -> {
-                center.addFileBox(dir, center, fileMap);
-                set.forEach(file -> {
-                    // 文件行
-                    center.addFileBox(file, center,fileMap);
-                });
-            });
-            center.reload();
+            queryAll();
         });
         // 添加标签子面板
         top.add(subTop);
-        content.add(top, BorderLayout.NORTH);
         // 创建下方结果滚动面板，用于显示点击标签后的文件
+        center.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         JScrollPane scrollPane = new JScrollPane(center);
         scrollPane.setOpaque(false);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);//设置滚轮速度
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);// 设置滚轮速度
         content.add(scrollPane, BorderLayout.CENTER);
 
         frame.setContentPane(content);
-        frame.setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
+        frame.setIconImage(
+                new ImageIcon("src\\gui\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setSize(400, 500);
         frame.setLocationRelativeTo(father);
         frame.setVisible(true);
+    }
+
+    public void queryAll() {
+        // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
+        HashMap<String, Set<IFile>> files = fileService.getAllFiles();
+        // 获取文件标签字典
+        HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
+        center.removeAll();
+        files.forEach((dir, set) -> {
+            center.addFileBox(dir, center, fileMap);
+            set.forEach(file -> {
+                // 文件行
+                center.addFileBox(file, center, fileMap);
+            });
+        });
+        center.reload();
     }
 
     /**
@@ -159,5 +178,9 @@ public class Tag {
         tags.forEach(tag -> {
             groups.addItem(tag);
         });
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }

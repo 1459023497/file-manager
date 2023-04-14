@@ -2,7 +2,6 @@ package gui.window;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,29 +25,29 @@ public class TagSellector {
     private TagService tagService;
 
     // 添加标签时的选择窗口
-    public TagSellector(IFile file, AddLabel addLabel, Point point) {
+    public TagSellector(IFile file, AddLabel addLabel) {
         // 窗口初始化
         JWindow window = new JWindow();
         IPanel content = new IPanel(new Dimension(210, 300));
         content.setBorder(BorderFactory.createLineBorder(Color.black, 1, true));
         window.setContentPane(content);
-        //透明化
+        // 透明化
         window.setOpacity(0.2f);
         window.pack();
         window.setSize(200, 300);
-        window.setLocationRelativeTo(addLabel);
+        window.setLocationRelativeTo(AppContext.getTag().getFrame());
         window.setVisible(true);
-    
+
         // 顶部显示全部标签和操作按钮
-        IPanel top = new IPanel(new Dimension(200, 100));
+        IPanel top = new IPanel(new Dimension(200, 130));
         top.setBorder(BorderFactory.createLineBorder(Color.gray, 1, true));
         // 底部显示已选择的标签
-        IPanel down = new IPanel(new Dimension(200, 100));
+        IPanel down = new IPanel(new Dimension(200, 130));
         down.setBorder(BorderFactory.createLineBorder(Color.gray, 1, true));
         down.setTags(new HashSet<>());
         // 顶部查询加载全部标签
         tagService = new TagService();
-        HashMap<String,ITag> tagMap = tagService.getTagsMap();
+        HashMap<String, ITag> tagMap = tagService.getTagsMap();
         HashMap<String, Set<String>> groupMap = tagService.getGroupsMap();
         TagColor color = TagColor.RED;
         groupMap.forEach((group, set) -> {
@@ -68,16 +67,8 @@ public class TagSellector {
                 JOptionPane.showMessageDialog(confirm, "你未选择标签！", "错误", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            // 提示用户确认
-            String name = file.getName() == null ? file.getPath() : file.getName();
-            String tap = "确认给[" + name + "] 添加标签 " + tags + " 吗？";
-            int confirmTag = JOptionPane.showConfirmDialog(confirm, tap, "确认信息", JOptionPane.YES_NO_OPTION);
-            if (confirmTag == 0) {
-                // 打标签
-                tagService.tags(tags, file);
-            }
-            JOptionPane.showMessageDialog(confirm, "添加成功！");
-            AppContext.getHome().queryAll();
+            tagService.tags(tags, file);
+            AppContext.getTag().queryAll();
             window.dispose();
         });
         // 点击取消关闭选择窗口

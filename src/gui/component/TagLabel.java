@@ -102,12 +102,6 @@ public class TagLabel extends JLabel implements MouseListener {
         this.setBorder(new RoundedBorder(Color.BLACK, 5));// 圆角边框
         this.setBackground(color);
     }
-
-    // //标签重绘,圆角背景
-    // @Override
-    // protected void paintComponent(Graphics g){
-
-    // }
     
     //设置事件类型
     public void setEvent(int event) {
@@ -121,11 +115,10 @@ public class TagLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        TagService tagService = new TagService();
         if (e.getButton() == MouseEvent.BUTTON1) {
             // 左键点击
             if (event == 1) {
-                // 打开数据库链接
-                TagService tagService = new TagService();
                 // 找到标签下的文件
                 HashMap<String, Set<ITag>> fileMap = tagService.getFileMapByTag(tag);
                 HashMap<String, Set<IFile>> files = tagService.getFilesByTag(tag);
@@ -146,8 +139,6 @@ public class TagLabel extends JLabel implements MouseListener {
                     //panel.add(Box.createVerticalGlue());//撑满空的地方
                 });
                 panel.reload();
-                // 关闭链接
-                tagService.close();
             } else if (event == 2) {
                 // 将标签添加到下方待选列表
                 if(panel.getTags().contains(tag)) return;
@@ -169,10 +160,7 @@ public class TagLabel extends JLabel implements MouseListener {
                 String tap = "你真的要删除[" + tag.getName() + "]标签吗?";
                 int confirmDel = JOptionPane.showConfirmDialog(this, tap, "确认信息", JOptionPane.YES_NO_OPTION);
                 if (confirmDel == JOptionPane.YES_OPTION) {
-                    TagService tagService = new TagService();
                     tagService.deleteTag(tag);
-                    tagService.close();
-                    JOptionPane.showMessageDialog(this, "删除成功！");
                     // 页面信息重载
                     tagWindow.reloadGroups();
                     tagWindow.reloadTags();
@@ -181,10 +169,7 @@ public class TagLabel extends JLabel implements MouseListener {
                 String tap = "你真的要移除该文件的[" + tag.getName() + "]标签吗?";
                 int confirmDel = JOptionPane.showConfirmDialog(this, tap, "确认信息", JOptionPane.YES_NO_OPTION);
                 if (confirmDel == JOptionPane.YES_OPTION) {
-                    TagService tagService = new TagService();
                     tagService.removeTag(tag, file);
-                    tagService.close();
-                    JOptionPane.showMessageDialog(this, "移除成功！");
                     this.setVisible(false);// 先隐藏
                 }
             }
@@ -203,7 +188,6 @@ public class TagLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        // 线条边框
         this.setBorder(new RoundedBorder(Color.red, 5));
 
     }

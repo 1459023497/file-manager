@@ -1,10 +1,7 @@
 package gui.window;
 
-import java.awt.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import common.AppContext;
 import entity.IFile;
 import entity.ITag;
 import gui.component.FileLabel;
@@ -87,7 +85,7 @@ public class Home {
 
         frame.setContentPane(content);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // TODO: 背景透明化
+        // 背景透明化
         frame.setUndecorated(true);// 去掉窗口菜单
         frame.setOpacity(0.1f);
         frame.pack();
@@ -97,49 +95,6 @@ public class Home {
         frame.setVisible(true);
 
         // 以下为事件处理
-        // 添加鼠标监听器，支持拖动窗口
-        MouseAdapter ma = new MouseAdapter() {
-            private int x;
-            private int y;
-
-            /*
-             * 记录鼠标按下时的坐标
-             */
-            @Override
-            public void mousePressed(MouseEvent e) {
-                x = e.getX();
-                y = e.getY();
-            }
-
-            /*
-             * 鼠标移进标题栏时，设置鼠标图标为移动图标
-             */
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                frame.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-            }
-
-            /*
-             * 鼠标移出标题栏时，设置鼠标图标为默认指针
-             */
-            @Override
-            public void mouseExited(MouseEvent e) {
-                frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                // 计算窗口移动后的位置
-                int left = frame.getLocation().x + e.getX() - x;
-                int top = frame.getLocation().y + e.getY() - y;
-                // 移动窗口
-                frame.setLocation(left, top);
-            }
-        };
-        frame.addMouseListener(ma);
-        // 接收鼠标拖动事件
-        frame.addMouseMotionListener(ma);
-
         // 扫描按钮点击事件
         b_scan.addActionListener(e -> {
             // 空路径
@@ -181,7 +136,9 @@ public class Home {
         b_all.addActionListener(e -> queryAll());
 
         // 标签按钮点击事件，打开标签面板
-        b_tag.addActionListener(e -> new Tag(frame));
+        b_tag.addActionListener(e -> {
+            AppContext.setKey(Tag.WIN_NAME, new Tag(frame));
+        });
 
         // 文件写入数据库
         b_init.addActionListener(e1 -> {

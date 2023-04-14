@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import gui.window.Home;
+import gui.window.Tag;
 
 /*
  * 应用上下文
@@ -33,4 +34,9 @@ public class AppContext {
     public static Home getHome() {
         return (Home) map.get(Home.WIN_NAME);
     }
+
+    public static Tag getTag() {
+        return (Tag) map.get(Tag.WIN_NAME);
+    }
+    
 }

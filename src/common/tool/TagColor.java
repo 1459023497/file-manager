@@ -7,7 +7,8 @@ public enum TagColor {
     GREEN(new Color(141, 246, 148), 2),
     BLUE(new Color(186, 255, 235), 3),
     YELLOW(new Color(248, 232, 102), 4),
-    GREY(new Color(134, 123, 123),5);
+    GREY(new Color(200, 200, 200),5);
+    //color: #
 
     private Color color;
     private int index;
