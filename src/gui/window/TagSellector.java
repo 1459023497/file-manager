@@ -8,9 +8,11 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
 
 import common.AppContext;
 import common.tool.TagColor;
@@ -35,7 +37,9 @@ public class TagSellector {
         window.setOpacity(0.2f);
         window.pack();
         window.setSize(200, 300);
-        window.setLocationRelativeTo(AppContext.getTag().getFrame());
+        // 获取组件所在的窗口
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(addLabel);
+        window.setLocationRelativeTo(frame);
         window.setVisible(true);
 
         // 顶部显示全部标签和操作按钮
