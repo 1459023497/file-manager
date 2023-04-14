@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import common.tool.BeanUtils;
+import common.tool.IdGenerator;
 import entity.IFile;
 import entity.ITag;
 import jdbc.JDBCConnector;
-import tool.BeanUtils;
-import tool.IdGenerator;
 
 //文件标签服务，复制标签增删改查
 public class TagService {

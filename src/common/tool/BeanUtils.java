@@ -1,4 +1,4 @@
-package tool;
+package common.tool;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
 import gui.component.FrameBar;
@@ -27,7 +28,6 @@ import gui.component.IPanel;
 import gui.component.TagLabel;
 import service.FileService;
 import service.TagService;
-import tool.TagColor;
 
 public class Tag {
     public static final String WIN_NAME = "Tag";

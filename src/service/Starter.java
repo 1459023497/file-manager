@@ -1,4 +1,4 @@
-package main;
+package service;
 
 import java.io.File;
 import java.util.HashMap;
@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import common.AppContext;
-import service.FileService;
 
 //初始化
 public class Starter {

@@ -1,4 +1,4 @@
-package common;
+package common.tool;
 
 public interface KeyBuilder {
     String HOME = "home:";

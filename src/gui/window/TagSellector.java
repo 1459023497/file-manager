@@ -13,13 +13,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
 import common.AppContext;
+import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
 import gui.component.AddLabel;
 import gui.component.IPanel;
 import gui.component.TagLabel;
 import service.TagService;
-import tool.TagColor;
 
 public class TagSellector {
     private TagService tagService;

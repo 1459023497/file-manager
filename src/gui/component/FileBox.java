@@ -10,10 +10,10 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import org.apache.commons.collections4.CollectionUtils;
 
+import common.tool.FileUtils;
+import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
-import tool.FileUtils;
-import tool.TagColor;
 
 public class FileBox extends Box {
 

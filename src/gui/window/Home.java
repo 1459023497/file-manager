@@ -19,15 +19,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import common.AppContext;
+import common.tool.FileUtils;
 import entity.IFile;
 import entity.ITag;
 import gui.component.FileLabel;
 import gui.component.FrameBar;
 import gui.component.IPanel;
-import main.Starter;
 import service.FileService;
+import service.Starter;
 import service.TagService;
-import tool.FileUtils;
 
 public class Home {
     public final static String WIN_NAME = "Home";

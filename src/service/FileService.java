@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import common.tool.BeanUtils;
+import common.tool.IdGenerator;
 import entity.IFile;
 import entity.ITag;
 import jdbc.JDBCConnector;
-import tool.BeanUtils;
-import tool.IdGenerator;
 
 public class FileService {
     private JDBCConnector conn;
