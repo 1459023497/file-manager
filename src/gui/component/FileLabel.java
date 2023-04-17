@@ -67,9 +67,31 @@ public class FileLabel extends JLabel implements MouseListener {
         this.setText(file.getName());
     }
 
+    /**
+     * 设置高亮搜索字符
+     * 
+     * @param text
+     */
+    public void setHighlight(String text) {
+        String s = getText();
+        int start_pos = s.indexOf(text);
+        int end_pos = start_pos + text.length();
+        // 切分高亮再拼接
+        if (start_pos != -1) {
+            StringBuffer result = new StringBuffer("<html>");
+            result.append(s.substring(0, start_pos));
+            result.append("<font color='red'>");
+            result.append(s.substring(start_pos, end_pos));
+            result.append("</font>");
+            result.append(s.substring(end_pos));
+            result.append("</html>");
+            setText(result.toString());
+        }
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
-        if ((e.getButton() == MouseEvent.BUTTON1) ) {
+        if ((e.getButton() == MouseEvent.BUTTON1)) {
             // 左键点击打开文件
             fileService = new FileService();
             // 路径不存在于本地

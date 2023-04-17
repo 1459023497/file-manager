@@ -1,11 +1,9 @@
 package gui.component;
 
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.LayoutManager;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.JPanel;
@@ -57,20 +55,31 @@ public class IPanel extends JPanel {
         this.tags = tags;
     }
 
-    public void addFileBox(String dir, IPanel center, HashMap<String, Set<ITag>> fileMap) {
-        FileBox dirRow = new FileBox(new IFile(dir), center, fileMap);
-        this.add(dirRow);
-        this.add(Box.createVerticalStrut(3));//垂直間距
-    }
-
-    public void addFileBox(IFile file, IPanel center, HashMap<String, Set<ITag>> fileMap) {
-        FileBox dirRow = new FileBox(file, center, fileMap);
+    /**
+     * 文件夹
+     * @param dir 文件夹
+     * @param center 父面板
+     */
+    public void addFileBox(String dir, IPanel center) {
+        FileBox dirRow = new FileBox(new IFile(dir), center);
         this.add(dirRow);
         this.add(Box.createVerticalStrut(3));
     }
 
+    /**
+     * 文件
+     * @param file 文件
+     * @param center 父面板
+     */
     public void addFileBox(IFile file, IPanel center) {
         FileBox dirRow = new FileBox(file, center);
+        this.add(dirRow);
+        this.add(Box.createVerticalStrut(3));//垂直間距
+    }
+
+    public void addFileBox(IFile file, IPanel center, String highlightText) {
+        FileBox dirRow = new FileBox(file, center);
+        dirRow.setHighlight(highlightText);
         this.add(dirRow);
         this.add(Box.createVerticalStrut(3));
     }

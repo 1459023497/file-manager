@@ -6,7 +6,10 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -121,16 +124,12 @@ public class Tag {
 
     public void queryAll() {
         // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
-        HashMap<String, Set<IFile>> files = fileService.getAllFiles();
-        // 获取文件标签字典
-        HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
+        List<IFile> files = fileService.getAllFiles();
+        Map<String, List<IFile>> map = files.stream().collect(Collectors.groupingBy(IFile::getBelong));
         center.removeAll();
-        files.forEach((dir, set) -> {
-            center.addFileBox(dir, center, fileMap);
-            set.forEach(file -> {
-                // 文件行
-                center.addFileBox(file, center, fileMap);
-            });
+        map.forEach((dir, list) -> {
+            center.addFileBox(dir, center);
+            list.forEach(file -> center.addFileBox(file, center));
         });
         center.reload();
     }

@@ -5,12 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import common.tool.BeanUtils;
@@ -105,59 +102,6 @@ public class FileService {
         return true;
     }
 
-    /**
-     * 查所有文件，按文件夹分类
-     *
-     * @return <文件夹，文件>
-     */
-    public HashMap<String, Set<IFile>> getAllFiles() {
-        String sql = "SELECT * FROM file;";
-        ResultSet rs = conn.select(sql);
-        // 字典《目录：文件》
-        HashMap<String, Set<IFile>> files = new HashMap<>();
-
-        try {
-            while (rs.next()) {
-                IFile file = BeanUtils.getFile(rs);
-                String dir = file.getBelong();
-                if (files.get(dir) == null) {
-                    HashSet<IFile> set = new HashSet<>();
-                    set.add(file);
-                    files.put(dir, set);
-                } else {
-                    files.get(dir).add(file);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            conn.close();
-        }
-        return files;
-    }
-
-    /*
-     * 查所有文件
-     */
-    public List<IFile> getFiles() {
-        String sql = "SELECT * FROM file;";
-        ResultSet rs = conn.select(sql);
-        List<IFile> files = new ArrayList<IFile>();
-
-        try {
-            while (rs.next()) {
-                IFile file = BeanUtils.getFile(rs);
-                files.add(file);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            conn.close();
-        }
-
-        return files;
-    }
-
     /*
      * 查重
      * 
@@ -165,7 +109,7 @@ public class FileService {
      */
     public Map<String, List<IFile>> getRepeatMap() {
         Map<String, List<IFile>> map = new HashMap<String, List<IFile>>();
-        List<IFile> files = getFiles();
+        List<IFile> files = getAllFiles();
         if (!files.isEmpty()) {
             map = files.stream().collect(Collectors.groupingBy(IFile::getSize));
             map = map.entrySet().stream().filter(e -> e.getValue().size() > 1)
@@ -174,13 +118,28 @@ public class FileService {
         return map;
     }
 
-    /*
+    /**
+     * 获取所有文件带标签
+     */
+    public List<IFile> getAllFiles(){
+        String sql = "SELECT * FROM file;";
+        return getFilesAndTags(sql);
+    }
+
+    /**
      * 模糊搜索
      */
     public List<IFile> search(String text) {
-        Map<String, IFile> map = new HashMap<>();
         String sql = "SELECT * FROM file WHERE name LIKE '%" + text + "%';";
+        return getFilesAndTags(sql);
+    }   
+
+    /**
+     * 查询文件带标签
+     */
+    private List<IFile> getFilesAndTags(String sql){
         ResultSet rs = conn.select(sql);
+        Map<String, IFile> map = new HashMap<>();
         try {
             while (rs.next()) {
                 IFile file = BeanUtils.getFile(rs);
@@ -192,16 +151,13 @@ public class FileService {
             conn.close();
         }
         if (!map.isEmpty()) {
-            String sqlFormat = "SELECT ft.file_id, ft.tag_id, t.name, t.'group' FROM file_tag ft LEFT JOIN tag t ON ft.tag_id = t.id WHERE file_id in (%s);";
+            String sqlFormat = "SELECT ft.file_id, ft.tag_id as id, t.name, t.'group' FROM file_tag ft LEFT JOIN tag t ON ft.tag_id = t.id WHERE file_id in (%s);";
             String sql2 = String.format(sqlFormat, map.keySet().stream().collect(Collectors.joining(",")));
             ResultSet rs2 = conn.select(sql2);
             try {
                 while (rs2.next()) {
                     String file_id = rs2.getString("file_id");
-                    String tag_id = rs2.getString("tag_id");
-                    String name = rs2.getString("name");
-                    String group = rs2.getString("group");
-                    ITag tag = new ITag(tag_id, name, group);
+                    ITag tag = BeanUtils.getTag(rs);
                     map.get(file_id).add(tag);
                 }
             } catch (SQLException e) {

@@ -16,6 +16,8 @@ import entity.IFile;
 import entity.ITag;
 
 public class FileBox extends Box {
+    private FileLabel fileLabel;
+    private boolean isDir;
 
     /**
      * 生成一个文件行，包括文件信息，标签，和添加标签按钮
@@ -27,23 +29,10 @@ public class FileBox extends Box {
     public FileBox(IFile file, IPanel panel, HashMap<String, Set<ITag>> fileMap) {
         // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
         super(BoxLayout.X_AXIS);
-        this.setAlignmentX(Component.LEFT_ALIGNMENT);
-        // this.setPreferredSize(new Dimension(0,5));
-        this.setMaximumSize(new Dimension(3000, 20));// 设置组件变化的最大大小
-        // 文件夹只展示路径
-        if (file.isDirectory()) {
-            this.add(new FileLabel(file.getPath(), this));
-            this.add(Box.createHorizontalStrut(5)); // 占位的隐藏间距
-            this.add(new AddLabel(file));
+        init(file, panel);
+        if(isDir){
             return;
-        }
-        // 只有文件才展示大小和标签
-        this.add(new FileLabel(file, this));
-        this.add(Box.createHorizontalStrut(5));
-        // 展示大小
-        String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
-        this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
-        this.add(Box.createHorizontalStrut(5));
+        }            
         // 展示标签
         Set<ITag> tags = fileMap.get(file.getId());
         TagColor color = TagColor.RED;
@@ -58,28 +47,21 @@ public class FileBox extends Box {
         this.add(addLabel);
     }
 
+    /**
+     * 生成一个文件行，包括文件信息，标签，和添加标签按钮
+     * 
+     * @param file  文件
+     * @param panel 承载面板
+     */
     public FileBox(IFile file, IPanel panel) {
         // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
         super(BoxLayout.X_AXIS);
-        this.setAlignmentX(Component.LEFT_ALIGNMENT);
-        // this.setPreferredSize(new Dimension(0,5));
-        this.setMaximumSize(new Dimension(3000, 20));// 设置组件变化的最大大小
-        // 文件夹只展示路径
-        if (file.isDirectory()) {
-            this.add(new FileLabel(file.getPath(), this));
-            this.add(Box.createHorizontalStrut(5)); // 占位的隐藏间距
-            this.add(new AddLabel(file));
+        init(file, panel);
+        if(isDir){
             return;
-        }
-        // 只有文件才展示大小和标签
-        this.add(new FileLabel(file, this));
-        this.add(Box.createHorizontalStrut(5));
-        // 展示大小
-        String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
-        this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
-        this.add(Box.createHorizontalStrut(5));
+        }  
         // 展示标签
-        List<ITag>  tags = file.getTags();
+        List<ITag> tags = file.getTags();
         TagColor color = TagColor.RED;
         if (CollectionUtils.isNotEmpty(tags)) {
             tags.forEach(t -> {
@@ -90,6 +72,33 @@ public class FileBox extends Box {
         // 添加标签按钮
         AddLabel addLabel = new AddLabel(file);
         this.add(addLabel);
+    }
+
+    private void init(IFile file, IPanel panel) {
+        this.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.setMaximumSize(new Dimension(3000, 20));// 设置组件变化的最大大小
+        // 文件夹只展示路径
+        if (file.isDirectory()) {
+            isDir = true;
+            fileLabel = new FileLabel(file.getPath(), this);
+            this.add(fileLabel);
+            this.add(Box.createHorizontalStrut(5)); // 占位的隐藏间距
+            this.add(new AddLabel(file));
+            return;
+        }
+        // 只有文件才展示大小和标签
+        isDir = false;
+        fileLabel = new FileLabel(file, this);
+        this.add(fileLabel);
+        this.add(Box.createHorizontalStrut(5));
+        // 展示大小
+        String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
+        this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
+        this.add(Box.createHorizontalStrut(5));
+    }
+
+    public void setHighlight(String text) {
+        fileLabel.setHighlight(text);
     }
 
 }

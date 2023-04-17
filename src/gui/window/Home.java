@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -21,7 +22,6 @@ import javax.swing.JTextField;
 import common.AppContext;
 import common.tool.FileUtils;
 import entity.IFile;
-import entity.ITag;
 import gui.component.FileLabel;
 import gui.component.FrameBar;
 import gui.component.IPanel;
@@ -149,15 +149,13 @@ public class Home {
         // 点击查重，展示重复文件
         b_check.addActionListener(e1 -> {
             Map<String, List<IFile>> repMap = fileService.getRepeatMap();
-            HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
-
             // 输出大小相同的文件
             center.removeAll();
             repMap.forEach((size, list) -> {
                 center.add(new JLabel("大小：" + FileUtils.getFileSizeString(size)));
                 list.forEach(file -> {
                     // 文件行
-                    center.addFileBox(file, center, fileMap);
+                    center.addFileBox(file, center);
                 });
             });
             b_success.setText("查重完成");
@@ -171,7 +169,7 @@ public class Home {
             center.removeAll();
             files.forEach(file -> {
                 // 文件行
-                center.addFileBox(file, center);
+                center.addFileBox(file, center, text);
             });
             center.reload();
         } else {
@@ -193,17 +191,12 @@ public class Home {
 
     public void queryAll() {
         // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
-        HashMap<String, Set<IFile>> files = fileService.getAllFiles();
-        // 获取文件标签字典
-        HashMap<String, Set<ITag>> fileMap = tagService.getFilesTagsMap();
+        List<IFile> files = fileService.getAllFiles();
+        Map<String, List<IFile>> map = files.stream().collect(Collectors.groupingBy(IFile::getBelong));
         center.removeAll();
-        files.forEach((dir, set) -> {
-            // 目录行
-            center.addFileBox(dir, center, fileMap);
-            set.forEach(file -> {
-                // 文件行
-                center.addFileBox(file, center, fileMap);
-            });
+        map.forEach((dir, list) -> {
+            center.addFileBox(dir, center);
+            list.forEach(file -> center.addFileBox(file, center));
         });
         center.reload();
     }
