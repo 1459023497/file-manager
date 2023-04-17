@@ -1,8 +1,6 @@
 package gui.component;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -20,7 +18,7 @@ public class FrameBar extends JPanel {
      * @param frame 关联窗口
      */
     public FrameBar(JFrame frame) {
-        setLayout(new FlowLayout(FlowLayout.RIGHT));
+        setLayout(new BorderLayout());
         setBackground(Color.lightGray);
         IButton btnMin = new IButton();
         btnMin.setBackground(Color.GREEN);
@@ -28,10 +26,13 @@ public class FrameBar extends JPanel {
         btnMax.setBackground(Color.ORANGE);
         IButton btnClose = new IButton();
         btnClose.setBackground(Color.RED);
-
-        add(btnMin);
-        add(btnMax);
-        add(btnClose);
+        IPanel leftBar = new IPanel();
+        IPanel rightBar = new IPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightBar.add(btnMin);
+        rightBar.add(btnMax);
+        rightBar.add(btnClose);
+        add(leftBar, BorderLayout.CENTER);
+        add(rightBar, BorderLayout.EAST);
 
         btnMin.addActionListener(e -> {
             // 最小化
@@ -87,11 +88,11 @@ public class FrameBar extends JPanel {
                 frame.setLocation(left, top);
             }
         };
-        addMouseListener(ma);
+        leftBar.addMouseListener(ma);
         // 接收鼠标拖动事件
-        addMouseMotionListener(ma);
+        leftBar.addMouseMotionListener(ma);
 
-        // todo: 边框调整还未生效，待完成
+        // TODO: 边框调整还未生效，待完成
         MouseAdapter btnMa = new MouseAdapter() {
             Border border;
 

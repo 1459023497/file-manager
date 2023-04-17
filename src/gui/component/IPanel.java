@@ -17,6 +17,9 @@ public class IPanel extends JPanel {
     //标签列表
     private HashSet<ITag> tags;
 
+    /**
+     * 透明面板
+     */
     public IPanel(){
         super();
         init();
