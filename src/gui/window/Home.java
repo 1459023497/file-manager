@@ -27,7 +27,6 @@ import gui.component.FrameBar;
 import gui.component.IPanel;
 import service.FileService;
 import service.Starter;
-import service.TagService;
 
 public class Home {
     public final static String WIN_NAME = "Home";
@@ -36,12 +35,10 @@ public class Home {
     private IPanel center;
     private Starter starter;
     private FileService fileService;
-    private TagService tagService;
 
     public Home() {
         // 窗口，面版初始化
         fileService = new FileService();
-        tagService = new TagService();
         frame = new JFrame("文件管理");
         content = new IPanel(new BorderLayout());
         starter = new Starter();

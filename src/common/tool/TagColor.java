@@ -18,6 +18,10 @@ public enum TagColor {
         this.index = index;
     }
 
+    public void init(){
+        this.index = 1;
+    }
+
     public Color getColor() {
         return color;
     }

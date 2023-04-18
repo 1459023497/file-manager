@@ -157,7 +157,7 @@ public class FileService {
             try {
                 while (rs2.next()) {
                     String file_id = rs2.getString("file_id");
-                    ITag tag = BeanUtils.getTag(rs);
+                    ITag tag = BeanUtils.getTag(rs2);
                     map.get(file_id).add(tag);
                 }
             } catch (SQLException e) {

@@ -30,12 +30,13 @@ public class FileBox extends Box {
         // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
         super(BoxLayout.X_AXIS);
         init(file, panel);
-        if(isDir){
+        if (isDir) {
             return;
-        }            
+        }
         // 展示标签
         Set<ITag> tags = fileMap.get(file.getId());
         TagColor color = TagColor.RED;
+        color.init();
         if (tags != null) {
             tags.forEach(t -> {
                 this.add(new TagLabel(t, color.next(), panel, 1, file));
@@ -57,12 +58,13 @@ public class FileBox extends Box {
         // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
         super(BoxLayout.X_AXIS);
         init(file, panel);
-        if(isDir){
+        if (isDir) {
             return;
-        }  
+        }
         // 展示标签
         List<ITag> tags = file.getTags();
         TagColor color = TagColor.RED;
+        color.init();
         if (CollectionUtils.isNotEmpty(tags)) {
             tags.forEach(t -> {
                 this.add(new TagLabel(t, color.next(), panel, 1, file));
