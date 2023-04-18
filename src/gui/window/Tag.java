@@ -1,32 +1,22 @@
 package gui.window;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 
 import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
-import gui.component.FrameBar;
+import gui.component.IFrame;
 import gui.component.IPanel;
 import gui.component.TagLabel;
 import service.FileService;
@@ -39,29 +29,17 @@ public class Tag {
     private JComboBox<ITag> groups;
     private FileService fileService;
     private TagService tagService;
-    private JFrame frame;
+    private IFrame frame;
 
     public Tag(JFrame father) {
-        // 窗口，面版初始化
-        frame = new JFrame("文件管理");
-        IPanel content = new IPanel(new BorderLayout());
-        content.setBackground(new Color(142, 147, 147));
-        center = new IPanel();
-        // 新增行布局
-        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         fileService = new FileService();
         tagService = new TagService();
-        // 去除装饰，设置透明
-        frame.setUndecorated(true);
-        frame.setOpacity(0.1f);
 
-        IPanel north = new IPanel(new BorderLayout());
-        FrameBar bar = new FrameBar(frame);
-        north.add(bar, BorderLayout.NORTH);
         // 顶部加载面板，按钮和标签
         IPanel top = new IPanel(new Dimension(0, 80));
-        north.add(top, BorderLayout.CENTER);
-        content.add(north, BorderLayout.NORTH);
+        frame = new IFrame("标签管理", top);
+        center = frame.getCenter();
+        frame.setLocationRelativeTo(father);
         // 新标签名字输入
         JTextField newTag = new JTextField(10);
         top.add(newTag);
@@ -76,6 +54,16 @@ public class Tag {
         // 标签有上下级关系，可以进行分组，如 水果是一个标签，默认分组为空，即为最高级，下级可以为苹果，香蕉等标签
         JButton addTag = new JButton("新建标签");
         top.add(addTag);
+        // 显示全部文件按钮，点击事件
+        JButton all = new JButton("全部");
+        top.add(all);
+        // 添加标签子面板
+        top.add(subTop);
+
+        all.addActionListener(e -> {
+            queryAll();
+        });
+
         addTag.addActionListener((a) -> {
             // 获取新标签名和选择的父标签
             ITag selectedTag = (ITag) groups.getSelectedItem();
@@ -97,41 +85,13 @@ public class Tag {
                 reloadTags();
             }
         });
-        // 显示全部文件按钮，点击事件
-        JButton all = new JButton("全部");
-        top.add(all);
-        all.addActionListener(e -> {
-            queryAll();
-        });
-        // 添加标签子面板
-        top.add(subTop);
-        // 创建下方结果滚动面板，用于显示点击标签后的文件
-        center.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JScrollPane scrollPane = new JScrollPane(center);
-        scrollPane.setOpaque(false);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);// 设置滚轮速度
-        content.add(scrollPane, BorderLayout.CENTER);
 
-        frame.setContentPane(content);
-        frame.setIconImage(
-                new ImageIcon("src\\gui\\icon\\home.png").getImage().getScaledInstance(80, 80, Image.SCALE_DEFAULT));
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        frame.pack();
-        frame.setSize(400, 500);
-        frame.setLocationRelativeTo(father);
-        frame.setVisible(true);
     }
 
     public void queryAll() {
         // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
         List<IFile> files = fileService.getAllFiles();
-        Map<String, List<IFile>> map = files.stream().collect(Collectors.groupingBy(IFile::getBelong));
-        center.removeAll();
-        map.forEach((dir, list) -> {
-            center.addFileBox(dir, center);
-            list.forEach(file -> center.addFileBox(file, center));
-        });
-        center.reload();
+        frame.showContents(files);
     }
 
     /**

@@ -1,6 +1,5 @@
 package gui.window;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.HashMap;
@@ -9,47 +8,35 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import common.AppContext;
 import common.tool.FileUtils;
 import entity.IFile;
 import gui.component.FileLabel;
-import gui.component.FrameBar;
+import gui.component.IFrame;
 import gui.component.IPanel;
 import service.FileService;
 import service.Starter;
 
 public class Home {
     public final static String WIN_NAME = "Home";
-    private JFrame frame;
+    private IFrame frame;
     private IPanel content;
     private IPanel center;
     private Starter starter;
     private FileService fileService;
 
     public Home() {
-        // 窗口，面版初始化
         fileService = new FileService();
-        frame = new JFrame("文件管理");
-        content = new IPanel(new BorderLayout());
         starter = new Starter();
 
-        IPanel northPanel = new IPanel(new BorderLayout());
-        FrameBar frameBar = new FrameBar(frame);
-        northPanel.add(frameBar, BorderLayout.NORTH);
+        //功能面板
         IPanel top = new IPanel(new Dimension(0, 60));
-        northPanel.add(top, BorderLayout.CENTER);
-        content.add(northPanel, BorderLayout.NORTH);
-
         JLabel l_path = new JLabel("文件夹");
         JTextField textField = new JTextField(15);
         JButton b_scan = new JButton("扫描");
@@ -69,27 +56,8 @@ public class Home {
         top.add(b_success);
         top.add(b_init);
         top.add(b_check);
-        // 创建结果滚动面板
-        IPanel center = new IPanel();
-        this.center = center;
-        // 内边距
-        center.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-        JScrollPane scrollPane = new JScrollPane(center);
-        scrollPane.setOpaque(false);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);// 设置滚轮速度
-        content.add(scrollPane, BorderLayout.CENTER);
-
-        frame.setContentPane(content);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // 背景透明化
-        frame.setUndecorated(true);// 去掉窗口菜单
-        frame.setOpacity(0.1f);
-        frame.pack();
-        frame.setSize(400, 500);
-        frame.setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage());
-        frame.setLocationRelativeTo(null);// 居中显示
-        frame.setVisible(true);
+        frame = new IFrame("文件管理", top);
+        center = frame.getCenter();
 
         // 以下为事件处理
         // 扫描按钮点击事件
@@ -187,14 +155,7 @@ public class Home {
     }
 
     public void queryAll() {
-        // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
         List<IFile> files = fileService.getAllFiles();
-        Map<String, List<IFile>> map = files.stream().collect(Collectors.groupingBy(IFile::getBelong));
-        center.removeAll();
-        map.forEach((dir, list) -> {
-            center.addFileBox(dir, center);
-            list.forEach(file -> center.addFileBox(file, center));
-        });
-        center.reload();
+        frame.showContents(files);
     }
 }
