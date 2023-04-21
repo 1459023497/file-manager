@@ -1,4 +1,4 @@
-package gui.window;
+package test;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -28,6 +28,7 @@ import javax.swing.border.BevelBorder;
 
 import gui.component.FrameBar;
 import gui.component.IPanel;
+import gui.component.ScratchPanel;
 
 public class Money {
     private JFrame frame;
@@ -52,7 +53,7 @@ public class Money {
         IPanel north = new IPanel(new BorderLayout());
         FrameBar bar = new FrameBar(frame);
         IPanel top = new IPanel();
-        top.setLayout(new BoxLayout(top,BoxLayout.Y_AXIS));
+        top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
         top.setPreferredSize(new Dimension(400, 100));
         north.add(bar, BorderLayout.NORTH);
         north.add(top, BorderLayout.CENTER);
@@ -83,7 +84,6 @@ public class Money {
         top.add(top1);
         top.add(top2);
         top.add(top3);
-
 
         initTarget();
         retry(center, rows, cols);
@@ -193,6 +193,7 @@ public class Money {
         back.add(label1);
         back.add(label2);
         JPanel front = new JPanel();
+        //ScratchPanel front = new ScratchPanel("src\\gui\\icon\\silver.jpeg", 100, 100);
         front.setBackground(Color.gray);
         panel.add(back, "back");
         panel.add(front, "front");
