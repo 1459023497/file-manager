@@ -83,5 +83,10 @@ public class IFrame extends JFrame {
         this.center = center;
     }
 
+    //底部栏
+    public void setBottom(IPanel panel){
+        content.add(panel, BorderLayout.SOUTH);
+        content.reload();
+    }
     
 }

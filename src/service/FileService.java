@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,5 +170,26 @@ public class FileService {
         } else {
             return null;
         }
+    }
+
+    /**
+     * 未打标签的文件
+     * @return
+     */
+    public List<IFile> getUntaggedFiles() {
+        String sql = "SELECT * FROM file WHERE id not in (SELECT DISTINCT file_id FROM file_tag);";
+        List<IFile> files = new ArrayList<IFile>();
+        ResultSet rs = conn.select(sql);
+        try {
+            while (rs.next()) {
+                IFile file = BeanUtils.getFile(rs);
+                files.add(file);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            conn.close();
+        }
+        return files;
     }
 }

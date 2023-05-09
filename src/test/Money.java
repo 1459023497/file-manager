@@ -28,7 +28,6 @@ import javax.swing.border.BevelBorder;
 
 import gui.component.FrameBar;
 import gui.component.IPanel;
-import gui.component.ScratchPanel;
 
 public class Money {
     private JFrame frame;
@@ -193,7 +192,6 @@ public class Money {
         back.add(label1);
         back.add(label2);
         JPanel front = new JPanel();
-        //ScratchPanel front = new ScratchPanel("src\\gui\\icon\\silver.jpeg", 100, 100);
         front.setBackground(Color.gray);
         panel.add(back, "back");
         panel.add(front, "front");
@@ -213,7 +211,8 @@ public class Money {
                 }
             }
         });
-        return panel;
+        //return panel;
+        return back;
 
     }
 

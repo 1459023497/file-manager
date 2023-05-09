@@ -11,12 +11,11 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 
 import javax.imageio.ImageIO;
-import javax.swing.JPanel;
 
-public class ScratchPanel extends JPanel implements MouseListener, MouseMotionListener {
+public class ScratchPanel extends IPanel implements MouseListener, MouseMotionListener {
     private BufferedImage maskImg;
     private Graphics2D maskG2D;
-    private int mouseX, mouseY, brushSize = 20;
+    private int mouseX, mouseY, brushSize = 100;
 
     public ScratchPanel(String imagePath, int width, int height) {
         try {
@@ -33,6 +32,8 @@ public class ScratchPanel extends JPanel implements MouseListener, MouseMotionLi
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        //绘制文字
+        g.drawString("hello world", 30, 30);
         g.drawImage(maskImg, 0, 0, null);
     }
 

@@ -2,5 +2,14 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "src\\libs\\sqlite-jdbc-3.7.2.jar"
+    ],
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 100,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:file-manager}/src/test.db",
+            "name": "test,db"
+        }
     ]
 }

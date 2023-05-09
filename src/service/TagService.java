@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import common.myenum.Status;
 import common.tool.BeanUtils;
 import common.tool.IdGenerator;
 import entity.IFile;
@@ -292,6 +295,17 @@ public class TagService {
         for (IFile file : files) {
             String sql = "DELETE FROM file_tag WHERE file_id='" + file.getId() + "' AND tag_id ='" + tag.getId() + "';";
             conn.update(sql);
+        }
+    }
+
+    /**
+     * 添加文件存在的新标签
+     * @param files
+     */
+    public void tag(List<IFile> files) {
+        for(IFile file : files) {
+            List<ITag> tags = file.getTags().stream().filter(e->e.getStatus().equals(Status.INSERT)).collect(Collectors.toList());
+            tags(tags, file);
         }
     }
 

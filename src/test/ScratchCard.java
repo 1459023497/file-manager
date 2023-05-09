@@ -15,7 +15,7 @@ public class ScratchCard extends JPanel implements MouseListener, MouseMotionLis
 
     private BufferedImage backImg, maskImg;
     private Graphics2D maskG2D;
-    private int mouseX, mouseY, brushSize = 30;
+    private int mouseX, mouseY, brushSize = 100;
 
     public ScratchCard(String backgroundPath) {
         try {

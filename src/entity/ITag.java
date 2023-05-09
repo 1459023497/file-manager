@@ -1,5 +1,7 @@
 package entity;
 
+import common.myenum.Status;
+
 /* 
  * 标签
  */
@@ -7,6 +9,7 @@ public class ITag {
     private String id;
     private String name;
     private String group;
+    private Status status = Status.BROWSE;
 
     public ITag(String name){
         this.name = name;
@@ -48,6 +51,14 @@ public class ITag {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override

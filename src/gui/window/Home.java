@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,27 +17,34 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import common.AppContext;
+import common.myenum.Status;
 import common.tool.FileUtils;
 import entity.IFile;
+import entity.ITag;
 import gui.component.FileLabel;
 import gui.component.IFrame;
 import gui.component.IPanel;
 import service.FileService;
 import service.Starter;
+import service.TagService;
 
 public class Home {
     public final static String WIN_NAME = "Home";
     private IFrame frame;
     private IPanel content;
     private IPanel center;
+    private IPanel bottom;
     private Starter starter;
     private FileService fileService;
+    private TagService tagService;
+    private List<IFile> files;
 
     public Home() {
         fileService = new FileService();
+        tagService = new TagService();
         starter = new Starter();
 
-        //功能面板
+        // 功能面板
         IPanel top = new IPanel(new Dimension(0, 60));
         JLabel l_path = new JLabel("文件夹");
         JTextField textField = new JTextField(15);
@@ -45,6 +55,13 @@ public class Home {
         JLabel b_success = new JLabel("扫描成功");
         JButton b_init = new JButton("初始化");
         JButton b_check = new JButton("查重");
+        JButton b_auto = new JButton("自动归类");
+        bottom = new IPanel();
+        JButton b_confirm = new JButton("确认");
+        JButton b_cancel = new JButton("取消");
+        bottom.add(b_confirm);
+        bottom.add(b_cancel);
+        bottom.setVisible(false);
         b_success.setVisible(false);
         top.add(l_path);
         top.add(textField);
@@ -55,8 +72,11 @@ public class Home {
         top.add(b_success);
         top.add(b_init);
         top.add(b_check);
+        top.add(b_auto);
         frame = new IFrame("文件管理", top);
         center = frame.getCenter();
+        frame.setBottom(bottom);
+
 
         // 以下为事件处理
         // 扫描按钮点击事件
@@ -84,6 +104,21 @@ public class Home {
 
             }
         });
+
+        b_auto.addActionListener(e -> {
+            autoTag();
+        });
+
+        b_confirm.addActionListener(e ->{
+            tagService.tag(files);
+            queryAll();
+            bottom.setVisible(false);
+        } );
+
+        b_cancel.addActionListener(e ->{
+            queryAll();
+            bottom.setVisible(false);
+        } );
 
         // 搜索文件
         b_search.addActionListener(e -> {
@@ -156,5 +191,32 @@ public class Home {
     public void queryAll() {
         List<IFile> files = fileService.getAllFiles();
         frame.showContents(files);
+    }
+
+    /**
+     * 给没有标签的文件自动贴标签
+     */
+    public void autoTag() {
+        List<ITag> tags = tagService.getAllTags();
+        // 标签name字典
+        Map<String, ITag> tagMap = tags.stream().collect(Collectors.toMap(ITag::getName, v -> v));
+        String[] keywords = tags.stream().map(ITag::getName).collect(Collectors.toList()).toArray(new String[0]);
+        files = fileService.getUntaggedFiles();
+        //正则匹配
+        String patternString = "\\b(" + String.join("|", keywords) + ")\\b";
+        Pattern pattern = Pattern.compile(patternString);
+        for (IFile file : files) {
+            String name = file.getName();
+            // 找到文件名中可能包含的标签
+            Matcher matcher = pattern.matcher(name);
+            while (matcher.find()) {
+                String tagName = matcher.group();
+                ITag tag = tagMap.get(tagName);
+                tag.setStatus(Status.INSERT);
+                file.add(tag);
+            }
+        }
+        frame.showContents(files);
+        bottom.setVisible(true);
     }
 }
