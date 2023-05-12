@@ -101,8 +101,8 @@ public class Home {
                 b_success.setVisible(true);
                 center.reload();
                 content.reload();
-
             }
+            bottom.setVisible(false);
         });
 
         b_auto.addActionListener(e -> {
@@ -129,20 +129,26 @@ public class Home {
             } else {
                 search(text);
             }
+            bottom.setVisible(false);
         });
 
         // 全部按钮点击事件，展示数据库全部文件
-        b_all.addActionListener(e -> queryAll());
+        b_all.addActionListener(e -> {
+            queryAll();
+            bottom.setVisible(false);
+        });
 
         // 标签按钮点击事件，打开标签面板
         b_tag.addActionListener(e -> {
             AppContext.setKey(Tag.WIN_NAME, new Tag(frame));
+            bottom.setVisible(false);
         });
 
         // 文件写入数据库
         b_init.addActionListener(e1 -> {
             starter.init();
             b_success.setText("写入完成");
+            bottom.setVisible(false);
         });
 
         // 点击查重，展示重复文件
@@ -159,6 +165,7 @@ public class Home {
             });
             b_success.setText("查重完成");
             center.reload();
+            bottom.setVisible(false);
         });
     }
 
@@ -176,6 +183,7 @@ public class Home {
             center.add(new JLabel("没有搜索到相关内容！"));
             center.reload();
         }
+        bottom.setVisible(false);
 
     }
 
@@ -202,7 +210,7 @@ public class Home {
         Map<String, ITag> tagMap = tags.stream().collect(Collectors.toMap(ITag::getName, v -> v));
         String[] keywords = tags.stream().map(ITag::getName).collect(Collectors.toList()).toArray(new String[0]);
         files = fileService.getUntaggedFiles();
-        //正则匹配
+        // 正则匹配
         String patternString = "\\b(" + String.join("|", keywords) + ")\\b";
         Pattern pattern = Pattern.compile(patternString);
         for (IFile file : files) {

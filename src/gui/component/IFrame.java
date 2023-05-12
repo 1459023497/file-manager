@@ -9,9 +9,11 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import entity.IFile;
+import entity.ITag;
 
 public class IFrame extends JFrame {
     private IPanel content;
@@ -31,7 +33,8 @@ public class IFrame extends JFrame {
         content.add(northPanel, BorderLayout.NORTH);
 
         // 创建结果滚动面板
-        this.center = new IPanel();;
+        this.center = new IPanel();
+        ;
         // 内边距
         center.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
@@ -42,7 +45,7 @@ public class IFrame extends JFrame {
 
         setContentPane(content);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //背景透明化
+        // 背景透明化
         setUndecorated(true);// 去掉窗口菜单
         setOpacity(0.1f);
         pack();
@@ -55,16 +58,23 @@ public class IFrame extends JFrame {
     /**
      * 展示内容
      */
-    public void showContents(List<IFile> files) {
-        // 按文件夹：文件的方式输出，带上文件的标签
-        Map<String, List<IFile>> map = files.stream().collect(Collectors.groupingBy(IFile::getBelong));
+    public void showContents(List<?> files) {
         center.removeAll();
-        map.forEach((dir, list) -> {
-            center.addFileBox(dir, center);
-            list.forEach(file -> center.addFileBox(file, center));
-        });
+        if (files.isEmpty()) {
+            center.add(new JLabel("无结果"));
+        } else {
+            if (files.get(0) instanceof IFile) {
+                // 按文件夹：文件的方式输出，带上文件的标签
+                Map<String, List<IFile>> map = files.stream().map(e-> (IFile)e).collect(Collectors.groupingBy(IFile::getBelong));
+                map.forEach((dir, list) -> {
+                    center.addFileBox(dir, center);
+                    list.forEach(file -> center.addFileBox(file, center));
+                });
+            }else if(files.get(0) instanceof ITag){
+                // TODO 输出
+            }
+        }
         center.reload();
-
     }
 
     public IPanel getContent() {
@@ -83,10 +93,10 @@ public class IFrame extends JFrame {
         this.center = center;
     }
 
-    //底部栏
-    public void setBottom(IPanel panel){
+    // 底部栏
+    public void setBottom(IPanel panel) {
         content.add(panel, BorderLayout.SOUTH);
         content.reload();
     }
-    
+
 }

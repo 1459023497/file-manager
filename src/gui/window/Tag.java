@@ -57,6 +57,9 @@ public class Tag {
         // 显示全部文件按钮，点击事件
         JButton all = new JButton("全部");
         top.add(all);
+        //关联标签
+        JButton bindTag = new JButton("关联标签");
+        top.add(bindTag);
         // 添加标签子面板
         top.add(subTop);
 
@@ -84,6 +87,10 @@ public class Tag {
                 reloadGroups();
                 reloadTags();
             }
+        });
+
+        bindTag.addActionListener(e->{
+            new TagBinder(frame);
         });
 
     }

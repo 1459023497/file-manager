@@ -105,7 +105,7 @@ public class TagService {
             while (rs.next()) {
                 String fileId = rs.getString("file_id");
                 ITag tag = BeanUtils.getTag(rs);
-                map.computeIfAbsent(fileId, k-> new HashSet<>()).add(tag);
+                map.computeIfAbsent(fileId, k -> new HashSet<>()).add(tag);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -300,13 +300,52 @@ public class TagService {
 
     /**
      * 添加文件存在的新标签
+     * 
      * @param files
      */
     public void tag(List<IFile> files) {
-        for(IFile file : files) {
-            List<ITag> tags = file.getTags().stream().filter(e->e.getStatus().equals(Status.INSERT)).collect(Collectors.toList());
+        for (IFile file : files) {
+            List<ITag> tags = file.getTags().stream().filter(e -> e.getStatus().equals(Status.INSERT))
+                    .collect(Collectors.toList());
             tags(tags, file);
         }
+    }
+
+    /**
+     * 绑定标签关键词
+     * 
+     * @param id   标签id
+     * @param keys 关键词
+     */
+    public void tagKeys(String tagId, String[] keys) {
+        StringBuffer batch = new StringBuffer();
+        for (String key : keys) {
+            batch.append("INSERT INTO tag_key VALUES ('" + idGenerator.next() + "','" + tagId + "','" + key + "');");
+        }
+        conn.update(batch.toString());
+    }
+
+    /**
+     * 获取全部标签带关键词
+     * 
+     * @return
+     */
+    public List<ITag> getAllTagsWithKeys() {
+        // 词采用拼接
+        ResultSet rs = conn.select(
+                "select t.id,t.name,t.'group', GROUP_CONCAT(tk.key) as key from tag t left join tag_key tk on t.id = tk.tag_id group by t.id;");
+        List<ITag> tags = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                ITag tag = BeanUtils.getTagWithKey(rs);
+                tags.add(tag);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            conn.close();
+        }
+        return tags;
     }
 
 }

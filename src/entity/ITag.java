@@ -1,5 +1,7 @@
 package entity;
 
+import java.util.List;
+
 import common.myenum.Status;
 
 /* 
@@ -9,6 +11,7 @@ public class ITag {
     private String id;
     private String name;
     private String group;
+    private List<String> keys;
     private Status status = Status.BROWSE;
 
     public ITag(String name){
@@ -61,9 +64,19 @@ public class ITag {
         this.status = status;
     }
 
+    
+
     @Override
     public String toString() {
         return name;
+    }
+
+    public List<String> getKeys() {
+        return keys;
+    }
+
+    public void setKeys(List<String> keys) {
+        this.keys = keys;
     }
 
     
