@@ -103,6 +103,15 @@ public class TagLabel extends JLabel implements MouseListener {
         this.setBackground(color);
     }
     
+    public TagLabel(ITag tag, Color next) {
+        super(tag.getName());
+        this.tag = tag;
+        this.setOpaque(true);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));// 圆角边框
+        this.setBackground(color);
+
+    }
+
     //设置事件类型
     public void setEvent(int event) {
         this.event = event;

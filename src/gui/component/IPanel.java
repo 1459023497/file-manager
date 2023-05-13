@@ -84,4 +84,10 @@ public class IPanel extends JPanel {
         this.add(Box.createVerticalStrut(3));
     }
 
+    public void addTagBox(ITag tag, IPanel center) {
+        TagBox dirRow = new TagBox(tag);
+        this.add(dirRow);
+        this.add(Box.createVerticalStrut(3));
+    }
+
 }

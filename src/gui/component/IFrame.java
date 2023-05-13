@@ -47,7 +47,7 @@ public class IFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // 背景透明化
         setUndecorated(true);// 去掉窗口菜单
-        setOpacity(0.1f);
+        //setOpacity(0.1f);
         pack();
         setSize(400, 500);
         setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage());
@@ -58,20 +58,24 @@ public class IFrame extends JFrame {
     /**
      * 展示内容
      */
-    public void showContents(List<?> files) {
+    public void showContents(List<?> items) {
         center.removeAll();
-        if (files.isEmpty()) {
+        if (items.isEmpty()) {
             center.add(new JLabel("无结果"));
         } else {
-            if (files.get(0) instanceof IFile) {
+            if (items.get(0) instanceof IFile) {
                 // 按文件夹：文件的方式输出，带上文件的标签
-                Map<String, List<IFile>> map = files.stream().map(e-> (IFile)e).collect(Collectors.groupingBy(IFile::getBelong));
+                Map<String, List<IFile>> map = items.stream().map(e-> (IFile)e).collect(Collectors.groupingBy(IFile::getBelong));
                 map.forEach((dir, list) -> {
                     center.addFileBox(dir, center);
                     list.forEach(file -> center.addFileBox(file, center));
                 });
-            }else if(files.get(0) instanceof ITag){
+            }else if(items.get(0) instanceof ITag){
                 // TODO 输出
+                items.forEach(e->{
+                    ITag tag = (ITag) e;
+                    center.addTagBox(tag, center);
+                });
             }
         }
         center.reload();

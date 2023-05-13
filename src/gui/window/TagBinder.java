@@ -37,6 +37,7 @@ public class TagBinder {
         confirm.addActionListener(e->{
             //确定绑定标签关键词
             String text = input.getText();
+            if (text.length() == 0) return;
             String[] keys = text.split(",");
             ITag tag = (ITag) tagSellector.getSelectedItem();
             tagService.tagKeys(tag.getId(), keys);
