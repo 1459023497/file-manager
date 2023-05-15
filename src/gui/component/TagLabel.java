@@ -103,7 +103,7 @@ public class TagLabel extends JLabel implements MouseListener {
         this.setBackground(color);
     }
     
-    public TagLabel(ITag tag, Color next) {
+    public TagLabel(ITag tag, Color color) {
         super(tag.getName());
         this.tag = tag;
         this.setOpaque(true);

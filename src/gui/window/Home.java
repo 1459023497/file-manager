@@ -2,13 +2,13 @@ package gui.window;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -77,7 +77,6 @@ public class Home {
         center = frame.getCenter();
         frame.setBottom(bottom);
 
-
         // 以下为事件处理
         // 扫描按钮点击事件
         b_scan.addActionListener(e -> {
@@ -109,16 +108,16 @@ public class Home {
             autoTag();
         });
 
-        b_confirm.addActionListener(e ->{
+        b_confirm.addActionListener(e -> {
             tagService.tag(files);
             queryAll();
             bottom.setVisible(false);
-        } );
+        });
 
-        b_cancel.addActionListener(e ->{
+        b_cancel.addActionListener(e -> {
             queryAll();
             bottom.setVisible(false);
-        } );
+        });
 
         // 搜索文件
         b_search.addActionListener(e -> {
@@ -205,23 +204,35 @@ public class Home {
      * 给没有标签的文件自动贴标签
      */
     public void autoTag() {
-        List<ITag> tags = tagService.getAllTags();
-        // 标签name字典
-        Map<String, ITag> tagMap = tags.stream().collect(Collectors.toMap(ITag::getName, v -> v));
-        String[] keywords = tags.stream().map(ITag::getName).collect(Collectors.toList()).toArray(new String[0]);
+        List<ITag> tags = tagService.getAllTagsWithKeys();
+        Map<String, List<ITag>> tagMap = new HashMap<>();
+        tags.forEach(tag -> {
+            List<String> keys = tag.getKeys();
+            // 将名字和关键词作为索引
+            tagMap.computeIfAbsent(tag.getName(), k -> new ArrayList<>()).add(tag);
+            keys.forEach(key -> {
+                tagMap.computeIfAbsent(key, k -> new ArrayList<>()).add(tag);
+            });
+        });
         files = fileService.getUntaggedFiles();
         // 正则匹配
-        String patternString = "\\b(" + String.join("|", keywords) + ")\\b";
+        String[] keywords = tagMap.keySet().toArray(new String[0]);
+        String patternString = "^.+(" + String.join("|", keywords) + ")\\b";
         Pattern pattern = Pattern.compile(patternString);
         for (IFile file : files) {
             String name = file.getName();
             // 找到文件名中可能包含的标签
             Matcher matcher = pattern.matcher(name);
             while (matcher.find()) {
-                String tagName = matcher.group();
-                ITag tag = tagMap.get(tagName);
-                tag.setStatus(Status.INSERT);
-                file.add(tag);
+                // 直接group()会输出哈巴狗，在group()方法外再调用一次group(1)获取第一个捕获组的内容：哈巴狗->狗。
+                String tagName = matcher.group(1);
+                List<ITag> matchTags = tagMap.get(tagName);
+                if (matchTags != null) {
+                    matchTags.forEach(tag -> {
+                        tag.setStatus(Status.INSERT);
+                        file.add(tag);
+                    });
+                }
             }
         }
         frame.showContents(files);

@@ -328,7 +328,7 @@ public class TagService {
     /**
      * 获取全部标签带关键词
      * 
-     * @return
+     * @return 标签列表
      */
     public List<ITag> getAllTagsWithKeys() {
         // 词采用拼接
@@ -346,6 +346,14 @@ public class TagService {
             conn.close();
         }
         return tags;
+    }
+
+    /**
+     * 删除标签关键词
+     */
+    public void deleteTagKey(String tagId, String key) {
+        String sql = "delete from tag_key where tag_id = '" + tagId + "' and key = '" + key + "';";
+        conn.update(sql);
     }
 
 }

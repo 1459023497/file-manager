@@ -47,7 +47,7 @@ public class IFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // 背景透明化
         setUndecorated(true);// 去掉窗口菜单
-        //setOpacity(0.1f);
+        setOpacity(0.1f);
         pack();
         setSize(400, 500);
         setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage());
@@ -71,7 +71,7 @@ public class IFrame extends JFrame {
                     list.forEach(file -> center.addFileBox(file, center));
                 });
             }else if(items.get(0) instanceof ITag){
-                // TODO 输出
+                // 输出标签，关键词
                 items.forEach(e->{
                     ITag tag = (ITag) e;
                     center.addTagBox(tag, center);

@@ -72,7 +72,7 @@ public class TagSellector {
                 return;
             }
             tagService.tags(tags, file);
-            AppContext.getTag().queryAll();
+            AppContext.getHome().queryAll();
             window.dispose();
         });
         // 点击取消关闭选择窗口
