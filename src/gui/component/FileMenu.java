@@ -7,6 +7,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import com.alibaba.druid.util.StringUtils;
+
 import common.AppContext;
 import entity.IFile;
 import gui.window.Home;
@@ -21,6 +23,7 @@ public class FileMenu extends JPopupMenu {
      * @param fileBox 该文件行
      */
     public FileMenu(IFile file, FileLabel fileLabel, FileBox fileBox) {
+        FileService fileService = new FileService();
         //菜单选项
         JMenuItem rename = new JMenuItem("重命名");
         JMenuItem delete = new JMenuItem("删除");
@@ -31,13 +34,13 @@ public class FileMenu extends JPopupMenu {
             public void actionPerformed(ActionEvent e){
                 // 弹出输入框，更新名字
                 String input = JOptionPane.showInputDialog(fileLabel, "新命名", file.getName());
-                if (input != null && !input.equals("")) {
-                    file.setName(input);
-                    FileService fileService = new FileService();
-                    fileService.renameFile(file);
-                    fileService.close();
-                    // 刷新文件
-                    fileLabel.setFile(file);
+                if (!StringUtils.isEmpty(input)) {
+                    if(file.isExist()){
+                        file.setName(input);
+                        fileService.renameFile(file);
+                        // 刷新文件
+                        fileLabel.setFile(file);   
+                    }
                 }
             }
         });
@@ -49,9 +52,7 @@ public class FileMenu extends JPopupMenu {
                 String message  = file.isDirectory() ? "确认删除该文件夹吗？":"确认删除该文件吗？";
                 int confirm = JOptionPane.showConfirmDialog(fileLabel, message, "确认", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    FileService fileService = new FileService();
                     fileService.removeFile(file);
-                    fileService.close();
                     // 移除文件
                     fileBox.setVisible(false);
                     //删除文件夹需要刷新界面

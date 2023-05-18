@@ -1,8 +1,10 @@
 package entity;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Desktop;
 
 public class IFile {
     private String id;
@@ -10,7 +12,7 @@ public class IFile {
     private String path;
     private String size;
     private String belong;
-    private boolean isDirectory = false;//默认是文件夹
+    private boolean isDirectory = false;//默认是文件
     private List<ITag> tags;
 
     public IFile(){
@@ -117,5 +119,30 @@ public class IFile {
     public void add(ITag tag){
         tags.add(tag);
     }
+
+    /**
+    * @param file
+    * @return true if file exists, false otherwise
+    */
+   public boolean isExist() {
+       File f = new File(path);
+       if (f.exists()){
+           return true;
+       }
+       return false;
+   }
+
+   public boolean open(){
+    File file = new File(path);
+    if (!file.exists())
+        return false;
+    try {
+        // 打开文件
+        Desktop.getDesktop().open(file);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+    return true;
+   }
     
 }

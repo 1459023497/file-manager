@@ -47,19 +47,26 @@ public class FileService {
     }
 
     /**
-     * 重命名
+     * rename the file
      * 
      * @param file
      */
-    public void renameFile(IFile file) {
-        String name = file.getName();
-        String id = file.getId();
-        String sql = "UPDATE file SET name = '" + name + "' WHERE id = '" + id + "';";
+    public void renameFile(IFile iFile) {
+        //rename the real file
+        File file = new File(iFile.getPath());
+        File newFile = new File(file.getParent(), iFile.getName());
+        file.renameTo(newFile);
+
+        //rename the file in the database 
+        String id = iFile.getId();
+        String sql = "UPDATE file SET name = '" + newFile.getName() + "',path='"+newFile.getPath()+"' WHERE id = '" + id + "';";
         conn.update(sql);
+        //reset
+        iFile.setPath(newFile.getPath());
     }
 
     /**
-     * 删除文件
+     * delee the file
      *
      * @param file
      */
@@ -73,7 +80,7 @@ public class FileService {
     }
 
     /**
-     * 删除文件夹
+     * delete the folder
      * 
      * @param dir
      */
@@ -84,7 +91,7 @@ public class FileService {
     }
 
     /**
-     * 打开文件
+     * open the file
      *
      * @param path
      * @return true-打开路径, false-路径不存在

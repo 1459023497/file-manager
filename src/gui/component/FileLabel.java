@@ -8,33 +8,29 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 import entity.IFile;
-import service.FileService;
 
 /**
  * 实现了鼠标监听的自定义文件标签
  */
 public class FileLabel extends JLabel implements MouseListener {
-
-    private FileService fileService;
-
     private String path;
 
     private IFile file;
-    // 是否第一次提示路径不存在
+    // first show the tip for no existed file
     private boolean firstTap = true;
 
     private FileBox fileBox;
 
-    // 文件夹
+    // folder
     public FileLabel(String dir) {
         super("<--" + dir + "-->");
-        setForeground(Color.MAGENTA);// 字体颜色
+        setForeground(Color.MAGENTA);
         path = dir;
         file = new IFile(dir);
         this.addMouseListener(this);
     }
 
-    // 文件
+    // file
     public FileLabel(IFile file) {
         super(file.getName());
         this.file = file;
@@ -42,33 +38,39 @@ public class FileLabel extends JLabel implements MouseListener {
         this.addMouseListener(this);
     }
 
-    // 文件夹
+    // folder
     public FileLabel(String dir, FileBox fileBox) {
         super("<--" + dir + "-->");
-        setForeground(Color.MAGENTA);// 字体颜色
+        setForeground(Color.MAGENTA);
         path = dir;
         file = new IFile(dir);
         this.fileBox = fileBox;
         this.addMouseListener(this);
     }
 
-    // 文件
+    // file and folder
     public FileLabel(IFile file, FileBox fileBox) {
-        super(file.getName());
+        super();
+        if(file.isDirectory()){
+            setText("<--" + file.getPath() + "-->");
+            setForeground(Color.MAGENTA);// text color
+        }else{
+            setText(file.getName());
+        }
         this.file = file;
         path = file.getPath();
         this.fileBox = fileBox;
         this.addMouseListener(this);
     }
 
-    // 刷新文件
+    // reset
     public void setFile(IFile file) {
         this.file = file;
         this.setText(file.getName());
     }
 
     /**
-     * 设置高亮搜索字符
+     * highlighting the search characters 
      * 
      * @param text
      */
@@ -92,16 +94,15 @@ public class FileLabel extends JLabel implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         if ((e.getButton() == MouseEvent.BUTTON1)) {
-            // 左键点击打开文件
-            fileService = new FileService();
-            // 路径不存在于本地
-            if (!fileService.openDir(path) && firstTap) {
+            if (!file.isExist() && firstTap) {
                 firstTap = false;
-                this.setText(this.getText() + "     该路径不存在！");
+                this.setText(this.getText() + "  该路径不存在！");
+            } else {
+                file.open();
             }
         }
         if ((e.getButton() == MouseEvent.BUTTON3) && fileBox != null) {
-            // 文件右键菜单
+            // click right button to show file menu
             new FileMenu(file, this, fileBox).show(this, e.getX(), e.getY());
         }
     }
@@ -118,7 +119,6 @@ public class FileLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        // 线条边框
         this.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
     }
 
