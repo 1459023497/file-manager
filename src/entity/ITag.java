@@ -12,7 +12,7 @@ public class ITag {
     private String name;
     private String group;
     private List<String> keys;
-    private Status status = Status.BROWSE;
+    private int status = Status.BROWSE;
 
     public ITag(String name){
         this.name = name;
@@ -56,15 +56,13 @@ public class ITag {
         this.group = group;
     }
 
-    public Status getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(int status) {
         this.status = status;
     }
-
-    
 
     @Override
     public String toString() {
@@ -78,7 +76,5 @@ public class ITag {
     public void setKeys(List<String> keys) {
         this.keys = keys;
     }
-
-    
     
 }

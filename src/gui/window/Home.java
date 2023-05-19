@@ -17,13 +17,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import common.AppContext;
+import common.myenum.InfoType;
 import common.myenum.Status;
 import common.tool.FileUtils;
 import entity.IFile;
 import entity.ITag;
 import gui.component.FileLabel;
-import gui.component.IFrame;
-import gui.component.IPanel;
+import gui.component.base.IDialog;
+import gui.component.base.IFrame;
+import gui.component.base.IPanel;
 import service.FileService;
 import service.Starter;
 import service.TagService;
@@ -52,27 +54,29 @@ public class Home {
         JButton b_search = new JButton("搜索");
         JButton b_all = new JButton("全部");
         JButton b_tag = new JButton("标签");
-        JLabel b_success = new JLabel("扫描成功");
+        JLabel l_success = new JLabel("扫描成功");
         JButton b_init = new JButton("初始化");
         JButton b_check = new JButton("查重");
         JButton b_auto = new JButton("自动归类");
+        JButton b_bulid = new JButton("生成目录");
         bottom = new IPanel();
         JButton b_confirm = new JButton("确认");
         JButton b_cancel = new JButton("取消");
         bottom.add(b_confirm);
         bottom.add(b_cancel);
         bottom.setVisible(false);
-        b_success.setVisible(false);
+        l_success.setVisible(false);
         top.add(l_path);
         top.add(textField);
         top.add(b_scan);
         top.add(b_search);
         top.add(b_all);
         top.add(b_tag);
-        top.add(b_success);
+        top.add(l_success);
         top.add(b_init);
         top.add(b_check);
         top.add(b_auto);
+        top.add(b_bulid);
         frame = new IFrame("文件管理", top);
         center = frame.getCenter();
         frame.setBottom(bottom);
@@ -97,7 +101,7 @@ public class Home {
                     center.add(new FileLabel(dir));
                     files.forEach(file -> center.add(new FileLabel(new IFile(file))));
                 });
-                b_success.setVisible(true);
+                l_success.setVisible(true);
                 center.reload();
                 content.reload();
             }
@@ -146,7 +150,7 @@ public class Home {
         // 文件写入数据库
         b_init.addActionListener(e1 -> {
             starter.init();
-            b_success.setText("写入完成");
+            l_success.setText("写入完成");
             bottom.setVisible(false);
         });
 
@@ -162,9 +166,25 @@ public class Home {
                     center.addFileBox(file, center);
                 });
             });
-            b_success.setText("查重完成");
+            l_success.setText("查重完成");
             center.reload();
             bottom.setVisible(false);
+        });
+
+        // 根据标签结构在指定位置生成目录
+        b_bulid.addActionListener(e -> {
+            // JFileChooser fileChooser = new JFileChooser();
+            // fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            // fileChooser.setCurrentDirectory(new File("D:/"));
+            
+            // int result = fileChooser.showOpenDialog(frame);
+            // if (result == JFileChooser.APPROVE_OPTION) {
+            //     File file = fileChooser.getSelectedFile();
+            //     String path = file.getPath();
+            //     IFolder topFolder = tagService.getTagFolder(path);
+            //     topFolder.generate();
+            // }
+            new IDialog(frame, "已生成文件目录！", InfoType.INFO);
         });
     }
 

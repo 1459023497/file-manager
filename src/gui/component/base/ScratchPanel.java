@@ -1,4 +1,4 @@
-package gui.component;
+package gui.component.base;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics;

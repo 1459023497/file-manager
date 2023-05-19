@@ -1,4 +1,4 @@
-package gui.component;
+package gui.component.base;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;

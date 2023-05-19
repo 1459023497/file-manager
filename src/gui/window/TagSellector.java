@@ -2,8 +2,8 @@ package gui.window;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -19,8 +19,8 @@ import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
 import gui.component.AddLabel;
-import gui.component.IPanel;
 import gui.component.TagLabel;
+import gui.component.base.IPanel;
 import service.TagService;
 
 public class TagSellector {
@@ -51,8 +51,8 @@ public class TagSellector {
         down.setTags(new HashSet<>());
         // 顶部查询加载全部标签
         tagService = new TagService();
-        HashMap<String, ITag> tagMap = tagService.getTagsMap();
-        HashMap<String, Set<String>> groupMap = tagService.getGroupsMap();
+        Map<String, ITag> tagMap = tagService.getTagsMap();
+        Map<String, Set<String>> groupMap = tagService.getGroupsMap();
         TagColor color = TagColor.RED;
         groupMap.forEach((group, set) -> {
             // 每次选择的标签会添加到下方的待选面板

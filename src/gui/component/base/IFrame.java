@@ -1,4 +1,4 @@
-package gui.component;
+package gui.component.base;
 
 import java.awt.*;
 import java.util.Map;
@@ -14,6 +14,7 @@ import javax.swing.JScrollPane;
 
 import entity.IFile;
 import entity.ITag;
+import gui.component.FrameBar;
 
 public class IFrame extends JFrame {
     private IPanel content;
@@ -101,6 +102,20 @@ public class IFrame extends JFrame {
     public void setBottom(IPanel panel) {
         content.add(panel, BorderLayout.SOUTH);
         content.reload();
+    }
+
+    public Point getCenterPointOnScreen(){
+        int width = getWidth();  
+        int height = getHeight();
+        int centerX = width / 2;      
+        int centerY = height / 2;
+        
+        int frameX = getX();  
+        int frameY = getY();
+        
+        int screenCenterX = frameX + centerX;  
+        int screenCenterY = frameY + centerY; 
+        return new Point(screenCenterX,screenCenterY);
     }
 
 }

@@ -12,7 +12,7 @@ import javax.swing.JWindow;
 
 import entity.IFile;
 import gui.component.FileLabel;
-import gui.component.IPanel;
+import gui.component.base.IPanel;
 import service.FileService;
 
 public class FileMenu {

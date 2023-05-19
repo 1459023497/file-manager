@@ -1,6 +1,6 @@
 package common.tool;
 
-import java.awt.*;
+import java.awt.Color;
 
 public enum TagColor {
     RED(new Color(250, 183, 183), 1),

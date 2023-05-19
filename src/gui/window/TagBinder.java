@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 
 import entity.ITag;
 import gui.component.HintTextField;
-import gui.component.IFrame;
-import gui.component.IPanel;
+import gui.component.base.IFrame;
+import gui.component.base.IPanel;
 import service.TagService;
 
 public class TagBinder {

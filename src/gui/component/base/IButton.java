@@ -1,4 +1,4 @@
-package gui.component;
+package gui.component.base;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;

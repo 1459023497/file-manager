@@ -2,18 +2,20 @@ package gui.component;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+
 import org.apache.commons.collections4.CollectionUtils;
 
 import common.tool.FileUtils;
 import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
+import gui.component.base.IPanel;
 
 public class FileBox extends Box {
     private FileLabel fileLabel;
@@ -26,7 +28,7 @@ public class FileBox extends Box {
      * @param panel   承载面板
      * @param fileMap 文件标签字典
      */
-    public FileBox(IFile file, IPanel panel, HashMap<String, Set<ITag>> fileMap) {
+    public FileBox(IFile file, IPanel panel, Map<String, Set<ITag>> fileMap) {
         // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
         super(BoxLayout.X_AXIS);
         init(file, panel);
@@ -84,9 +86,11 @@ public class FileBox extends Box {
         this.add(fileLabel);
         this.add(Box.createHorizontalStrut(5));
         // 展示大小
-        String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
-        this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
-        this.add(Box.createHorizontalStrut(5));
+        if (!isDir) {
+            String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
+            this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
+            this.add(Box.createHorizontalStrut(5));
+        }
     }
 
     public void setHighlight(String text) {

@@ -1,18 +1,9 @@
 package common.myenum;
 
-public enum Status {
-    INSERT("insert"),
-    UPDATE("update"),
-    BROWSE("browse"),
-    DELETE("delete");
-
-    private String status;
-
-    Status(String status) {
-        this.status = status;
-    }
-
-    public String getStatus() {
-        return status;
-    }
+public interface Status {
+    int UNCHANGED = 0;
+    int INSERT = 1;
+    int UPDATE = 2;
+    int BROWSE = 3;
+    int DELETE = 4;
 }

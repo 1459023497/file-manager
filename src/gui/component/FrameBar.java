@@ -10,6 +10,9 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
+import gui.component.base.IButton;
+import gui.component.base.IPanel;
+
 public class FrameBar extends JPanel {
 
     /**

@@ -13,8 +13,6 @@ import entity.IFile;
  * 实现了鼠标监听的自定义文件标签
  */
 public class FileLabel extends JLabel implements MouseListener {
-    private String path;
-
     private IFile file;
     // first show the tip for no existed file
     private boolean firstTap = true;
@@ -25,7 +23,6 @@ public class FileLabel extends JLabel implements MouseListener {
     public FileLabel(String dir) {
         super("<--" + dir + "-->");
         setForeground(Color.MAGENTA);
-        path = dir;
         file = new IFile(dir);
         this.addMouseListener(this);
     }
@@ -34,7 +31,6 @@ public class FileLabel extends JLabel implements MouseListener {
     public FileLabel(IFile file) {
         super(file.getName());
         this.file = file;
-        path = file.getPath();
         this.addMouseListener(this);
     }
 
@@ -42,7 +38,6 @@ public class FileLabel extends JLabel implements MouseListener {
     public FileLabel(String dir, FileBox fileBox) {
         super("<--" + dir + "-->");
         setForeground(Color.MAGENTA);
-        path = dir;
         file = new IFile(dir);
         this.fileBox = fileBox;
         this.addMouseListener(this);
@@ -58,7 +53,6 @@ public class FileLabel extends JLabel implements MouseListener {
             setText(file.getName());
         }
         this.file = file;
-        path = file.getPath();
         this.fileBox = fileBox;
         this.addMouseListener(this);
     }

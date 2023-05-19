@@ -1,4 +1,4 @@
-package gui.component;
+package gui.component.base;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 
 import entity.IFile;
 import entity.ITag;
+import gui.component.FileBox;
+import gui.component.TagBox;
 
 public class IPanel extends JPanel {
     //标签列表

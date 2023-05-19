@@ -3,7 +3,7 @@ package gui.component;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Box;
@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 
 import entity.IFile;
 import entity.ITag;
+import gui.component.base.IPanel;
+import gui.component.base.RoundedBorder;
 import gui.window.Tag;
 import service.TagService;
 
@@ -129,8 +131,8 @@ public class TagLabel extends JLabel implements MouseListener {
             // 左键点击
             if (event == 1) {
                 // 找到标签下的文件
-                HashMap<String, Set<ITag>> fileMap = tagService.getFileMapByTag(tag);
-                HashMap<String, Set<IFile>> files = tagService.getFilesByTag(tag);
+                Map<String, Set<ITag>> fileMap = tagService.getFileMapByTag(tag);
+                Map<String, Set<IFile>> files = tagService.getFilesByTag(tag);
                 // 显示结果
                 panel.removeAll();
                 files.forEach((dir, fileSet) -> {

@@ -2,8 +2,8 @@ package gui.window;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -16,9 +16,9 @@ import javax.swing.JTextField;
 import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
-import gui.component.IFrame;
-import gui.component.IPanel;
 import gui.component.TagLabel;
+import gui.component.base.IFrame;
+import gui.component.base.IPanel;
 import service.FileService;
 import service.TagService;
 
@@ -107,8 +107,8 @@ public class Tag {
     public void reloadTags() {
         subTop.removeAll();
         // 获取标签和标签组的字典
-        HashMap<String, ITag> tagMap = tagService.getTagsMap();
-        HashMap<String, Set<String>> groupMap = tagService.getGroupsMap();
+        Map<String, ITag> tagMap = tagService.getTagsMap();
+        Map<String, Set<String>> groupMap = tagService.getGroupsMap();
         TagColor color = TagColor.RED;
         groupMap.forEach((groupId, tagSet) -> {
             subTop.add(new JLabel("【"));

@@ -7,13 +7,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import common.myenum.Status;
 import common.tool.BeanUtils;
 import common.tool.IdGenerator;
 import entity.IFile;
+import entity.IFolder;
 import entity.ITag;
 import jdbc.JDBCConnector;
 
@@ -75,7 +79,7 @@ public class TagService {
      * 标签字典《标签id，标签》
      *
      */
-    public HashMap<String, ITag> getTagsMap() {
+    public Map<String, ITag> getTagsMap() {
         ResultSet rs = conn.select("select * from tag;");
         HashMap<String, ITag> tagMap = new HashMap<>();
         try {
@@ -116,11 +120,52 @@ public class TagService {
     }
 
     /**
+     * 按标签结构生成目录结构
+     * 
+     * @return
+     */
+    public IFolder getTagFolder(String topPath) {
+        IFolder topFolder = new IFolder(topPath);
+        Map<String, ITag> tagMap = getTagsMap();
+        Map<String, Set<String>> groupMap = getGroupsMap();
+        // 只对最上级标签做递归
+        groupMap.forEach((k, v) -> {
+            ITag tag = tagMap.get(k);
+            if (tag.getGroup().equals("无分组")) {
+                String path = topPath + "\\" + tag.getName();
+                IFolder folder = new IFolder(path, tag.getName());
+                topFolder.addSubFolder(folder);
+                v.forEach(e -> {
+                    findSub(groupMap, tagMap, e, folder);
+                });
+            }
+        });
+        return topFolder;
+    }
+
+    /**
+     * 向内递归
+     */
+    public void findSub(Map<String, Set<String>> groupMap, Map<String, ITag> tagMap, String tagId, IFolder folder) {
+        ITag tag = tagMap.get(tagId);
+        String path = folder.getPath() + "\\" + tag.getName();
+        IFolder subFolder = new IFolder(path, tag.getName());
+        if (CollectionUtils.isNotEmpty(groupMap.get(tagId))) {
+            groupMap.get(tagId).forEach(subTagId -> {
+                // 有子标签，继续向内递归
+                findSub(groupMap, tagMap, subTagId, subFolder);
+            });
+        }
+        // 将自己添加到父标签
+        folder.addSubFolder(subFolder);
+    }
+
+    /**
      * 标签分组字典《标签id，set《标签id》》
      */
-    public HashMap<String, Set<String>> getGroupsMap() {
-        HashMap<String, ITag> tagMap = getTagsMap();
-        HashMap<String, Set<String>> groupMap = new HashMap<>();
+    public Map<String, Set<String>> getGroupsMap() {
+        Map<String, ITag> tagMap = getTagsMap();
+        Map<String, Set<String>> groupMap = new HashMap<>();
         tagMap.values().forEach(tag -> {
             String id = tag.getId();
             String group = tag.getGroup();
@@ -150,7 +195,7 @@ public class TagService {
      * @param tag
      * @return map 【文件id,【标签】】
      */
-    public HashMap<String, Set<ITag>> getFileMapByTag(ITag tag) {
+    public Map<String, Set<ITag>> getFileMapByTag(ITag tag) {
         String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
                 + "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
@@ -175,7 +220,7 @@ public class TagService {
      * @param tag
      * @return map 【目录,【文件】】
      */
-    public HashMap<String, Set<IFile>> getFilesByTag(ITag tag) {
+    public Map<String, Set<IFile>> getFilesByTag(ITag tag) {
         String sql = "SELECT * FROM file WHERE id IN (\n" +
                 "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
@@ -305,7 +350,7 @@ public class TagService {
      */
     public void tag(List<IFile> files) {
         for (IFile file : files) {
-            List<ITag> tags = file.getTags().stream().filter(e -> e.getStatus().equals(Status.INSERT))
+            List<ITag> tags = file.getTags().stream().filter(e -> e.getStatus() == Status.INSERT)
                     .collect(Collectors.toList());
             tags(tags, file);
         }
