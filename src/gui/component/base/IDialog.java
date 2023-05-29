@@ -1,8 +1,11 @@
 package gui.component.base;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JWindow;
@@ -11,12 +14,12 @@ import javax.swing.Timer;
 import common.myenum.InfoType;
 import common.tool.TagColor;
 
-public class IDialog extends JWindow{
-    public IDialog(IFrame frame, String info, int type){
+public class IDialog extends JWindow {
+    public IDialog(IFrame frame, String info, int type) {
         super();
         RoundPanel panel = new RoundPanel();
         setContentPane(panel);
-        if(type == InfoType.INFO){
+        if (type == InfoType.INFO) {
             panel.setBackground(TagColor.GREEN.getColor());
         }
         panel.setBorder(new RoundedBorder(Color.BLACK, 20));
@@ -28,11 +31,25 @@ public class IDialog extends JWindow{
         setFocusableWindowState(false);
         setSize(100, 20);
 
-        //TODO: 设置位置
-        setLocation(frame.getCenterPointOnScreen());
-        //setLocationRelativeTo(frame);
+        // position
+        Point point = frame.getCenterPointOnScreen();
+        point.x = point.x - getWidth() / 2;
+        point.y = point.y - frame.getHeight() / 2 + 30;
+        setLocation(point);
+        // setLocationRelativeTo(frame);
         pack();
         setVisible(true);
+        
+        // follow the frame's position changes
+        frame.addComponentListener(new ComponentAdapter() {
+            public void componentMoved(ComponentEvent e) {
+                // position
+                Point point = frame.getCenterPointOnScreen();
+                point.x = point.x - getWidth() / 2 + 15; // fix 
+                point.y = point.y - frame.getHeight() / 2 + 30;
+                setLocation(point);
+            }
+        });
 
         // dispose after 3 seconds
         Timer timer = new Timer(3000, new ActionListener() {
@@ -44,5 +61,5 @@ public class IDialog extends JWindow{
         timer.setRepeats(false);
         timer.start();
     }
-    
+
 }

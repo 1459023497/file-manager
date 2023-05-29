@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -21,6 +22,7 @@ import common.myenum.InfoType;
 import common.myenum.Status;
 import common.tool.FileUtils;
 import entity.IFile;
+import entity.IFolder;
 import entity.ITag;
 import gui.component.FileLabel;
 import gui.component.base.IDialog;
@@ -79,7 +81,7 @@ public class Home {
         top.add(b_bulid);
         frame = new IFrame("文件管理", top);
         center = frame.getCenter();
-        frame.setBottom(bottom);
+        frame.setRoot(bottom);
 
         // 以下为事件处理
         // 扫描按钮点击事件
@@ -173,17 +175,17 @@ public class Home {
 
         // 根据标签结构在指定位置生成目录
         b_bulid.addActionListener(e -> {
-            // JFileChooser fileChooser = new JFileChooser();
-            // fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            // fileChooser.setCurrentDirectory(new File("D:/"));
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fileChooser.setCurrentDirectory(new File("D:/"));
             
-            // int result = fileChooser.showOpenDialog(frame);
-            // if (result == JFileChooser.APPROVE_OPTION) {
-            //     File file = fileChooser.getSelectedFile();
-            //     String path = file.getPath();
-            //     IFolder topFolder = tagService.getTagFolder(path);
-            //     topFolder.generate();
-            // }
+            int result = fileChooser.showOpenDialog(frame);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                String path = file.getPath();
+                IFolder topFolder = tagService.getTagFolder(path);
+                topFolder.generate();
+            }
             new IDialog(frame, "已生成文件目录！", InfoType.INFO);
         });
     }
@@ -193,7 +195,6 @@ public class Home {
         if (files != null) {
             center.removeAll();
             files.forEach(file -> {
-                // 文件行
                 center.addFileBox(file, center, text);
             });
             center.reload();

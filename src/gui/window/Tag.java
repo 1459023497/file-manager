@@ -1,6 +1,7 @@
 package gui.window;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import common.tool.TagColor;
@@ -48,7 +50,8 @@ public class Tag {
         reloadGroups();
         top.add(groups);
         // 标签子面板,加载全部标签
-        subTop = new IPanel(new Dimension(400, 50));
+        subTop = new IPanel(new Dimension(400, 60));
+        JScrollPane scrollPane =  new JScrollPane(subTop);
         reloadTags();
         // 添加标签按钮，事件
         // 标签有上下级关系，可以进行分组，如 水果是一个标签，默认分组为空，即为最高级，下级可以为苹果，香蕉等标签
@@ -61,7 +64,7 @@ public class Tag {
         JButton bindTag = new JButton("关联标签");
         top.add(bindTag);
         // 添加标签子面板
-        top.add(subTop);
+        top.add(scrollPane);
 
         all.addActionListener(e -> {
             queryAll();

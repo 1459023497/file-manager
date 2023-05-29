@@ -1,24 +1,25 @@
 package gui.component;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 
 import gui.component.base.IButton;
 import gui.component.base.IPanel;
 
 public class FrameBar extends JPanel {
+    private int state = 0;
 
     /**
-     * 自定义窗口栏
+     * diy framebar
      * 
-     * @param frame 关联窗口
+     * @param frame father frame
      */
     public FrameBar(JFrame frame) {
         setLayout(new BorderLayout());
@@ -38,27 +39,34 @@ public class FrameBar extends JPanel {
         add(rightBar, BorderLayout.EAST);
 
         btnMin.addActionListener(e -> {
-            // 最小化
+            // min
             frame.setExtendedState(JFrame.ICONIFIED);
         });
 
         btnMax.addActionListener(e -> {
-            // 最大化
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            if (state == JFrame.MAXIMIZED_BOTH) {
+                // nomal
+                frame.setExtendedState(JFrame.NORMAL);
+
+            } else if (state == JFrame.NORMAL) {
+                // max
+                frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                state = JFrame.MAXIMIZED_BOTH;
+            }
+
         });
 
         btnClose.addActionListener(e -> {
-            // 关闭
             frame.dispose();
         });
 
-        // 添加鼠标监听器，支持拖动窗口
+        // add listener to support moving frame
         MouseAdapter ma = new MouseAdapter() {
             private int x;
             private int y;
 
             /*
-             * 记录鼠标按下时的坐标
+             * record mouse position
              */
             @Override
             public void mousePressed(MouseEvent e) {
@@ -67,7 +75,7 @@ public class FrameBar extends JPanel {
             }
 
             /*
-             * 鼠标移进标题栏时，设置鼠标图标为移动图标
+             * mouse in
              */
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -75,7 +83,7 @@ public class FrameBar extends JPanel {
             }
 
             /*
-             * 鼠标移出标题栏时，设置鼠标图标为默认指针
+             * mouse out
              */
             @Override
             public void mouseExited(MouseEvent e) {
@@ -84,44 +92,16 @@ public class FrameBar extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                // 计算窗口移动后的位置
+                // compute the last position
                 int left = frame.getLocation().x + e.getX() - x;
                 int top = frame.getLocation().y + e.getY() - y;
-                // 移动窗口
+                // reset location
                 frame.setLocation(left, top);
             }
         };
         leftBar.addMouseListener(ma);
-        // 接收鼠标拖动事件
+        // listen for mouse moving
         leftBar.addMouseMotionListener(ma);
-
-        // TODO: 边框调整还未生效，待完成
-        MouseAdapter btnMa = new MouseAdapter() {
-            Border border;
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                Object source = e.getSource();
-                if (source instanceof IButton) {
-                    IButton btn = (IButton) source;
-                    border = btn.getBorder();
-                    btn.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-                }
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                Object source = e.getSource();
-                if (source instanceof IButton) {
-                    IButton btn = (IButton) source;
-                    btn.setBorder(border);
-                }
-            }
-        };
-
-        btnMin.addMouseListener(btnMa);
-        btnMax.addMouseListener(btnMa);
-        btnClose.addMouseListener(btnMa);
     }
 
 }

@@ -1,14 +1,19 @@
 package gui.component.base;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Shape;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 
-import javax.swing.*;
+import javax.swing.JButton;
 
-public class IButton extends JButton{
+public class IButton extends JButton {
 
     /*
-     * 自定义圆形按钮
+     * diy round button
      */
     public IButton() {
         super();
@@ -16,15 +21,29 @@ public class IButton extends JButton{
     }
 
     private void Iinit() {
-        setBackground(new Color(0, 0, 0, 0)); // 将背景颜色设为透明
-        setFocusPainted(false); // 取消焦点边框
-        setContentAreaFilled(false);// 取消周围区域
-        //setForeground(Color.BLACK); // 设置前景颜色为黑色
-        // 获取外部设置的大小
+        setBackground(new Color(0, 0, 0, 0)); // transparent
+        setFocusPainted(false); // cancel focus border
+        setContentAreaFilled(false);// don't fill the content area
+        // setForeground(Color.BLACK); 
         Dimension size = getPreferredSize();
         size.width = size.height = Math.max(size.width, size.height);
         setPreferredSize(size);
-        setPreferredSize(new Dimension(20, 20)); // 强制设置大小为
+        setPreferredSize(new Dimension(20, 20)); // forced size
+
+        // change color 
+        addMouseListener(new MouseAdapter() {
+            Color color;
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                color = getBackground();
+                setBackground(Color.BLACK);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                setBackground(color);
+            }
+        });
     }
 
     public IButton(String label) {
@@ -33,30 +52,32 @@ public class IButton extends JButton{
     }
 
     protected void paintComponent(Graphics g) {
-        if (getModel().isArmed()) { // 如果按钮被按下
-            g.setColor(Color.darkGray); // 绘制灰色的圆形背景
+        if (getModel().isArmed()) {
+            // press the button
+            g.setColor(Color.darkGray); 
         } else {
-            g.setColor(getBackground()); // 使用按钮的背景色绘制圆形背景
+            // owned color
+            g.setColor(getBackground());
         }
-        g.fillOval(0, 0, getSize().width - 1, getSize().height - 1); // 绘制圆形背景
+        g.fillOval(0, 0, getSize().width - 1, getSize().height - 1); // fill rounded background
         super.paintComponent(g);
     }
 
-    // 绘制圆形边框
+    // paint rounded border
     protected void paintBorder(Graphics g) {
         g.setColor(Color.lightGray);
         g.drawOval(0, 0, getSize().width - 1, getSize().height - 1);
     }
 
-    // shape对象用于保存按钮的形状，用于监听事件
+    // create a rounded shape for listeners
     Shape shape;
 
     public boolean contains(int x, int y) {
         if ((shape == null) || (!shape.getBounds().equals(getBounds()))) {
-            // 构造一个圆的对象
+            // creat a rouded shape
             shape = new Ellipse2D.Float(0, 0, getWidth(), getHeight());
         }
-        // 判断鼠标坐标是否落在按钮形状内
+        // it contains mouse point?
         return shape.contains(x, y);
     }
 }
