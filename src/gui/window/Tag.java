@@ -2,6 +2,8 @@ package gui.window;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.LayoutManager;
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,17 +40,20 @@ public class Tag {
         tagService = new TagService();
 
         // 顶部加载面板，按钮和标签
-        IPanel top = new IPanel(new Dimension(0, 80));
+        IPanel top = new IPanel(new Dimension(0, 100));
+        top.setLayout(new BorderLayout());
         frame = new IFrame("标签管理", top);
         center = frame.getCenter();
         frame.setLocationRelativeTo(father);
+        IPanel menu = new IPanel();
+        top.add(menu, BorderLayout.NORTH);
         // 新标签名字输入
         JTextField newTag = new JTextField(10);
-        top.add(newTag);
+        menu.add(newTag);
         // 加载分组下拉列表
         groups = new JComboBox<>();
         reloadGroups();
-        top.add(groups);
+        menu.add(groups);
         // 标签子面板,加载全部标签
         subTop = new IPanel(new Dimension(400, 60));
         JScrollPane scrollPane =  new JScrollPane(subTop);
@@ -56,15 +61,15 @@ public class Tag {
         // 添加标签按钮，事件
         // 标签有上下级关系，可以进行分组，如 水果是一个标签，默认分组为空，即为最高级，下级可以为苹果，香蕉等标签
         JButton addTag = new JButton("新建标签");
-        top.add(addTag);
+        menu.add(addTag);
         // 显示全部文件按钮，点击事件
         JButton all = new JButton("全部");
-        top.add(all);
+        menu.add(all);
         //关联标签
         JButton bindTag = new JButton("关联标签");
-        top.add(bindTag);
+        menu.add(bindTag);
         // 添加标签子面板
-        top.add(scrollPane);
+        top.add(scrollPane, BorderLayout.SOUTH);
 
         all.addActionListener(e -> {
             queryAll();
