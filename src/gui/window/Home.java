@@ -17,6 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+import common.tool.StringUtils;
+
 import common.AppContext;
 import common.myenum.InfoType;
 import common.myenum.Status;
@@ -48,7 +50,7 @@ public class Home {
         tagService = new TagService();
         starter = new Starter();
 
-        // 功能面板
+        // menu buttons
         IPanel top = new IPanel(new Dimension(0, 60));
         JLabel l_path = new JLabel("文件夹");
         JTextField textField = new JTextField(15);
@@ -56,8 +58,7 @@ public class Home {
         JButton b_search = new JButton("搜索");
         JButton b_all = new JButton("全部");
         JButton b_tag = new JButton("标签");
-        JLabel l_success = new JLabel("扫描成功");
-        JButton b_init = new JButton("初始化");
+        JButton b_init = new JButton("写入文件");
         JButton b_check = new JButton("查重");
         JButton b_auto = new JButton("自动归类");
         JButton b_bulid = new JButton("生成目录");
@@ -67,14 +68,12 @@ public class Home {
         bottom.add(b_confirm);
         bottom.add(b_cancel);
         bottom.setVisible(false);
-        l_success.setVisible(false);
         top.add(l_path);
         top.add(textField);
         top.add(b_scan);
         top.add(b_search);
         top.add(b_all);
         top.add(b_tag);
-        top.add(l_success);
         top.add(b_init);
         top.add(b_check);
         top.add(b_auto);
@@ -83,27 +82,24 @@ public class Home {
         center = frame.getCenter();
         frame.setRoot(bottom);
 
-        // 以下为事件处理
-        // 扫描按钮点击事件
+        // event listeners
         b_scan.addActionListener(e -> {
-            // 空路径
+            // empty path
             if (textField.getText().equals("")) {
                 JOptionPane.showMessageDialog(frame, "输入为空，请重试！", "提示", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // 获取路径，开始扫描
             String path = textField.getText();
             if (starter.scan(path)) {
-                // 扫描成功
+                // success, show result 
                 center.removeAll();
                 HashMap<String, Set<File>> fileMap = starter.getFileMap();
-                // 显示结果
                 fileMap.forEach((dir, files) -> {
                     center.add(new FileLabel(dir));
                     files.forEach(file -> center.add(new FileLabel(new IFile(file))));
                 });
-                l_success.setVisible(true);
+                new IDialog(frame, "扫描完成", InfoType.INFO);
                 center.reload();
                 content.reload();
             }
@@ -125,7 +121,7 @@ public class Home {
             bottom.setVisible(false);
         });
 
-        // 搜索文件
+        // search for files
         b_search.addActionListener(e -> {
             String text = textField.getText();
             if (text.equals("")) {
@@ -137,43 +133,42 @@ public class Home {
             bottom.setVisible(false);
         });
 
-        // 全部按钮点击事件，展示数据库全部文件
+        // show all files
         b_all.addActionListener(e -> {
             queryAll();
             bottom.setVisible(false);
         });
 
-        // 标签按钮点击事件，打开标签面板
+        // open tag frame
         b_tag.addActionListener(e -> {
             AppContext.setKey(Tag.WIN_NAME, new Tag(frame));
             bottom.setVisible(false);
         });
 
-        // 文件写入数据库
+        // file data persistence
         b_init.addActionListener(e1 -> {
             starter.init();
-            l_success.setText("写入完成");
+            new IDialog(frame, "写入完成", InfoType.INFO);
             bottom.setVisible(false);
         });
 
-        // 点击查重，展示重复文件
+        // show repeated files
         b_check.addActionListener(e1 -> {
             Map<String, List<IFile>> repMap = fileService.getRepeatMap();
-            // 输出大小相同的文件
+            // same size as repeat
             center.removeAll();
             repMap.forEach((size, list) -> {
                 center.add(new JLabel("大小：" + FileUtils.getFileSizeString(size)));
                 list.forEach(file -> {
-                    // 文件行
                     center.addFileBox(file, center);
                 });
             });
-            l_success.setText("查重完成");
+            new IDialog(frame, "查重完成", InfoType.INFO);
             center.reload();
             bottom.setVisible(false);
         });
 
-        // 根据标签结构在指定位置生成目录
+        //  generate tag's diretory structure
         b_bulid.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -185,8 +180,8 @@ public class Home {
                 String path = file.getPath();
                 IFolder topFolder = tagService.getTagFolder(path);
                 topFolder.generate();
+                new IDialog(frame, "已生成文件目录！", InfoType.INFO);
             }
-            new IDialog(frame, "已生成文件目录！", InfoType.INFO);
         });
     }
 
@@ -208,7 +203,7 @@ public class Home {
     }
 
     /**
-     * 获取主窗口
+     * get this frame
      * 
      * @return
      */
@@ -222,27 +217,27 @@ public class Home {
     }
 
     /**
-     * 给没有标签的文件自动贴标签
+     * auto-tag for untagged files
      */
     public void autoTag() {
         List<ITag> tags = tagService.getAllTagsWithKeys();
         Map<String, List<ITag>> tagMap = new HashMap<>();
         tags.forEach(tag -> {
             List<String> keys = tag.getKeys();
-            // 将名字和关键词作为索引
+            // names and keys as indexes
             tagMap.computeIfAbsent(tag.getName(), k -> new ArrayList<>()).add(tag);
             keys.forEach(key -> {
                 tagMap.computeIfAbsent(key, k -> new ArrayList<>()).add(tag);
             });
         });
         files = fileService.getUntaggedFiles();
-        // 正则匹配
+        //  regular expression for matching files
         String[] keywords = tagMap.keySet().toArray(new String[0]);
-        String patternString = "^.+(" + String.join("|", keywords) + ")\\b";
+        String patternString = "(" + String.join("|", keywords) + ")";
         Pattern pattern = Pattern.compile(patternString);
         for (IFile file : files) {
-            String name = file.getName();
-            // 找到文件名中可能包含的标签
+            String name = StringUtils.RemoveSuffix(file.getName());
+            // Find index that may be included in the file name
             Matcher matcher = pattern.matcher(name);
             while (matcher.find()) {
                 // 直接group()会输出哈巴狗，在group()方法外再调用一次group(1)获取第一个捕获组的内容：哈巴狗->狗。

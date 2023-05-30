@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import gui.component.base.IButton;
+import gui.component.base.IFrame;
 import gui.component.base.IPanel;
 
 public class FrameBar extends JPanel {
@@ -21,7 +22,7 @@ public class FrameBar extends JPanel {
      * 
      * @param frame father frame
      */
-    public FrameBar(JFrame frame) {
+    public FrameBar(IFrame frame) {
         setLayout(new BorderLayout());
         setBackground(Color.lightGray);
         IButton btnMin = new IButton();

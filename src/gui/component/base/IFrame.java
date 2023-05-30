@@ -19,7 +19,7 @@ import gui.component.FrameBar;
 public class IFrame extends JFrame {
     private IPanel content;
     private IPanel center;
-
+  
     /**
      * diy frame: framebar + menu + content
      */

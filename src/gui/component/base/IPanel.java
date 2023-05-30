@@ -14,11 +14,10 @@ import gui.component.FileBox;
 import gui.component.TagBox;
 
 public class IPanel extends JPanel {
-    //标签列表
     private HashSet<ITag> tags;
 
     /**
-     * 透明面板
+     * transparent panel
      */
     public IPanel(){
         super();
@@ -36,17 +35,15 @@ public class IPanel extends JPanel {
         init();
     }
 
-    /*
-     * 面板初始化
-     */
+
     private void init(){
         this.setBackground(new Color(0,0,0,0));
-        this.setOpaque(false);//背景透明
+        this.setOpaque(false);
     }
 
     public void reload(){
-        this.revalidate();//重布局
-        this.repaint();//重绘
+        this.revalidate();
+        this.repaint();
     }
 
     public HashSet<ITag> getTags() {
@@ -58,25 +55,25 @@ public class IPanel extends JPanel {
     }
 
     /**
-     * 文件夹
-     * @param dir 文件夹
-     * @param center 父面板
+     * folder
+     * @param dir folder path
+     * @param center father panel
      */
     public void addFileBox(String dir, IPanel center) {
         FileBox dirRow = new FileBox(new IFile(dir), center);
         this.add(dirRow);
-        this.add(Box.createVerticalStrut(3));
+        this.add(Box.createVerticalStrut(3));//vetical gap
     }
 
     /**
-     * 文件
-     * @param file 文件
-     * @param center 父面板
+     * file
+     * @param file 
+     * @param center father panel
      */
     public void addFileBox(IFile file, IPanel center) {
         FileBox dirRow = new FileBox(file, center);
         this.add(dirRow);
-        this.add(Box.createVerticalStrut(3));//垂直間距
+        this.add(Box.createVerticalStrut(3));
     }
 
     public void addFileBox(IFile file, IPanel center, String highlightText) {

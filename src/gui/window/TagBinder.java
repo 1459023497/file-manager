@@ -39,7 +39,7 @@ public class TagBinder {
         frame.showContents(tagService.getAllTagsWithKeys());
 
         confirm.addActionListener(e->{
-            //确定绑定标签关键词
+            //add key to the tag
             String text = input.getText();
             if (text.length() == 0) return;
             String[] keys = text.split(" ");
@@ -51,9 +51,7 @@ public class TagBinder {
     }
 
     /**
-     * 加载全部分组
-     * 
-     * @param groups 下拉选择列表
+     * reload groups
      */
     public void reloadSellector() {
         tagSellector.removeAllItems();

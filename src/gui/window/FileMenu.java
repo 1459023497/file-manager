@@ -18,12 +18,9 @@ import service.FileService;
 public class FileMenu {
     private FileService fileService;
 
-    // 文件右键的菜单
+    // File right-click menu
     public FileMenu(IFile file, FileLabel fileLabel) {
-        // 窗口初始化
         fileService = new FileService();
-        // 获取焦点
-        //window.requestFocus();
         JWindow window = new JWindow();
         IPanel content = new IPanel(new Dimension(50, 70));
         content.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -32,10 +29,9 @@ public class FileMenu {
         window.setSize(50, 70);
         window.setLocationRelativeTo(fileLabel);
         window.setVisible(true);
-        //获取焦点
         //window.requestFocus();
 
-        // 菜单选项
+        // menu
         JLabel rename = new JLabel("重命名");
         JLabel delete = new JLabel("删除");
         JLabel cancel = new JLabel("取消");
@@ -43,17 +39,16 @@ public class FileMenu {
         content.add(delete);
         content.add(cancel);
 
-        // 重命名事件
         rename.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                // 弹出输入框，更新名字
+                // rename input
                 String input = JOptionPane.showInputDialog(rename, "新命名",file.getName());
                 if (input != null && !input.equals("")) {
                     file.setName(input);
                     fileService.renameFile(file);
-                    // 刷新文件
+                    // refresh
                     fileLabel.setFile(file);
                 }
                 window.dispose();
@@ -71,7 +66,7 @@ public class FileMenu {
 
         });
 
-        // 删除文件
+
         delete.addMouseListener(new MouseAdapter() {
 
             @Override
