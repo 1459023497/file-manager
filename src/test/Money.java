@@ -27,10 +27,11 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 
 import gui.component.FrameBar;
+import gui.component.base.IFrame;
 import gui.component.base.IPanel;
 
 public class Money {
-    private JFrame frame;
+    private IFrame frame;
     private int money;
     private int[] targetArray;
     private Map<Integer, Integer> targetMap;
@@ -47,7 +48,7 @@ public class Money {
         isShowAll = false;
         showTimes = 0;
 
-        frame = new JFrame();
+        frame = new IFrame();
         IPanel content = new IPanel(new BorderLayout());
         IPanel north = new IPanel(new BorderLayout());
         FrameBar bar = new FrameBar(frame);

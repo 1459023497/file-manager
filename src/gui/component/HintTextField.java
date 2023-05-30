@@ -11,8 +11,8 @@ public class HintTextField extends JTextField implements FocusListener {
     private boolean showingHint;
 
     /**
-     * 带提示输入框
-     * @param hint 提示语
+     * hint text field
+     * @param hint tip
      */
     public HintTextField(final String hint) {
         super(hint);

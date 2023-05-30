@@ -19,7 +19,11 @@ import gui.component.FrameBar;
 public class IFrame extends JFrame {
     private IPanel content;
     private IPanel center;
-  
+
+    public IFrame() {
+        super();
+    }
+
     /**
      * diy frame: framebar + menu + content
      */
@@ -33,7 +37,7 @@ public class IFrame extends JFrame {
         northPanel.add(top, BorderLayout.CENTER);
         content.add(northPanel, BorderLayout.NORTH);
 
-        //content scrollpane
+        // content scrollpane
         this.center = new IPanel();
 
         // inner border
@@ -66,14 +70,15 @@ public class IFrame extends JFrame {
         } else {
             if (items.get(0) instanceof IFile) {
                 // folder ==> file + tags
-                Map<String, List<IFile>> map = items.stream().map(e-> (IFile)e).collect(Collectors.groupingBy(IFile::getBelong));
+                Map<String, List<IFile>> map = items.stream().map(e -> (IFile) e)
+                        .collect(Collectors.groupingBy(IFile::getBelong));
                 map.forEach((dir, list) -> {
                     center.addFileBox(dir, center);
                     list.forEach(file -> center.addFileBox(file, center));
                 });
-            }else if(items.get(0) instanceof ITag){
+            } else if (items.get(0) instanceof ITag) {
                 // tags and keys
-                items.forEach(e->{
+                items.forEach(e -> {
                     ITag tag = (ITag) e;
                     center.addTagBox(tag, center);
                 });
@@ -104,18 +109,18 @@ public class IFrame extends JFrame {
         content.reload();
     }
 
-    public Point getCenterPointOnScreen(){
-        int width = getWidth();  
+    public Point getCenterPointOnScreen() {
+        int width = getWidth();
         int height = getHeight();
-        int centerX = width / 2;      
+        int centerX = width / 2;
         int centerY = height / 2;
-        
-        int frameX = getX();  
+
+        int frameX = getX();
         int frameY = getY();
-        
-        int screenCenterX = frameX + centerX;  
-        int screenCenterY = frameY + centerY; 
-        return new Point(screenCenterX,screenCenterY);
+
+        int screenCenterX = frameX + centerX;
+        int screenCenterY = frameY + centerY;
+        return new Point(screenCenterX, screenCenterY);
     }
 
 }

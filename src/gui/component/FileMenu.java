@@ -16,29 +16,26 @@ import service.FileService;
 
 public class FileMenu extends JPopupMenu {
     /**
-     * 文件右键弹出菜单
+     * file menu
      * 
-     * @param file      文件
-     * @param fileLabel 文件标签
-     * @param fileBox 该文件行
+     * @param file    
+     * @param fileLabel 
+     * @param fileBox 
      */
     public FileMenu(IFile file, FileLabel fileLabel, FileBox fileBox) {
         FileService fileService = new FileService();
-        //菜单选项
         JMenuItem rename = new JMenuItem("重命名");
         JMenuItem delete = new JMenuItem("删除");
-
-        //菜单事件
         rename.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-                // 弹出输入框，更新名字
+                // rename input
                 String input = JOptionPane.showInputDialog(fileLabel, "新命名", file.getName());
                 if (!StringUtils.isEmpty(input)) {
                     if(file.isExist()){
                         file.setName(input);
                         fileService.renameFile(file);
-                        // 刷新文件
+                        // refresh
                         fileLabel.setFile(file);   
                     }
                 }
@@ -48,14 +45,13 @@ public class FileMenu extends JPopupMenu {
         delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 弹出确认框
                 String message  = file.isDirectory() ? "确认删除该文件夹吗？":"确认删除该文件吗？";
                 int confirm = JOptionPane.showConfirmDialog(fileLabel, message, "确认", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     fileService.removeFile(file);
-                    // 移除文件
+                    // remove
                     fileBox.setVisible(false);
-                    //删除文件夹需要刷新界面
+                    // refresh
                     Home home = (Home) AppContext.getKey(Home.WIN_NAME);
                     home.queryAll();
                 }

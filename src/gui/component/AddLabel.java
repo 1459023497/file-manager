@@ -17,20 +17,19 @@ public class AddLabel extends JLabel implements MouseListener {
     private IFile file;
 
     /**
-     * 绑定文件的添加标签按钮，可以给文件添加标签
+     * add tag button
      * 
      * @param file
      */
     public AddLabel(IFile file) {
-        // super("+++");
         super();
         this.file = file;
         ImageIcon icon = new ImageIcon("src\\gui\\icon\\add.png");
-        Image image = icon.getImage(); // 获取Image对象
-        Image scaledImage = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH); // 调整大小
-        ImageIcon scaledIcon = new ImageIcon(scaledImage); // 创建新的ImageIcon
+        Image image = icon.getImage(); 
+        Image scaledImage = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH); // resize image
+        ImageIcon scaledIcon = new ImageIcon(scaledImage); // new size ImageIcon
 
-        setPreferredSize(new Dimension(scaledIcon.getIconWidth(), scaledIcon.getIconHeight())); // 设置JLabel大小
+        setPreferredSize(new Dimension(scaledIcon.getIconWidth(), scaledIcon.getIconHeight())); // set size to image size
         setIcon(scaledIcon);
         addMouseListener(this);
     }
@@ -52,7 +51,6 @@ public class AddLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        // 线条边框
         setBorder(BorderFactory.createLineBorder(Color.gray, 1, true));
     }
 

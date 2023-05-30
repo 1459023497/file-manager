@@ -72,7 +72,7 @@ public class FileLabel extends JLabel implements MouseListener {
         String s = getText();
         int start_pos = s.indexOf(text);
         int end_pos = start_pos + text.length();
-        // 切分高亮再拼接
+        // splice, highlight, concate
         if (start_pos != -1) {
             StringBuffer result = new StringBuffer("<html>");
             result.append(s.substring(0, start_pos));

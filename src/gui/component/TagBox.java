@@ -14,15 +14,19 @@ import entity.ITag;
 
 public class TagBox extends Box {
 
+    /**
+     * show tag and keys
+     * @param tag
+     */
     public TagBox(ITag tag) {
         super(BoxLayout.X_AXIS);
         this.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.setMaximumSize(new Dimension(3000, 20));
-        // 展示标签
+        // show tag
         TagColor color = TagColor.RED;
         this.add(new TagLabel(tag, color.next()));
         this.add(Box.createHorizontalStrut(5));
-        // 展示关键词
+        // show keys
         List<String> keyList = tag.getKeys();
         if (CollectionUtils.isNotEmpty(keyList)) {
             keyList.forEach(key->{

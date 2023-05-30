@@ -22,20 +22,20 @@ public class FileBox extends Box {
     private boolean isDir;
 
     /**
-     * 生成一个文件行，包括文件信息，标签，和添加标签按钮
+     * file row : file + tags + add button
      * 
-     * @param file    文件
-     * @param panel   承载面板
-     * @param fileMap 文件标签字典
+     * @param file    
+     * @param panel   content panel
+     * @param fileMap dictionary
      */
     public FileBox(IFile file, IPanel panel, Map<String, Set<ITag>> fileMap) {
-        // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
+        // Align : horizontal, left; filename + size + tags + button
         super(BoxLayout.X_AXIS);
         init(file, panel);
         if (isDir) {
             return;
         }
-        // 展示标签
+        // show tags
         Set<ITag> tags = fileMap.get(file.getId());
         TagColor color = TagColor.RED;
         color.init();
@@ -45,23 +45,23 @@ public class FileBox extends Box {
                 this.add(Box.createHorizontalStrut(5));
             });
         }
-        // 添加标签按钮
+        // add button
         AddLabel addLabel = new AddLabel(file);
         this.add(addLabel);
     }
 
     /**
-     * 生成一个文件行，包括文件信息，标签，和添加标签按钮
+     * file row : file + tags + add button
      * 
-     * @param file  文件
-     * @param panel 承载面板
+     * @param file  
+     * @param panel content panel
      */
     public FileBox(IFile file, IPanel panel) {
-        // 默认构造为水平排列,左对齐, 形式=文件名+大小+标签+按钮
+        // Align : horizontal, left; filename + size + tags + button
         super(BoxLayout.X_AXIS);
         init(file, panel);
         if (!isDir) {
-            // 展示标签
+            // show tags
             List<ITag> tags = file.getTags();
             TagColor color = TagColor.RED;
             color.init();
@@ -72,20 +72,20 @@ public class FileBox extends Box {
                 });
             }
         }
-        // 添加标签按钮
+        // tag button
         AddLabel addLabel = new AddLabel(file);
         this.add(addLabel);
     }
 
     private void init(IFile file, IPanel panel) {
         this.setAlignmentX(Component.LEFT_ALIGNMENT);
-        this.setMaximumSize(new Dimension(3000, 20));// 设置组件变化的最大大小
-        // 文件夹只展示路径,只有文件才展示大小和标签
+        this.setMaximumSize(new Dimension(3000, 20));
+        // folder show path, file show size and tags
         isDir = file.isDirectory();
         fileLabel = new FileLabel(file, this);
         this.add(fileLabel);
         this.add(Box.createHorizontalStrut(5));
-        // 展示大小
+        // show size
         if (!isDir) {
             String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
             this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
