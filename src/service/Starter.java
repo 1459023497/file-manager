@@ -10,24 +10,22 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import common.AppContext;
-
-//初始化
 public class Starter {
     public static final Logger logger = Logger.getLogger("Starter.class");
-    // 查重文件的字典map<文件大小，set<文件>>
+    // map<size，files>
     private HashMap<String, Set<File>> refileMap = new HashMap<>();
-    // 文件字典 <文件夹，set<文件>>
+    // map<folder，files>
     private HashMap<String, Set<File>> fileMap = new HashMap<>();
 
     /**
-     * 文件扫描，不添加数据库
+     * only scan files in the specified directory
      * 
      * @param path
      */
     public boolean scan(String path) {
         File file = new File(path);
         File[] tempList = file.listFiles();
-        //路径为空的话，提示错误
+        //no files in the directory
         if(tempList == null) {
             JOptionPane.showMessageDialog(AppContext.getHome().getFrame(), "输入路径有误，请检查！", "提示", JOptionPane.ERROR_MESSAGE);
             return false;
@@ -38,13 +36,13 @@ public class Starter {
             System.out.println("文件夹:" + path + " 对象个数：" + tempList.length);
             Set<File> fileList = new HashSet<>();
             for (File singleFile : tempList) {
-                // 是文件夹，向内递归
+                // folder, recursively
                 if (singleFile.isDirectory()) {
                     scan(singleFile.getPath());
                 }
                 if (singleFile.isFile()) {
                     fileList.add(singleFile);
-                    // 记录大小相同的重复文件
+                    // record same size files
                     String fileSize = String.valueOf(singleFile.length());
                     if (refileMap.get(fileSize) == null) {
                         Set<File> refileList = new HashSet<>();
@@ -61,7 +59,7 @@ public class Starter {
     }
 
     /**
-     * 输出扫描的文件
+     * show scan results
      */
     public void showFiles() {
         for (Map.Entry<String, Set<File>> entry : fileMap.entrySet()) {
@@ -72,7 +70,7 @@ public class Starter {
     }
 
     /**
-     * 输出重复的文件
+     * show repeat files
      */
     public void showRepeat() {
         for (Set<File> list : refileMap.values()) {
@@ -83,10 +81,9 @@ public class Starter {
     }
 
     /**
-     * 扫描的文件写入数据库
+     * write database
      */
     public void init() {
-        // 开启数据库链接
         FileService service = new FileService();
         for (Map.Entry<String, Set<File>> entry : fileMap.entrySet()) {
             for (File file : entry.getValue()) {
@@ -96,15 +93,15 @@ public class Starter {
     }
 
     /**
-     * 获取刚刚扫描的文件
-     * @return 文件字典 <文件夹，set<文件>>
+     * get scan files
+     * @return map<folder，files>
      */
     public HashMap<String, Set<File>> getFileMap() {
         return fileMap;
     }
 
     /**
-     * 获取查重文件的字典map<文件大小，set<文件>>
+     * get repeat map<size，files>
      * @return
      */
     public HashMap<String,Set<File>> getRefileMap(){

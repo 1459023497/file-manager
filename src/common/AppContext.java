@@ -7,7 +7,7 @@ import gui.window.Home;
 import gui.window.Tag;
 
 /*
- * 应用上下文
+ * application context
  */
 public class AppContext {
     private static Map<String, Object> map;
@@ -28,9 +28,6 @@ public class AppContext {
         map.remove(key);
     }
 
-    /*
-     * 获取主页
-     */
     public static Home getHome() {
         return (Home) map.get(Home.WIN_NAME);
     }

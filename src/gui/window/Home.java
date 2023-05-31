@@ -158,7 +158,7 @@ public class Home {
             // same size as repeat
             center.removeAll();
             repMap.forEach((size, list) -> {
-                center.add(new JLabel("大小：" + FileUtils.getFileSizeString(size)));
+                center.add(new JLabel("【大小：" + FileUtils.getFileSizeString(size)+"】"));
                 list.forEach(file -> {
                     center.addFileBox(file, center);
                 });

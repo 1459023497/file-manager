@@ -21,7 +21,6 @@ import entity.IFolder;
 import entity.ITag;
 import jdbc.JDBCConnector;
 
-//文件标签服务，复制标签增删改查
 public class TagService {
     private JDBCConnector conn;
     private IdGenerator idGenerator = new IdGenerator();
@@ -34,17 +33,13 @@ public class TagService {
         conn.close();
     }
 
-    /**
-     * 新建标签
-     *
-     */
     public void newTag(ITag tag) {
         conn.update("insert into tag values('" + idGenerator.next() + "','" + tag.getName() + "','" + tag.getGroup()
                 + "');");
     }
 
     /**
-     * 删除标签，注意：需要相关标签的组设为无分组，移除相关文件的该标签
+     * delete tag ，notice：set sub-tags to no group，remove all file's tag 
      * 
      * @param tag
      */
@@ -56,8 +51,7 @@ public class TagService {
     }
 
     /**
-     * 查所有标签
-     *
+     * get all tags
      */
     public ArrayList<ITag> getAllTags() {
         ResultSet rs = conn.select("select * from tag;");
@@ -76,7 +70,7 @@ public class TagService {
     }
 
     /**
-     * 标签字典《标签id，标签》
+     * map《id,tag》
      *
      */
     public Map<String, ITag> getTagsMap() {
@@ -97,7 +91,7 @@ public class TagService {
     }
 
     /**
-     * 全部文件标签字典，map<文件id, set<ITag>>
+     * all file with tags，map<fileId, tags>
      * 
      * @return
      */
@@ -120,7 +114,7 @@ public class TagService {
     }
 
     /**
-     * 按标签结构生成目录结构
+     * generates folders according to the tag structure
      * 
      * @return
      */
@@ -128,7 +122,7 @@ public class TagService {
         IFolder topFolder = new IFolder(topPath);
         Map<String, ITag> tagMap = getTagsMap();
         Map<String, Set<String>> groupMap = getGroupsMap();
-        // 只对最上级标签做递归
+        // only recursive top tag
         groupMap.forEach((k, v) -> {
             ITag tag = tagMap.get(k);
             if (tag.getGroup().equals("无分组")) {
@@ -144,7 +138,7 @@ public class TagService {
     }
 
     /**
-     * 向内递归
+     * recursion method
      */
     public void findSub(Map<String, Set<String>> groupMap, Map<String, ITag> tagMap, String tagId, IFolder folder) {
         ITag tag = tagMap.get(tagId);
@@ -152,16 +146,16 @@ public class TagService {
         IFolder subFolder = new IFolder(path, tag.getName());
         if (CollectionUtils.isNotEmpty(groupMap.get(tagId))) {
             groupMap.get(tagId).forEach(subTagId -> {
-                // 有子标签，继续向内递归
+                // if it has sub-tag, inner recursion
                 findSub(groupMap, tagMap, subTagId, subFolder);
             });
         }
-        // 将自己添加到父标签
+        // add itself to father folder
         folder.addSubFolder(subFolder);
     }
 
     /**
-     * 标签分组字典《标签id，set《标签id》》
+     * tag group, map《tagId，sub-tagId》
      */
     public Map<String, Set<String>> getGroupsMap() {
         Map<String, ITag> tagMap = getTagsMap();
@@ -170,13 +164,13 @@ public class TagService {
             String id = tag.getId();
             String group = tag.getGroup();
             if (groupMap.containsKey(group)) {
-                // 已经放入该组
+                // already grouped
                 groupMap.get(group).add(id);
             } else {
-                // 还未放入组
+                // not grouped
                 HashSet<String> set = new HashSet<>();
                 if (group.equals("无分组")) {
-                    // 这步判断是为了避免=》顶级标签后放入id会覆盖之前group对应的集合
+                    // here is to avoid : put top tag will cover old group set
                     if (groupMap.containsKey(id))
                         return;
                     groupMap.put(id, set);
@@ -190,10 +184,10 @@ public class TagService {
     }
 
     /**
-     * 批量查询该标签下的文件及其标签，组成字典
+     * get files with tags by a tag
      * 
      * @param tag
-     * @return map 【文件id,【标签】】
+     * @return map 【fileId,tags】
      */
     public Map<String, Set<ITag>> getFileMapByTag(ITag tag) {
         String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
@@ -215,10 +209,10 @@ public class TagService {
     }
 
     /**
-     * 根据标签查文件
+     * get files by tag
      *
      * @param tag
-     * @return map 【目录,【文件】】
+     * @return map 【folder,files】
      */
     public Map<String, Set<IFile>> getFilesByTag(ITag tag) {
         String sql = "SELECT * FROM file WHERE id IN (\n" +
@@ -230,7 +224,7 @@ public class TagService {
                 IFile file = BeanUtils.getFile(rs);
                 String dir = file.getBelong();
 
-                // 方法返回set
+                // return set
                 files.computeIfAbsent(dir, k -> new HashSet<>()).add(file);
             }
         } catch (SQLException e) {
@@ -243,7 +237,7 @@ public class TagService {
     }
 
     /**
-     * 获取文件的标签
+     * get file's tags
      *
      * @param file
      * @return
@@ -267,29 +261,11 @@ public class TagService {
     }
 
     /**
-     * 给单个文件打标签
-     *
-     * @param tag
-     * @param file
-     */
-    public void tag(ITag tag, IFile file) {
-        if (!file.isDirectory()) {
-            // 单个文件
-            String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','" + file.getId()
-                    + "','" + tag.getId() + "');";
-            conn.update(sql);
-        } else {
-            // 文件夹
-            // tag(tag, file.getPath());
-        }
-    }
-
-    /**
-     * 批量打标签
+     * batch tag
      */
     public void tags(Collection<ITag> tags, IFile file) {
         if (!file.isDirectory()) {
-            // 单个文件
+            // single file
             StringBuffer sb = new StringBuffer();
             tags.forEach(tag -> {
                 String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','"
@@ -298,13 +274,13 @@ public class TagService {
             });
             conn.update(sb.toString());
         } else {
-            // 文件夹
+            // folder
             tag(tags, file.getPath());
         }
     }
 
     /**
-     * 给文件夹下的文件打标签，批量操作
+     * batch add tags to all files i the folder
      *
      * @param tag
      * @param dir
@@ -331,7 +307,7 @@ public class TagService {
     }
 
     /**
-     * 删除文件的标签
+     * deletes tag from files
      *
      * @param tag
      * @param files
@@ -344,7 +320,7 @@ public class TagService {
     }
 
     /**
-     * 添加文件存在的新标签
+     * add file's new tags if its status is insert 
      * 
      * @param files
      */
@@ -371,12 +347,11 @@ public class TagService {
     }
 
     /**
-     * 获取全部标签带关键词
+     * get all tags with keys
      * 
-     * @return 标签列表
      */
     public List<ITag> getAllTagsWithKeys() {
-        // 词采用拼接
+        // concat keys
         ResultSet rs = conn.select(
                 "select t.id,t.name,t.'group', GROUP_CONCAT(tk.key) as key from tag t left join tag_key tk on t.id = tk.tag_id group by t.id;");
         List<ITag> tags = new ArrayList<>();
@@ -394,7 +369,7 @@ public class TagService {
     }
 
     /**
-     * 删除标签关键词
+     * delete key from tag
      */
     public void deleteTagKey(String tagId, String key) {
         String sql = "delete from tag_key where tag_id = '" + tagId + "' and key = '" + key + "';";

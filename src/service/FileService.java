@@ -31,13 +31,13 @@ public class FileService {
     }
 
     /**
-     * 添加文件
+     * adding file to database
      *
      * @param file
-     * @param belong 所属文件夹
+     * @param belong folder
      */
     public void addFile(File file, String belong) {
-        // String regex = "/\''/g"; //去掉所有单引号
+        // String regex = "/\''/g"; remove all '
         String name = file.getName().replace('\'', ' ');
         String path = file.getPath().replace('\'', ' ');
         String sql = "INSERT or ignore into file(id,name,path,size,belong) values('" + id.next() + "','"
@@ -94,7 +94,7 @@ public class FileService {
      * open the file
      *
      * @param path
-     * @return true-打开路径, false-路径不存在
+     * @return true: exist, false: not exist
      */
     public boolean openDir(String path) {
         File file = new File(path);
@@ -111,9 +111,9 @@ public class FileService {
     }
 
     /*
-     * 查重
+     * check repeat file
      * 
-     * @return <大小，文件>
+     * @return <same size，files>
      */
     public Map<String, List<IFile>> getRepeatMap() {
         Map<String, List<IFile>> map = new HashMap<String, List<IFile>>();
@@ -127,25 +127,25 @@ public class FileService {
     }
 
     /**
-     * 获取所有文件带标签
+     * get all files with tags
      */
     public List<IFile> getAllFiles(){
         String sql = "SELECT * FROM file;";
-        return getFilesAndTags(sql);
+        return getFilesWithTags(sql);
     }
 
     /**
-     * 模糊搜索
+     * fuzzy search
      */
     public List<IFile> search(String text) {
         String sql = "SELECT * FROM file WHERE name LIKE '%" + text + "%';";
-        return getFilesAndTags(sql);
+        return getFilesWithTags(sql);
     }   
 
     /**
-     * 查询文件带标签
+     * get all files with tags
      */
-    private List<IFile> getFilesAndTags(String sql){
+    private List<IFile> getFilesWithTags(String sql){
         ResultSet rs = conn.select(sql);
         Map<String, IFile> map = new HashMap<>();
         try {
@@ -180,8 +180,8 @@ public class FileService {
     }
 
     /**
-     * 未打标签的文件
-     * @return
+     * 
+     * @return untagged files
      */
     public List<IFile> getUntaggedFiles() {
         String sql = "SELECT * FROM file WHERE id not in (SELECT DISTINCT file_id FROM file_tag);";

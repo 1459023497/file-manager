@@ -13,7 +13,7 @@ public class RoundedBorder extends AbstractBorder{
     private final int gap;
 
     /**
-     * 重绘圆角边框
+     * this is a rounded border
      * @param c
      * @param g
      */
