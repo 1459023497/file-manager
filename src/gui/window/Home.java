@@ -14,15 +14,13 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
-import common.tool.StringUtils;
 
 import common.AppContext;
 import common.myenum.InfoType;
 import common.myenum.Status;
 import common.tool.FileUtils;
+import common.tool.StringUtils;
 import entity.IFile;
 import entity.IFolder;
 import entity.ITag;
@@ -44,6 +42,7 @@ public class Home {
     private FileService fileService;
     private TagService tagService;
     private List<IFile> files;
+    private String lastChoosePath;
 
     public Home() {
         fileService = new FileService();
@@ -62,6 +61,7 @@ public class Home {
         JButton b_check = new JButton("查重");
         JButton b_auto = new JButton("自动归类");
         JButton b_bulid = new JButton("生成目录");
+        JButton b_move = new JButton("移动");
         bottom = new IPanel();
         JButton b_confirm = new JButton("确认");
         JButton b_cancel = new JButton("取消");
@@ -78,6 +78,7 @@ public class Home {
         top.add(b_check);
         top.add(b_auto);
         top.add(b_bulid);
+        top.add(b_move);
         frame = new IFrame("文件管理", top);
         center = frame.getCenter();
         frame.setRoot(bottom);
@@ -86,7 +87,7 @@ public class Home {
         b_scan.addActionListener(e -> {
             // empty path
             if (textField.getText().equals("")) {
-                JOptionPane.showMessageDialog(frame, "输入为空，请重试！", "提示", JOptionPane.ERROR_MESSAGE);
+                new IDialog(frame, "输入为空，请重试！", InfoType.INFO);
                 return;
             }
 
@@ -125,7 +126,7 @@ public class Home {
         b_search.addActionListener(e -> {
             String text = textField.getText();
             if (text.equals("")) {
-                JOptionPane.showMessageDialog(frame, "输入为空，请重试！", "提示", JOptionPane.ERROR_MESSAGE);
+                new IDialog(frame, "输入为空，请重试！", InfoType.INFO);
                 return;
             } else {
                 search(text);
@@ -177,11 +178,21 @@ public class Home {
             int result = fileChooser.showOpenDialog(frame);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                String path = file.getPath();
-                IFolder topFolder = tagService.getTagFolder(path);
+                lastChoosePath = file.getPath();
+                IFolder topFolder = tagService.getTagFolder(lastChoosePath);
                 topFolder.generate();
                 new IDialog(frame, "已生成文件目录！", InfoType.INFO);
             }
+        });
+
+        // move files to their own folder
+        b_move.addActionListener(e->{
+            if (lastChoosePath == null){
+                new IDialog(frame, "请先生成目录！", InfoType.ERROR);
+                return;
+            }
+            IFolder topFolder = tagService.getTagFolder(lastChoosePath);
+            topFolder.moveFiles();
         });
     }
 

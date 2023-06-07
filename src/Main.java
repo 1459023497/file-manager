@@ -7,7 +7,7 @@ import gui.window.Home;
 
 public class Main {
     public static void main(String[] args) {
-        //切换window风格ui
+        //set window ui style
         String lookAndFeel ="com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         try {
             UIManager.setLookAndFeel(lookAndFeel);
@@ -16,10 +16,9 @@ public class Main {
                 | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-        //初始化程序上下文
         AppContext.init();
         Home home = new Home();
-        //添加到上下文
+        //adding frame to context
         AppContext.setKey(Home.WIN_NAME, home);
     }
 }

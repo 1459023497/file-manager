@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import common.AppContext;
 import entity.IFile;
 import entity.ITag;
 import gui.component.FrameBar;
@@ -52,7 +53,9 @@ public class IFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // remove default menubar, set backgroud to transparent
         setUndecorated(true);
-        setOpacity(0.1f);
+        if(AppContext.UI_TRANSPARENT){
+            setOpacity(0.1f);
+        }
         pack();
         setSize(400, 500);
         setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage());

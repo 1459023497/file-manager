@@ -39,7 +39,7 @@ public class TagService {
     }
 
     /**
-     * delete tag ，notice：set sub-tags to no group，remove all file's tag 
+     * delete tag ，notice：set sub-tags to no group，remove all file's tag
      * 
      * @param tag
      */
@@ -127,7 +127,7 @@ public class TagService {
             ITag tag = tagMap.get(k);
             if (tag.getGroup().equals("无分组")) {
                 String path = topPath + "\\" + tag.getName();
-                IFolder folder = new IFolder(path, tag.getName());
+                IFolder folder = new IFolder(path, tag.getName(), tag.getId());
                 topFolder.addSubFolder(folder);
                 v.forEach(e -> {
                     findSub(groupMap, tagMap, e, folder);
@@ -143,7 +143,7 @@ public class TagService {
     public void findSub(Map<String, Set<String>> groupMap, Map<String, ITag> tagMap, String tagId, IFolder folder) {
         ITag tag = tagMap.get(tagId);
         String path = folder.getPath() + "\\" + tag.getName();
-        IFolder subFolder = new IFolder(path, tag.getName());
+        IFolder subFolder = new IFolder(path, tag.getName(), tag.getId());
         if (CollectionUtils.isNotEmpty(groupMap.get(tagId))) {
             groupMap.get(tagId).forEach(subTagId -> {
                 // if it has sub-tag, inner recursion
@@ -214,7 +214,7 @@ public class TagService {
      * @param tag
      * @return map 【folder,files】
      */
-    public Map<String, Set<IFile>> getFilesByTag(ITag tag) {
+    public Map<String, Set<IFile>> getFilesMapByTag(ITag tag) {
         String sql = "SELECT * FROM file WHERE id IN (\n" +
                 "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
@@ -320,7 +320,7 @@ public class TagService {
     }
 
     /**
-     * add file's new tags if its status is insert 
+     * add file's new tags if its status is insert
      * 
      * @param files
      */
@@ -376,4 +376,19 @@ public class TagService {
         conn.update(sql);
     }
 
+    public List<IFile> getFilesByTag(String tagId) {
+        String sql = "SELECT * FROM file WHERE id IN (SELECT file_id FROM file_tag WHERE tag_id='" + tagId + "');";
+        ResultSet rs = conn.select(sql);
+        List<IFile> files = new ArrayList<IFile>();
+        try {
+            while (rs.next()) {
+                files.add(BeanUtils.getFile(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            conn.close();
+        }
+        return files;
+    }
 }

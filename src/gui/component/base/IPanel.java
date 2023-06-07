@@ -8,6 +8,7 @@ import java.util.HashSet;
 import javax.swing.Box;
 import javax.swing.JPanel;
 
+import common.AppContext;
 import entity.IFile;
 import entity.ITag;
 import gui.component.FileBox;
@@ -37,8 +38,10 @@ public class IPanel extends JPanel {
 
 
     private void init(){
-        this.setBackground(new Color(0,0,0,0));
-        this.setOpaque(false);
+        if(AppContext.UI_TRANSPARENT){
+            this.setBackground(new Color(0,0,0,0));
+            this.setOpaque(false);
+        }
     }
 
     public void reload(){

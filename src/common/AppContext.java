@@ -10,6 +10,9 @@ import gui.window.Tag;
  * application context
  */
 public class AppContext {
+    // global settings
+    public static boolean UI_TRANSPARENT = true;
+
     private static Map<String, Object> map;
 
     public static void init(){

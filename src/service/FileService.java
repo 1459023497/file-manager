@@ -42,7 +42,6 @@ public class FileService {
         String path = file.getPath().replace('\'', ' ');
         String sql = "INSERT or ignore into file(id,name,path,size,belong) values('" + id.next() + "','"
                 + name + "','" + path + "','" + file.length() + "','" + belong + "');";
-        System.out.println(sql);
         conn.update(sql);
     }
 
@@ -198,5 +197,14 @@ public class FileService {
             conn.close();
         }
         return files;
+    }
+
+    public void updateFiles(List<IFile> files) {
+        StringBuffer buffer = new StringBuffer();
+        files.forEach(file->{
+            String sql = "UPDATE file SET path='"+file.getPath()+"', belong = '"+file.getBelong()+"' WHERE id = '" + file.getId() + "';";
+            buffer.append(sql);
+        });
+        conn.update(buffer.toString());
     }
 }

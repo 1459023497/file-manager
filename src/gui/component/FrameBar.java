@@ -48,6 +48,7 @@ public class FrameBar extends JPanel {
             if (state == JFrame.MAXIMIZED_BOTH) {
                 // nomal
                 frame.setExtendedState(JFrame.NORMAL);
+                state = JFrame.NORMAL;
 
             } else if (state == JFrame.NORMAL) {
                 // max

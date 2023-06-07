@@ -132,7 +132,7 @@ public class TagLabel extends JLabel implements MouseListener {
             if (event == 1) {
                 // 找到标签下的文件
                 Map<String, Set<ITag>> fileMap = tagService.getFileMapByTag(tag);
-                Map<String, Set<IFile>> files = tagService.getFilesByTag(tag);
+                Map<String, Set<IFile>> files = tagService.getFilesMapByTag(tag);
                 // 显示结果
                 panel.removeAll();
                 files.forEach((dir, fileSet) -> {

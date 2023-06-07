@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.Timer;
 
+import common.AppContext;
 import common.myenum.InfoType;
 import common.tool.TagColor;
 
@@ -21,13 +22,17 @@ public class IDialog extends JWindow {
         setContentPane(panel);
         if (type == InfoType.INFO) {
             panel.setBackground(TagColor.GREEN.getColor());
+        }else if(type == InfoType.ERROR){
+            panel.setBackground(TagColor.RED.getColor());
         }
         panel.setBorder(new RoundedBorder(Color.BLACK, 20));
         JLabel label = new JLabel(info);
         panel.add(label);
 
-        setOpacity(0.1f);
-        setBackground(new Color(0, 0, 0, 0));
+        if (AppContext.UI_TRANSPARENT){
+            setOpacity(0.1f);
+            setBackground(new Color(0, 0, 0, 0));
+        }
         setFocusableWindowState(false);
         setSize(100, 20);
 

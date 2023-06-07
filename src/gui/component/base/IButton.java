@@ -36,7 +36,7 @@ public class IButton extends JButton {
             @Override
             public void mouseEntered(MouseEvent e) {
                 color = getBackground();
-                setBackground(Color.BLACK);
+                setBackground(Color.lightGray);
             }
 
             @Override
@@ -54,7 +54,7 @@ public class IButton extends JButton {
     protected void paintComponent(Graphics g) {
         if (getModel().isArmed()) {
             // press the button
-            g.setColor(Color.darkGray); 
+            g.setColor(Color.lightGray); 
         } else {
             // owned color
             g.setColor(getBackground());
