@@ -4,13 +4,12 @@ import java.util.List;
 
 import common.myenum.Status;
 
-/* 
- * 标签
- */
 public class ITag {
     private String id;
     private String name;
     private String group;
+    // the main tag of a file will be the folder where the file will be moved to
+    private int isMain;
     private List<String> keys;
     private int status = Status.BROWSE;
 
@@ -27,6 +26,13 @@ public class ITag {
         this.id = id;
         this.name = name;
         this.group = group;
+    }
+
+    public ITag(String id, String name, String group, int isMain) {
+        this.id = id;
+        this.name = name;
+        this.group = group;
+        this.isMain = isMain;
     }
 
     public ITag() {
@@ -75,6 +81,18 @@ public class ITag {
 
     public void setKeys(List<String> keys) {
         this.keys = keys;
+    }
+
+    /**
+     * judge it is main tag or not
+     * @return 1: it is main tag 0: it is not main tag
+     */
+    public int getIsMain() {
+        return isMain;
+    }
+
+    public void setIsMain(int isMain) {
+        this.isMain = isMain;
     }
     
 }

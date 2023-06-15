@@ -11,7 +11,7 @@ import entity.ITag;
 
 public class BeanUtils {
 
-    public static IFile getFile(ResultSet rs) throws SQLException {
+    public static IFile setFile(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
         String name = rs.getString("name");
         String path = rs.getString("path");
@@ -20,14 +20,15 @@ public class BeanUtils {
         return new IFile(id, name, path, size, dir);
     }
 
-    public static ITag getTag(ResultSet rs) throws SQLException{
+    public static ITag setTag(ResultSet rs) throws SQLException{
         String id = rs.getString("id");
         String name = rs.getString("name");
         String group = rs.getString("group");
-        return new ITag(id, name, group);
+        int isMain = rs.getInt("is_main");
+        return new ITag(id, name, group, isMain);
     }
 
-    public static ITag getTagWithKey(ResultSet rs) throws SQLException{
+    public static ITag setTagWithKey(ResultSet rs) throws SQLException{
         String id = rs.getString("id");
         String name = rs.getString("name");
         String group = rs.getString("group");

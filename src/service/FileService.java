@@ -149,7 +149,7 @@ public class FileService {
         Map<String, IFile> map = new HashMap<>();
         try {
             while (rs.next()) {
-                IFile file = BeanUtils.getFile(rs);
+                IFile file = BeanUtils.setFile(rs);
                 map.put(file.getId(), file);
             }
         } catch (SQLException e) {
@@ -158,13 +158,13 @@ public class FileService {
             conn.close();
         }
         if (!map.isEmpty()) {
-            String sqlFormat = "SELECT ft.file_id, ft.tag_id as id, t.name, t.'group' FROM file_tag ft LEFT JOIN tag t ON ft.tag_id = t.id WHERE file_id in (%s);";
+            String sqlFormat = "SELECT ft.file_id, ft.tag_id as id, t.name, t.'group', ft.is_main FROM file_tag ft LEFT JOIN tag t ON ft.tag_id = t.id WHERE file_id in (%s);";
             String sql2 = String.format(sqlFormat, map.keySet().stream().collect(Collectors.joining(",")));
             ResultSet rs2 = conn.select(sql2);
             try {
                 while (rs2.next()) {
                     String file_id = rs2.getString("file_id");
-                    ITag tag = BeanUtils.getTag(rs2);
+                    ITag tag = BeanUtils.setTag(rs2);
                     map.get(file_id).add(tag);
                 }
             } catch (SQLException e) {
@@ -188,7 +188,7 @@ public class FileService {
         ResultSet rs = conn.select(sql);
         try {
             while (rs.next()) {
-                IFile file = BeanUtils.getFile(rs);
+                IFile file = BeanUtils.setFile(rs);
                 files.add(file);
             }
         } catch (SQLException e) {

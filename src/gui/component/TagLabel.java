@@ -18,21 +18,21 @@ import gui.window.Tag;
 import service.TagService;
 
 public class TagLabel extends JLabel implements MouseListener {
-    private Tag tagWindow;// 标签窗口
+    private Tag tagWindow;
     private Color color;
-    private IPanel panel;// 绘制点击结果的面板
-    private int event;// 点击事件值: 1,展示该标签的文件, 2,选择要给文件添加标签, 3,移除要添加的标签
-    private ITag tag;// 关联的标签
-    private IFile file;// 关联的文件
-    private int type;// 标签类型：1，在标签菜单的标签 2，文件的标签
+    private IPanel panel;
+    private int event;// Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
+    private ITag tag;
+    private IFile file;
+    private int type;// Label type: 1: label in the label menu; 2: file label
 
     /**
-     * 带颜色的标签事件
+     * A colored event label
      * 
      * @param tag
      * @param color
-     * @param panel 绘制点击结果的面板
-     * @param event 点击事件值: 1,展示该标签的文件, 2,选择要给文件添加标签, 3,移除要添加的标签
+     * @param panel result panel
+     * @param event Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
      */
     public TagLabel(ITag tag, Color color, IPanel panel, int event) {
         super(tag.getName());
@@ -40,19 +40,19 @@ public class TagLabel extends JLabel implements MouseListener {
         this.panel = panel;
         this.event = event;
         this.color = color;
-        this.setOpaque(true);// 背景不透明
+        this.setOpaque(true);
         this.setBackground(color);
-        this.setBorder(new RoundedBorder(Color.BLACK, 5));// 圆角边框
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
         this.addMouseListener(this);
     }
 
     /**
-     * 带颜色的事件标签, 与文件相关联
+     * A colored event label associated with a file
      * 
      * @param tag
      * @param color
-     * @param panel 绘制点击结果的面板
-     * @param event 点击事件值: 1,展示该标签的文件, 2,选择要给文件添加标签, 3,移除要添加的标签
+     * @param panel result panel
+     * @param event Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
      * @param file
      */
     public TagLabel(ITag tag, Color color, IPanel panel, int event, IFile file) {
@@ -63,20 +63,23 @@ public class TagLabel extends JLabel implements MouseListener {
         this.file = file;
         this.color = color;
         this.type = 2;
-        this.setOpaque(true);// 背景不透明
+        this.setOpaque(true);
         this.setBackground(color);
-        this.setBorder(new RoundedBorder(Color.BLACK, 5));// 圆角边框
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
+        if (tag.getIsMain() == 1){
+            this.setForeground(Color.RED);
+        }
         this.addMouseListener(this);
     }
 
     /**
-     * 带颜色的事件标签,跟展示该标签的面板相关联，因为移除标签涉及到该面板的刷新
+     * The colored event label is associated with the panel that displays the label, because removing the label involves a refresh of the panel
      *
-     * @param tag       标签
-     * @param color     背景颜色
-     * @param panel     绘制结果的面板
-     * @param event     点击事件值: 1,展示该标签的文件, 2,选择要给文件添加标签, 3,移除要添加的标签
-     * @param tagWindow 标签的承载面板
+     * @param tag       tag
+     * @param color     background color
+     * @param panel     result panel
+     * @param event     Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
+     * @param tagWindow show window for this tag
      */
     public TagLabel(ITag tag, Color color, IPanel panel, int event, Tag tagWindow) {
         super(tag.getName());
@@ -85,15 +88,15 @@ public class TagLabel extends JLabel implements MouseListener {
         this.event = event;
         this.tagWindow = tagWindow;
         this.type = 1;
-        this.setOpaque(true);// 背景不透明
+        this.setOpaque(true);
         this.setBackground(color);
         this.color = color;
-        this.setBorder(new RoundedBorder(Color.BLACK, 5));// 圆角边框
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
         this.addMouseListener(this);
     }
 
     /**
-     * 无事件标签
+     * no event tag
      * 
      * @param text
      * @param color
@@ -101,7 +104,7 @@ public class TagLabel extends JLabel implements MouseListener {
     public TagLabel(String text, Color color) {
         super(text);
         this.setOpaque(true);
-        this.setBorder(new RoundedBorder(Color.BLACK, 5));// 圆角边框
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
         this.setBackground(color);
     }
     
@@ -109,17 +112,15 @@ public class TagLabel extends JLabel implements MouseListener {
         super(tag.getName());
         this.tag = tag;
         this.setOpaque(true);
-        this.setBorder(new RoundedBorder(Color.BLACK, 5));// 圆角边框
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
         this.setBackground(color);
-
     }
 
-    //设置事件类型
+    //set event type
     public void setEvent(int event) {
         this.event = event;
     }
 
-    //克隆
     public TagLabel clone(){
         return new TagLabel(tag, color, panel, event);
     }
@@ -128,61 +129,55 @@ public class TagLabel extends JLabel implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         TagService tagService = new TagService();
         if (e.getButton() == MouseEvent.BUTTON1) {
-            // 左键点击
+            // clicked left button to find files that belong to this tag
             if (event == 1) {
-                // 找到标签下的文件
                 Map<String, Set<ITag>> fileMap = tagService.getFileMapByTag(tag);
                 Map<String, Set<IFile>> files = tagService.getFilesMapByTag(tag);
-                // 显示结果
+                // show all
                 panel.removeAll();
                 files.forEach((dir, fileSet) -> {
-                    //将路径包装成对象
+                    // folder
                     IFile dirFile = new IFile();
                     dirFile.setDirectory(true);
                     dirFile.setPath(dir);
                     panel.add(new FileBox(dirFile, panel, fileMap));
-                    panel.add(Box.createVerticalStrut(3));//垂直間距
+                    panel.add(Box.createVerticalStrut(3));
                     fileSet.forEach(file -> {
                         FileBox row = new FileBox(file, panel, fileMap);
                         panel.add(row);
-                        panel.add(Box.createVerticalStrut(3));//垂直間距
+                        panel.add(Box.createVerticalStrut(3));
                     });
-                    //panel.add(Box.createVerticalGlue());//撑满空的地方
                 });
                 panel.reload();
             } else if (event == 2) {
-                // 将标签添加到下方待选列表
+                // add to candidate list
                 if(panel.getTags().contains(tag)) return;
                 panel.getTags().add(tag);
-                //克隆要添加的标签,事件类型修改为移除，添加到下方，刷新
+                // clone the tag you want to add, change the event type to remove, add to below, refresh
                 TagLabel copy = clone();
                 copy.setEvent(3);
                 panel.add(copy);
                 panel.reload();
             } else if (event == 3) {
-                // 将标签从待选移除
+                // remove it from candidate list
                 panel.getTags().remove(tag);
                 panel.remove(this);
                 panel.reload();
             }
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            // 右键删除标签，提示信息
+            // clicked right button to delete
             if (type == 1) {
                 String tap = "你真的要删除[" + tag.getName() + "]标签吗?";
                 int confirmDel = JOptionPane.showConfirmDialog(this, tap, "确认信息", JOptionPane.YES_NO_OPTION);
                 if (confirmDel == JOptionPane.YES_OPTION) {
                     tagService.deleteTag(tag);
-                    // 页面信息重载
+                    // frame information reload
                     tagWindow.reloadGroups();
                     tagWindow.reloadTags();
                 }
             } else if (type == 2) {
-                String tap = "你真的要移除该文件的[" + tag.getName() + "]标签吗?";
-                int confirmDel = JOptionPane.showConfirmDialog(this, tap, "确认信息", JOptionPane.YES_NO_OPTION);
-                if (confirmDel == JOptionPane.YES_OPTION) {
-                    tagService.removeTag(tag, file);
-                    this.setVisible(false);// 先隐藏
-                }
+                //TODO: 消除旧的主标签颜色，可用缓存
+                new TagMenu(tag, this, file).show(this, e.getX(), e.getY());
             }
         }
     }
@@ -206,5 +201,13 @@ public class TagLabel extends JLabel implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
         this.setBorder(new RoundedBorder(Color.BLACK, 5));
+    }
+
+    public void setMainTag(boolean isMain) {
+        if(isMain){
+            this.setForeground(Color.RED);
+        }else{
+            this.setForeground(Color.BLACK);
+        }
     }
 }

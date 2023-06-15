@@ -12,7 +12,7 @@ public class IFile {
     private String path;
     private String size;
     private String belong;
-    private boolean isDirectory = false;//默认是文件
+    private boolean isDirectory = false;//default is folder
     private List<ITag> tags;
 
     public IFile(){
@@ -25,7 +25,7 @@ public class IFile {
     }
 
     /**
-     * 文件夹构造器
+     * folder constructor
      * @param path
      */
     public IFile(String path){
@@ -34,7 +34,7 @@ public class IFile {
     }
 
     /**
-     * 文件构造器
+     * file constructor
      * @param id
      * @param name
      * @param path
@@ -132,12 +132,14 @@ public class IFile {
        return false;
    }
 
+   /**
+    * open file
+    */
    public boolean open(){
     File file = new File(path);
     if (!file.exists())
         return false;
     try {
-        // 打开文件
         Desktop.getDesktop().open(file);
     } catch (IOException e) {
         throw new RuntimeException(e);

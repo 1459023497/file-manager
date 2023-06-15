@@ -58,7 +58,7 @@ public class TagService {
         ArrayList<ITag> tags = new ArrayList<>();
         try {
             while (rs.next()) {
-                ITag tag = BeanUtils.getTag(rs);
+                ITag tag = BeanUtils.setTag(rs);
                 tags.add(tag);
             }
         } catch (SQLException e) {
@@ -78,7 +78,7 @@ public class TagService {
         HashMap<String, ITag> tagMap = new HashMap<>();
         try {
             while (rs.next()) {
-                ITag tag = BeanUtils.getTag(rs);
+                ITag tag = BeanUtils.setTag(rs);
                 tagMap.put(tag.getId(), tag);
             }
         } catch (SQLException e) {
@@ -102,7 +102,7 @@ public class TagService {
         try {
             while (rs.next()) {
                 String fileId = rs.getString("file_id");
-                ITag tag = BeanUtils.getTag(rs);
+                ITag tag = BeanUtils.setTag(rs);
                 map.computeIfAbsent(fileId, k -> new HashSet<>()).add(tag);
             }
         } catch (SQLException e) {
@@ -197,7 +197,7 @@ public class TagService {
         try {
             while (rs.next()) {
                 String fileId = rs.getString("file_id");
-                ITag tag2 = BeanUtils.getTag(rs);
+                ITag tag2 = BeanUtils.setTag(rs);
                 map.computeIfAbsent(fileId, key -> new HashSet<>()).add(tag2);
             }
         } catch (SQLException e) {
@@ -221,7 +221,7 @@ public class TagService {
         HashMap<String, Set<IFile>> files = new HashMap<>();
         try {
             while (rs.next()) {
-                IFile file = BeanUtils.getFile(rs);
+                IFile file = BeanUtils.setFile(rs);
                 String dir = file.getBelong();
 
                 // return set
@@ -249,7 +249,7 @@ public class TagService {
         HashSet<ITag> tags = new HashSet<>();
         try {
             while (rs.next()) {
-                ITag tag = BeanUtils.getTag(rs);
+                ITag tag = BeanUtils.setTag(rs);
                 tags.add(tag);
             }
         } catch (SQLException e) {
@@ -357,7 +357,7 @@ public class TagService {
         List<ITag> tags = new ArrayList<>();
         try {
             while (rs.next()) {
-                ITag tag = BeanUtils.getTagWithKey(rs);
+                ITag tag = BeanUtils.setTagWithKey(rs);
                 tags.add(tag);
             }
         } catch (SQLException e) {
@@ -382,7 +382,7 @@ public class TagService {
         List<IFile> files = new ArrayList<IFile>();
         try {
             while (rs.next()) {
-                files.add(BeanUtils.getFile(rs));
+                files.add(BeanUtils.setFile(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -390,5 +390,16 @@ public class TagService {
             conn.close();
         }
         return files;
+    }
+
+    public void renameTag(ITag tag) {
+        String sql = "UPDATE tag set name = '" + tag.getName() + "' WHERE id = '" + tag.getId() + "'";
+        conn.update(sql);
+    }
+
+    public void setMainTag(ITag tag, IFile file) {
+        String sql = "update file_tag set is_main = 0 where file_id = '" + file.getId() + "' and is_main = 1; update file_tag set is_main = 1 where file_id = '" 
+        + file.getId() + "' and tag_id = '" + tag.getId() + "';";
+        conn.update(sql);
     }
 }
