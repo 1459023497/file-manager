@@ -25,6 +25,7 @@ public class TagLabel extends JLabel implements MouseListener {
     private ITag tag;
     private IFile file;
     private int type;// Label type: 1: label in the label menu; 2: file label
+    private FileBox fileBox;
 
     /**
      * A colored event label
@@ -55,7 +56,7 @@ public class TagLabel extends JLabel implements MouseListener {
      * @param event Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
      * @param file
      */
-    public TagLabel(ITag tag, Color color, IPanel panel, int event, IFile file) {
+    public TagLabel(ITag tag, Color color, IPanel panel, int event, IFile file, FileBox fileBox) {
         super(tag.getName());
         this.tag = tag;
         this.panel = panel;
@@ -63,10 +64,11 @@ public class TagLabel extends JLabel implements MouseListener {
         this.file = file;
         this.color = color;
         this.type = 2;
+        this.fileBox = fileBox;
         this.setOpaque(true);
         this.setBackground(color);
         this.setBorder(new RoundedBorder(Color.BLACK, 5));
-        if (tag.getIsMain() == 1){
+        if (tag.getIsMain()){
             this.setForeground(Color.RED);
         }
         this.addMouseListener(this);
@@ -176,8 +178,7 @@ public class TagLabel extends JLabel implements MouseListener {
                     tagWindow.reloadTags();
                 }
             } else if (type == 2) {
-                //TODO: 消除旧的主标签颜色，可用缓存
-                new TagMenu(tag, this, file).show(this, e.getX(), e.getY());
+                new TagMenu(tag, this, file, fileBox).show(this, e.getX(), e.getY());
             }
         }
     }

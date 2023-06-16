@@ -85,10 +85,10 @@ public class ITag {
 
     /**
      * judge it is main tag or not
-     * @return 1: it is main tag 0: it is not main tag
+     * @return true: it is main tag; false: it is not main tag
      */
-    public int getIsMain() {
-        return isMain;
+    public boolean getIsMain() {
+        return isMain == 1? true : false;
     }
 
     public void setIsMain(int isMain) {

@@ -1,5 +1,6 @@
 package gui.component;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -15,7 +16,7 @@ import service.TagService;
 
 public class TagMenu extends JPopupMenu{
 
-    public TagMenu(ITag tag, TagLabel tagLabel, IFile file){
+    public TagMenu(ITag tag, TagLabel tagLabel, IFile file, FileBox fileBox){
         TagService tagService = new TagService();
         JMenuItem rename = new JMenuItem("重命名");
         JMenuItem setMain = new JMenuItem("设置为主标签");
@@ -52,6 +53,12 @@ public class TagMenu extends JPopupMenu{
             public void actionPerformed(ActionEvent e) {
                 tagService.setMainTag(tag, file);
                 tagLabel.setMainTag(true);
+                //reset old main label and new main label
+                TagLabel oldMainLabel = fileBox.getMainTagLabel();
+                if (oldMainLabel != null){
+                    oldMainLabel.setForeground(Color.BLACK);
+                }
+                fileBox.setMainTagLabel(tagLabel);
             }
         });
     }

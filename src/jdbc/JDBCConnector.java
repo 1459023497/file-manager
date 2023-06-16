@@ -21,14 +21,14 @@ public class JDBCConnector {
     private static final Logger logger = Logger.getLogger("JDBCConnector.class");
 
     /**
-     * 数据库链接池的方式
+     * connection with pool
      */
     public JDBCConnector() {
-        // 创建properties对象，读取配置文件
+        // create properties object，to read configuration
         try {
             Properties properties = new Properties();
             properties.load(new FileInputStream("src\\jdbc\\druid.properties"));
-            // 创建指定参数的数据库连接池
+            // create connection pool with properties
             dataSource = DruidDataSourceFactory.createDataSource(properties);
         } catch (Exception e) {
             logger.info("创建数据库连接出错：" + e.getMessage());
@@ -37,7 +37,7 @@ public class JDBCConnector {
     }
 
     /*
-     * 直接连接的方式
+     * simple connection
      */
     public JDBCConnector(int i){
         try {
@@ -50,7 +50,7 @@ public class JDBCConnector {
     }
 
     /**
-     * 增，删，改
+     * add, delete, update
      * 
      * @param sql
      */
@@ -68,7 +68,7 @@ public class JDBCConnector {
     }
 
     /**
-     * 查
+     * select
      * 
      * @param sql
      * @return
@@ -88,7 +88,7 @@ public class JDBCConnector {
     }
 
     /**
-     * 关闭库连接
+     * close the connection
      */
     public void close() {
         try {

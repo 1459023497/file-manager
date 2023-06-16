@@ -265,11 +265,12 @@ public class TagService {
      */
     public void tags(Collection<ITag> tags, IFile file) {
         if (!file.isDirectory()) {
-            // single file
             StringBuffer sb = new StringBuffer();
             tags.forEach(tag -> {
-                String sql = "INSERT into file_tag(id,file_id,tag_id) VALUES('" + idGenerator.next() + "','"
-                        + file.getId() + "','" + tag.getId() + "');";
+                //here case when : if first tag a file, it will select the first tag as default main tag 
+                String sql = "INSERT into file_tag(id,file_id,tag_id,is_main) VALUES('" + idGenerator.next() + "','"
+                        + file.getId() + "','" + tag.getId() + "',(case when (select count(*) from file_tag where file_id = '"+file.getId()
+                        +"' and is_main = 1) > 0 then 0 else 1 end));";
                 sb.append(sql);
             });
             conn.update(sb.toString());
@@ -401,5 +402,26 @@ public class TagService {
         String sql = "update file_tag set is_main = 0 where file_id = '" + file.getId() + "' and is_main = 1; update file_tag set is_main = 1 where file_id = '" 
         + file.getId() + "' and tag_id = '" + tag.getId() + "';";
         conn.update(sql);
+    }
+
+    /**
+     * returna the files that its main tag is this tag 
+     * @param tagId
+     * @return 
+     */
+    public List<IFile> getFilesByMainTag(String tagId) {
+        String sql = "SELECT * FROM file WHERE id IN (SELECT file_id FROM file_tag WHERE tag_id='" + tagId + "' and is_main = 1);";
+        ResultSet rs = conn.select(sql);
+        List<IFile> files = new ArrayList<IFile>();
+        try {
+            while (rs.next()) {
+                files.add(BeanUtils.setFile(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            conn.close();
+        }
+        return files;
     }
 }

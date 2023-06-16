@@ -20,6 +20,7 @@ import gui.component.base.IPanel;
 public class FileBox extends Box {
     private FileLabel fileLabel;
     private boolean isDir;
+    private TagLabel mainTagLabel;
 
     /**
      * file row : file + tags + add button
@@ -41,7 +42,11 @@ public class FileBox extends Box {
         color.init();
         if (tags != null) {
             tags.forEach(t -> {
-                this.add(new TagLabel(t, color.next(), panel, 1, file));
+                TagLabel tagLabel = new TagLabel(t, color.next(), panel, 1, file, this);
+                if (t.getIsMain()){
+                    mainTagLabel = tagLabel;
+                }
+                this.add(tagLabel);
                 this.add(Box.createHorizontalStrut(5));
             });
         }
@@ -67,7 +72,11 @@ public class FileBox extends Box {
             color.init();
             if (CollectionUtils.isNotEmpty(tags)) {
                 tags.forEach(t -> {
-                    this.add(new TagLabel(t, color.next(), panel, 1, file));
+                    TagLabel tagLabel = new TagLabel(t, color.next(), panel, 1, file, this);
+                    if (t.getIsMain()){
+                        mainTagLabel = tagLabel;
+                    }
+                    this.add(tagLabel);
                     this.add(Box.createHorizontalStrut(5));
                 });
             }
@@ -97,4 +106,12 @@ public class FileBox extends Box {
         fileLabel.setHighlight(text);
     }
 
+    public TagLabel getMainTagLabel() {
+        return mainTagLabel;
+    }
+
+    public void setMainTagLabel(TagLabel mainTagLabel) {
+        this.mainTagLabel = mainTagLabel;
+    }
+    
 }

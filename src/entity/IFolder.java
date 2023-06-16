@@ -92,7 +92,7 @@ public class IFolder {
 
     public void moveFiles() {
         if (tagId != null && path != null) {
-            List<IFile> files = tagService.getFilesByTag(tagId);
+            List<IFile> files = tagService.getFilesByMainTag(tagId);
             // update file path and belong folder
             files.forEach(file -> {
                 String sourceFilePath = file.getPath();
