@@ -49,6 +49,7 @@ public class Tag {
         JTextField newTag = new JTextField(10);
         menu.add(newTag);
         // load tag's group
+        //TODO: 改成树形下拉
         groups = new JComboBox<>();
         reloadGroups();
         menu.add(groups);

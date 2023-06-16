@@ -190,7 +190,7 @@ public class TagService {
      * @return map 【fileId,tags】
      */
     public Map<String, Set<ITag>> getFileMapByTag(ITag tag) {
-        String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
+        String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\",is_main FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
                 + "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
         HashMap<String, Set<ITag>> map = new HashMap<>();

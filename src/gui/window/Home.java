@@ -1,6 +1,7 @@
 package gui.window;
 
 import java.awt.Dimension;
+import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,7 +160,10 @@ public class Home {
             // same size as repeat
             center.removeAll();
             repMap.forEach((size, list) -> {
-                center.add(new JLabel("【大小：" + FileUtils.getFileSizeString(size)+"】"));
+                JLabel label = new JLabel("【大小：" + FileUtils.getFileSizeString(size)+"】");
+                label.setOpaque(true);
+                label.setBackground(Color.GREEN);
+                center.add(label);
                 list.forEach(file -> {
                     center.addFileBox(file, center);
                 });
