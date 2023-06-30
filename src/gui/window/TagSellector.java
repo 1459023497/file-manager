@@ -18,9 +18,9 @@ import common.AppContext;
 import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
+import gui.base.IPanel;
 import gui.component.AddLabel;
 import gui.component.TagLabel;
-import gui.component.base.IPanel;
 import service.TagService;
 
 public class TagSellector {

@@ -26,9 +26,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 
+import gui.base.IFrame;
+import gui.base.IPanel;
 import gui.component.FrameBar;
-import gui.component.base.IFrame;
-import gui.component.base.IPanel;
 
 public class Money {
     private IFrame frame;

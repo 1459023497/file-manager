@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.swing.JTree;
+
 import org.apache.commons.collections4.CollectionUtils;
 
 import common.myenum.Status;
@@ -19,6 +21,7 @@ import common.tool.IdGenerator;
 import entity.IFile;
 import entity.IFolder;
 import entity.ITag;
+import gui.base.TagTreeNode;
 import jdbc.JDBCConnector;
 
 public class TagService {
@@ -46,14 +49,14 @@ public class TagService {
     public void deleteTag(ITag tag) {
         String sql = "DELETE FROM tag WHERE id = '" + tag.getId() + "';\n" +
                 "DELETE FROM file_tag WHERE tag_id = '" + tag.getId() + "';\n" +
-                "UPDATE tag set \"group\" = '无分组' WHERE \"group\" = '" + tag.getId() + "';";
+                "UPDATE tag set \"group\" = '全部' WHERE \"group\" = '" + tag.getId() + "';";
         conn.update(sql);
     }
 
     /**
      * get all tags
      */
-    public ArrayList<ITag> getAllTags() {
+    public List<ITag> getAllTags() {
         ResultSet rs = conn.select("select * from tag;");
         ArrayList<ITag> tags = new ArrayList<>();
         try {
@@ -123,14 +126,15 @@ public class TagService {
         Map<String, ITag> tagMap = getTagsMap();
         Map<String, Set<String>> groupMap = getGroupsMap();
         // only recursive top tag
-        groupMap.forEach((k, v) -> {
-            ITag tag = tagMap.get(k);
-            if (tag.getGroup().equals("无分组")) {
+        groupMap.forEach((tagId, subTagIds) -> {
+            ITag tag = tagMap.get(tagId);
+            if (tag.getGroup().equals("全部")) {
                 String path = topPath + "\\" + tag.getName();
                 IFolder folder = new IFolder(path, tag.getName(), tag.getId());
                 topFolder.addSubFolder(folder);
-                v.forEach(e -> {
-                    findSub(groupMap, tagMap, e, folder);
+                // find sub-tags by recursion
+                subTagIds.forEach(subTagId -> {
+                    findSub(groupMap, tagMap, subTagId, folder);
                 });
             }
         });
@@ -138,7 +142,50 @@ public class TagService {
     }
 
     /**
-     * recursion method
+     * this method will create a JTree of the tags according to the group structure
+     * 
+     * @return JTree of the ITag
+     */
+    public JTree getTagTree() {
+        // root node
+        ITag rootTag = new ITag("全部","全部");
+        TagTreeNode root = new TagTreeNode(rootTag);
+        Map<String, ITag> tagMap = getTagsMap();
+        Map<String, Set<String>> groupMap = getGroupsMap();
+        groupMap.forEach((tagId, subTagIds) -> {
+            ITag tag = tagMap.get(tagId);
+            if (tag.getGroup().equals("全部")) {
+                // sub node
+                TagTreeNode sub = new TagTreeNode(tag);
+                root.add(sub);
+                // find sub-tags by recursion
+                subTagIds.forEach(subTagId -> {
+                    findSub(groupMap, tagMap, subTagId, sub);
+                });
+            }
+        });
+        return new JTree(root);
+    }
+
+    /**
+     * recursion method for JTree
+     */
+    private void findSub(Map<String, Set<String>> groupMap, Map<String, ITag> tagMap, String tagId,
+            TagTreeNode node) {
+        ITag tag = tagMap.get(tagId);
+        TagTreeNode subNode = new TagTreeNode(tag);
+        if (CollectionUtils.isNotEmpty(groupMap.get(tagId))) {
+            groupMap.get(tagId).forEach(subTagId -> {
+                // if it has sub-tag, inner recursion
+                findSub(groupMap, tagMap, subTagId, subNode);
+            });
+        }
+        // add itself to father node
+        node.add(subNode);
+    }
+
+    /**
+     * recursion method for IFolder
      */
     public void findSub(Map<String, Set<String>> groupMap, Map<String, ITag> tagMap, String tagId, IFolder folder) {
         ITag tag = tagMap.get(tagId);
@@ -169,7 +216,7 @@ public class TagService {
             } else {
                 // not grouped
                 HashSet<String> set = new HashSet<>();
-                if (group.equals("无分组")) {
+                if (group.equals("全部")) {
                     // here is to avoid : put top tag will cover old group set
                     if (groupMap.containsKey(id))
                         return;
@@ -267,10 +314,12 @@ public class TagService {
         if (!file.isDirectory()) {
             StringBuffer sb = new StringBuffer();
             tags.forEach(tag -> {
-                //here case when : if first tag a file, it will select the first tag as default main tag 
+                // here case when : if first tag a file, it will select the first tag as default
+                // main tag
                 String sql = "INSERT into file_tag(id,file_id,tag_id,is_main) VALUES('" + idGenerator.next() + "','"
-                        + file.getId() + "','" + tag.getId() + "',(case when (select count(*) from file_tag where file_id = '"+file.getId()
-                        +"' and is_main = 1) > 0 then 0 else 1 end));";
+                        + file.getId() + "','" + tag.getId()
+                        + "',(case when (select count(*) from file_tag where file_id = '" + file.getId()
+                        + "' and is_main = 1) > 0 then 0 else 1 end));";
                 sb.append(sql);
             });
             conn.update(sb.toString());
@@ -399,18 +448,21 @@ public class TagService {
     }
 
     public void setMainTag(ITag tag, IFile file) {
-        String sql = "update file_tag set is_main = 0 where file_id = '" + file.getId() + "' and is_main = 1; update file_tag set is_main = 1 where file_id = '" 
-        + file.getId() + "' and tag_id = '" + tag.getId() + "';";
+        String sql = "update file_tag set is_main = 0 where file_id = '" + file.getId()
+                + "' and is_main = 1; update file_tag set is_main = 1 where file_id = '"
+                + file.getId() + "' and tag_id = '" + tag.getId() + "';";
         conn.update(sql);
     }
 
     /**
-     * returna the files that its main tag is this tag 
+     * returna the files that its main tag is this tag
+     * 
      * @param tagId
-     * @return 
+     * @return
      */
     public List<IFile> getFilesByMainTag(String tagId) {
-        String sql = "SELECT * FROM file WHERE id IN (SELECT file_id FROM file_tag WHERE tag_id='" + tagId + "' and is_main = 1);";
+        String sql = "SELECT * FROM file WHERE id IN (SELECT file_id FROM file_tag WHERE tag_id='" + tagId
+                + "' and is_main = 1);";
         ResultSet rs = conn.select(sql);
         List<IFile> files = new ArrayList<IFile>();
         try {

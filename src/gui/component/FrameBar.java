@@ -10,9 +10,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import gui.component.base.IButton;
-import gui.component.base.IFrame;
-import gui.component.base.IPanel;
+import gui.base.IButton;
+import gui.base.IFrame;
+import gui.base.IPanel;
 
 public class FrameBar extends JPanel {
     private int state = 0;

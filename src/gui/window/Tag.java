@@ -2,25 +2,27 @@ package gui.window;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 
+import common.myenum.InfoType;
 import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
+import gui.base.IDialog;
+import gui.base.IFrame;
+import gui.base.IPanel;
+import gui.base.MyScrollPane;
 import gui.component.TagLabel;
-import gui.component.base.IFrame;
-import gui.component.base.IPanel;
-import gui.component.base.MyScrollPane;
+import gui.component.TreeSelect;
 import service.FileService;
 import service.TagService;
 
@@ -28,7 +30,7 @@ public class Tag {
     public static final String WIN_NAME = "Tag";
     private IPanel subTop;
     private IPanel center;
-    private JComboBox<ITag> groups;
+    private TreeSelect tagGroups;
     private FileService fileService;
     private TagService tagService;
     private IFrame frame;
@@ -49,10 +51,11 @@ public class Tag {
         JTextField newTag = new JTextField(10);
         menu.add(newTag);
         // load tag's group
-        //TODO: 改成树形下拉
-        groups = new JComboBox<>();
-        reloadGroups();
-        menu.add(groups);
+        JTree tree = tagService.getTagTree();
+        tagGroups = new TreeSelect(tree);
+        menu.add(tagGroups);
+
+
         // there are father ana son tags relationships, any tag can be a group; when its group is null, it will be the top tag
         JButton addTag = new JButton("新建标签");
         menu.add(addTag);
@@ -72,18 +75,21 @@ public class Tag {
 
         addTag.addActionListener((a) -> {
             // get input name and group
-            ITag selectedTag = (ITag) groups.getSelectedItem();
+            ITag selectedTag = (ITag) tagGroups.getSelectedItem();
             String name = newTag.getText();
-            String group = selectedTag.getName();
             if (name.length() == 0) {
-                JOptionPane.showMessageDialog(addTag, "输入为空！");
+                new IDialog(frame, "输入为空！", InfoType.ERROR);
                 return;
+            }
+            String group = "全部";
+            if (selectedTag != null){
+                group = selectedTag.getId();
             }
             // confirm message
             String tap = "新建标签：" + name + "  分组：" + group + "?";
             int confirm = JOptionPane.showConfirmDialog(frame, tap, "确认", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                tagService.newTag(new ITag(name, selectedTag.getId()));
+                tagService.newTag(new ITag(name, group));
                 reloadGroups();
                 reloadTags();
             }
@@ -132,16 +138,8 @@ public class Tag {
      * 
      */
     public void reloadGroups() {
-        groups.removeAllItems();
-        ArrayList<ITag> tags = tagService.getAllTags();
-        // no grouped tags
-        ITag blankTag = new ITag();
-        blankTag.setId("无分组");
-        blankTag.setName("无分组");
-        groups.addItem(blankTag);
-        tags.forEach(tag -> {
-            groups.addItem(tag);
-        });
+        JTree tree = tagService.getTagTree();
+        tagGroups.reloadTree(tree);
     }
 
     public JFrame getFrame() {

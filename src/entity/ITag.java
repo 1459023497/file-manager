@@ -13,11 +13,11 @@ public class ITag {
     private List<String> keys;
     private int status = Status.BROWSE;
 
-    public ITag(String name){
+    public ITag(String name) {
         this.name = name;
     }
 
-    public ITag(String name, String group){
+    public ITag(String name, String group) {
         this.name = name;
         this.group = group;
     }
@@ -85,14 +85,14 @@ public class ITag {
 
     /**
      * judge it is main tag or not
+     * 
      * @return true: it is main tag; false: it is not main tag
      */
     public boolean getIsMain() {
-        return isMain == 1? true : false;
+        return isMain == 1 ? true : false;
     }
 
     public void setIsMain(int isMain) {
         this.isMain = isMain;
     }
-    
 }

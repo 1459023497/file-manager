@@ -15,7 +15,7 @@ import common.tool.FileUtils;
 import common.tool.TagColor;
 import entity.IFile;
 import entity.ITag;
-import gui.component.base.IPanel;
+import gui.base.IPanel;
 
 public class FileBox extends Box {
     private FileLabel fileLabel;

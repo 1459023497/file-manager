@@ -1,4 +1,4 @@
-package gui.component.base;
+package gui.base;
 
 import java.awt.Color;
 import java.awt.Point;

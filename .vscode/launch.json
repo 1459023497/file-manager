@@ -6,16 +6,58 @@
     "configurations": [
         {
             "type": "java",
+            "name": "JWindowDemo",
+            "request": "launch",
+            "mainClass": "test.JWindowDemo",
+            "projectName": "file-manager_13b5338b"
+        },
+        {
+            "type": "java",
+            "name": "ComboTree",
+            "request": "launch",
+            "mainClass": "test.ComboTree",
+            "projectName": "file-manager_13b5338b"
+        },
+        {
+            "type": "java",
+            "name": "TreeCombo",
+            "request": "launch",
+            "mainClass": "test.TreeCombo",
+            "projectName": "file-manager_13b5338b"
+        },
+        {
+            "type": "java",
+            "name": "TreeComboBoxExample",
+            "request": "launch",
+            "mainClass": "test.TreeComboBoxExample",
+            "projectName": "file-manager_13b5338b"
+        },
+        {
+            "type": "java",
+            "name": "TreeDropdown",
+            "request": "launch",
+            "mainClass": "test.TreeDropdown",
+            "projectName": "file-manager_13b5338b"
+        },
+        {
+            "type": "java",
+            "name": "TreeComboBox",
+            "request": "launch",
+            "mainClass": "test.TreeComboBox",
+            "projectName": "file-manager_13b5338b"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
-            "mainClass": "${file}",
+            "mainClass": "${file}"
         },
         {
             "type": "java",
             "name": "Main",
             "request": "launch",
             "mainClass": "Main",
-            "projectName": "file-manager_13b5338b",
+            "projectName": "file-manager_13b5338b"
         },
         {
             "type": "java",

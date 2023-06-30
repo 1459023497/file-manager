@@ -12,8 +12,8 @@ import javax.swing.JOptionPane;
 
 import entity.IFile;
 import entity.ITag;
-import gui.component.base.IPanel;
-import gui.component.base.RoundedBorder;
+import gui.base.IPanel;
+import gui.base.RoundedBorder;
 import gui.window.Tag;
 import service.TagService;
 

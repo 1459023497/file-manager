@@ -1,7 +1,6 @@
 package gui.window;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -9,9 +8,9 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import entity.ITag;
+import gui.base.IFrame;
+import gui.base.IPanel;
 import gui.component.HintTextField;
-import gui.component.base.IFrame;
-import gui.component.base.IPanel;
 import service.TagService;
 
 public class TagBinder {
@@ -55,7 +54,7 @@ public class TagBinder {
      */
     public void reloadSellector() {
         tagSellector.removeAllItems();
-        ArrayList<ITag> tags = tagService.getAllTags();
+        List<ITag> tags = tagService.getAllTags();
         tags.forEach(tag -> {
             tagSellector.addItem(tag);
         });

@@ -3,7 +3,7 @@ package gui.component;
 import javax.swing.JLabel;
 
 import entity.ITag;
-import gui.component.base.RoundedBorder;
+import gui.base.RoundedBorder;
 import service.TagService;
 
 import java.awt.Color;
