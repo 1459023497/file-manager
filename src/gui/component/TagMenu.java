@@ -51,6 +51,9 @@ public class TagMenu extends JPopupMenu{
         setMain.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(tag.getIsMain()){
+                    return;
+                }
                 tagService.setMainTag(tag, file);
                 tagLabel.setMainTag(true);
                 //reset old main label and new main label

@@ -56,8 +56,8 @@ public class IDialog extends JWindow {
             }
         });
 
-        // dispose after 3 seconds
-        Timer timer = new Timer(3000, new ActionListener() {
+        // dispose after 2 seconds
+        Timer timer = new Timer(2000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();

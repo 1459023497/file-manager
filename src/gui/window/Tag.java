@@ -2,6 +2,8 @@ package gui.window;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 
+import common.AppContext;
 import common.myenum.InfoType;
 import common.tool.TagColor;
 import entity.IFile;
@@ -71,6 +74,12 @@ public class Tag {
         reloadTags();
         all.addActionListener(e -> {
             queryAll();
+        });
+
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowActivated(WindowEvent e) {
+                AppContext.currentFrame = Tag.this;
+            }
         });
 
         addTag.addActionListener((a) -> {

@@ -148,7 +148,7 @@ public class TagService {
      */
     public JTree getTagTree() {
         // root node
-        ITag rootTag = new ITag("全部","全部");
+        ITag rootTag = new ITag("全部", "全部");
         TagTreeNode root = new TagTreeNode(rootTag);
         Map<String, ITag> tagMap = getTagsMap();
         Map<String, Set<String>> groupMap = getGroupsMap();
@@ -345,7 +345,8 @@ public class TagService {
                 String fileId = rs.getString("id");
                 tags.forEach(tag -> {
                     batch.append("INSERT INTO file_tag VALUES ('" + idGenerator.next() + "','" + fileId + "','"
-                            + tag.getId() + "');");
+                            + tag.getId() + "',(case when (select count(*) from file_tag where file_id = '" + fileId
+                            + "' and is_main = 1) > 0 then 0 else 1 end));");
                 });
             }
         } catch (SQLException e) {
@@ -383,10 +384,10 @@ public class TagService {
     }
 
     /**
-     * 绑定标签关键词
+     * add keys to tag
      * 
-     * @param id   标签id
-     * @param keys 关键词
+     * @param tagId   
+     * @param keys 
      */
     public void tagKeys(String tagId, String[] keys) {
         StringBuffer batch = new StringBuffer();

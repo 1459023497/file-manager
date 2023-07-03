@@ -15,6 +15,8 @@ public class AppContext {
 
     private static Map<String, Object> map;
 
+    public static Object currentFrame;
+
     public static void init(){
         map = new HashMap<String,Object>();
     }

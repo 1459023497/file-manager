@@ -10,7 +10,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
@@ -34,7 +33,9 @@ public class TagSellector {
         content.setBorder(BorderFactory.createLineBorder(Color.black, 1, true));
         window.setContentPane(content);
         // transparency
-        window.setOpacity(0.2f);
+        if(AppContext.UI_TRANSPARENT){
+            window.setOpacity(0.2f);
+        }  
         window.pack();
         window.setSize(200, 300);
         // get conponent's frame
@@ -67,11 +68,16 @@ public class TagSellector {
             // get adding tags
             HashSet<ITag> tags = down.getTags();
             if (tags.isEmpty()) {
-                JOptionPane.showMessageDialog(confirm, "你未选择标签！", "错误", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             tagService.tags(tags, file);
-            AppContext.getHome().queryAll();
+            //entermine focus window
+            Object currentFrame = AppContext.currentFrame;
+            if (currentFrame instanceof Home){
+                ((Home)currentFrame).queryAll();
+            }else if (currentFrame instanceof Tag){
+                ((Tag)currentFrame).queryAll();
+            }
             window.dispose();
         });
 

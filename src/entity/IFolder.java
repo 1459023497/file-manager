@@ -3,6 +3,7 @@ package entity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -10,6 +11,8 @@ import service.FileService;
 import service.TagService;
 
 public class IFolder {
+    private static final Logger logger = Logger.getLogger("IFolder.class");
+
     // one tag for one folder
     String tagId;
     String name;
@@ -90,29 +93,55 @@ public class IFolder {
         this.tagId = tagId;
     }
 
-    public void moveFiles() {
+    /**
+     * this is a recursive function that moves files to their folder and records the failure message
+     * @param result failure files
+     */
+    public void moveFiles(List<String> result) {
         if (tagId != null && path != null) {
             List<IFile> files = tagService.getFilesByMainTag(tagId);
             // update file path and belong folder
             files.forEach(file -> {
+                int index = 1;
+                String oldName = file.getName();
+                int dotIndex = oldName.lastIndexOf(".");
+                String prefix = oldName.substring(0, dotIndex);
+                String suffix = oldName.substring(dotIndex);
                 String sourceFilePath = file.getPath();
-                String targetFilePath = path + "\\" + file.getName();
+                String targetFilePath = path + "\\" + oldName;
+                // continue if it already moved
+                if (sourceFilePath.equals(targetFilePath)) {
+                    return;
+                }
                 File sourceFile = new File(sourceFilePath);
+                // avoid duplicated name
+                String newName = oldName;
+                while (fileExists(targetFilePath)) {
+                    newName = prefix + "(" + index + ")" + suffix;
+                    targetFilePath = path + "\\" + newName;
+                    index++;
+                }
                 File targetFile = new File(targetFilePath);
                 // move file to new path
-                boolean success = sourceFile.renameTo(targetFile);
-                if (success) {
-                    file.setPath(path + "\\" + file.getName());
+                boolean moveSuccess = sourceFile.renameTo(targetFile);
+                if (moveSuccess) {
+                    file.setName(newName);
+                    file.setPath(targetFilePath);
                     file.setBelong(path);
                 } else {
-                    System.out.println("文件移动失败: " + sourceFilePath);
+                    logger.severe("文件移动失败，请检查文件路径是否存在： " + sourceFilePath);
                 }
             });
             fileService.updateFiles(files);
         }
         // recursion
         if (CollectionUtils.isNotEmpty(folders)) {
-            folders.forEach(IFolder::moveFiles);
+            folders.forEach(e->e.moveFiles(result));
         }
+    }
+
+    private boolean fileExists(String path) {
+        File file = new File(path);
+        return file.exists();
     }
 }

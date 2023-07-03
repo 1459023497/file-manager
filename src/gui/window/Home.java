@@ -1,7 +1,9 @@
 package gui.window;
 
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,7 +54,7 @@ public class Home {
 
         // menu buttons
         IPanel top = new IPanel(new Dimension(0, 60));
-        JLabel l_path = new JLabel("文件夹");
+        JLabel l_path = new JLabel("请输入");
         JTextField textField = new JTextField(15);
         JButton b_scan = new JButton("扫描");
         JButton b_search = new JButton("搜索");
@@ -80,11 +82,18 @@ public class Home {
         top.add(b_auto);
         top.add(b_bulid);
         top.add(b_move);
+
         frame = new IFrame("文件管理", top);
         center = frame.getCenter();
         frame.setRoot(bottom);
 
         // event listeners
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowActivated(WindowEvent e) {
+                AppContext.currentFrame = Home.this;
+            }
+        });
+
         b_scan.addActionListener(e -> {
             // empty path
             if (textField.getText().equals("")) {
@@ -94,7 +103,7 @@ public class Home {
 
             String path = textField.getText();
             if (starter.scan(path)) {
-                // success, show result 
+                // success, show result
                 center.removeAll();
                 HashMap<String, Set<File>> fileMap = starter.getFileMap();
                 fileMap.forEach((dir, files) -> {
@@ -160,7 +169,7 @@ public class Home {
             // same size as repeat
             center.removeAll();
             repMap.forEach((size, list) -> {
-                JLabel label = new JLabel("【大小：" + FileUtils.getFileSizeString(size)+"】");
+                JLabel label = new JLabel("【大小：" + FileUtils.getFileSizeString(size) + "】");
                 label.setOpaque(true);
                 label.setBackground(Color.GREEN);
                 center.add(label);
@@ -173,12 +182,12 @@ public class Home {
             bottom.setVisible(false);
         });
 
-        //  generate tag's diretory structure
+        // generate tag's diretory structure
         b_bulid.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            fileChooser.setCurrentDirectory(new File("D:/"));
-            
+            fileChooser.setCurrentDirectory(new File("D:/Downloads/test"));
+
             int result = fileChooser.showOpenDialog(frame);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
@@ -190,13 +199,20 @@ public class Home {
         });
 
         // move files to their own folder
-        b_move.addActionListener(e->{
-            if (lastChoosePath == null){
+        b_move.addActionListener(e -> {
+            if (lastChoosePath == null) {
                 new IDialog(frame, "请先生成目录！", InfoType.ERROR);
                 return;
             }
             IFolder topFolder = tagService.getTagFolder(lastChoosePath);
-            topFolder.moveFiles();
+            List<String> result = new ArrayList<String>();
+            topFolder.moveFiles(result);
+            queryAll();
+            if (result.isEmpty()) {
+                new IDialog(frame, "全部移动完成！", InfoType.INFO);
+            } else {
+                new IDialog(frame, "以下文件移动失败：" + String.join(",", result), InfoType.WARN);
+            }
         });
     }
 
@@ -246,7 +262,7 @@ public class Home {
             });
         });
         files = fileService.getUntaggedFiles();
-        //  regular expression for matching files
+        // regular expression for matching files
         String[] keywords = tagMap.keySet().toArray(new String[0]);
         String patternString = "(" + String.join("|", keywords) + ")";
         Pattern pattern = Pattern.compile(patternString);

@@ -202,7 +202,7 @@ public class FileService {
     public void updateFiles(List<IFile> files) {
         StringBuffer buffer = new StringBuffer();
         files.forEach(file->{
-            String sql = "UPDATE file SET path='"+file.getPath()+"', belong = '"+file.getBelong()+"' WHERE id = '" + file.getId() + "';";
+            String sql = "UPDATE file SET name = '"+ file.getName()+"',path='"+file.getPath()+"', belong = '"+file.getBelong()+"' WHERE id = '" + file.getId() + "';";
             buffer.append(sql);
         });
         conn.update(buffer.toString());
