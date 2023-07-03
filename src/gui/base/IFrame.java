@@ -50,7 +50,8 @@ public class IFrame extends JFrame {
         content.add(scrollPane, BorderLayout.CENTER);
 
         setContentPane(content);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // click close only close one window
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         // remove default menubar, set backgroud to transparent
         setUndecorated(true);
         if(AppContext.UI_TRANSPARENT){
