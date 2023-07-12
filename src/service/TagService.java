@@ -49,6 +49,7 @@ public class TagService {
     public void deleteTag(ITag tag) {
         String sql = "DELETE FROM tag WHERE id = '" + tag.getId() + "';\n" +
                 "DELETE FROM file_tag WHERE tag_id = '" + tag.getId() + "';\n" +
+                "DELETE FROM tag_key WHERE tag_id = '" + tag.getId() + "';\n" +
                 "UPDATE tag set \"group\" = '全部' WHERE \"group\" = '" + tag.getId() + "';";
         conn.update(sql);
     }
@@ -231,12 +232,12 @@ public class TagService {
     }
 
     /**
-     * get files with tags by a tag
+     * get file's tags map by a tag
      * 
      * @param tag
      * @return map 【fileId,tags】
      */
-    public Map<String, Set<ITag>> getFileMapByTag(ITag tag) {
+    public Map<String, Set<ITag>> getFileTagMapByTag(ITag tag) {
         String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\",is_main FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
                 + "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
@@ -256,31 +257,37 @@ public class TagService {
     }
 
     /**
-     * get files by tag
+     * get file with tags by a specific tag
      *
      * @param tag
      * @return map 【folder,files】
      */
-    public Map<String, Set<IFile>> getFilesMapByTag(ITag tag) {
+    public List<IFile> getFilesMapByTag(ITag tag) {
         String sql = "SELECT * FROM file WHERE id IN (\n" +
                 "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
         ResultSet rs = conn.select(sql);
-        HashMap<String, Set<IFile>> files = new HashMap<>();
+        // <id, file>
+        Map<String, IFile> fileMap = new HashMap<>();
         try {
             while (rs.next()) {
                 IFile file = BeanUtils.setFile(rs);
-                String dir = file.getBelong();
-
-                // return set
-                files.computeIfAbsent(dir, k -> new HashSet<>()).add(file);
+                fileMap.put(file.getId(), file);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             conn.close();
         }
-
-        return files;
+        Map<String, Set<ITag>> tagMap = getFileTagMapByTag(tag);
+        tagMap.forEach((k, v) -> {
+            IFile file = fileMap.get(k);
+            if (file != null) {
+                v.forEach(e -> {
+                    file.add(e);
+                });
+            }
+        });
+        return fileMap.values().stream().collect(Collectors.toList());
     }
 
     /**
@@ -386,8 +393,8 @@ public class TagService {
     /**
      * add keys to tag
      * 
-     * @param tagId   
-     * @param keys 
+     * @param tagId
+     * @param keys
      */
     public void tagKeys(String tagId, String[] keys) {
         StringBuffer batch = new StringBuffer();

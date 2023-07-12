@@ -73,7 +73,7 @@ public class FileService {
         if (file.isDirectory()) {
             removeDir(file.getPath());
         } else {
-            String sql = "DELETE FROM file WHERE id = '" + file.getId() + "';";
+            String sql = "DELETE FROM file WHERE id = '" + file.getId() + "'; DELETE FROM file_tag WHERE file_id = '" + file.getId() + "';";
             conn.update(sql);
         }
     }
@@ -84,8 +84,11 @@ public class FileService {
      * @param dir
      */
     public void removeDir(String dir) {
-        String sql = "DELETE FROM file WHERE belong = '" + dir + "';";
+        //delete relative tags first
+        String sql = "DELETE FROM file_tag WHERE file_id in (SELECT id FROM file WHERE belong = '" + dir + "');";
+        String sql1 = "DELETE FROM file WHERE belong = '" + dir + "';";
         conn.update(sql);
+        conn.update(sql1);
 
     }
 

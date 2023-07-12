@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import common.AppContext;
 import entity.IFile;
 import entity.ITag;
+import gui.component.FileBox;
 import gui.component.FrameBar;
 
 public class IFrame extends JFrame {
@@ -54,7 +55,7 @@ public class IFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         // remove default menubar, set backgroud to transparent
         setUndecorated(true);
-        if(AppContext.UI_TRANSPARENT){
+        if (AppContext.UI_TRANSPARENT) {
             setOpacity(0.1f);
         }
         pack();
@@ -77,8 +78,14 @@ public class IFrame extends JFrame {
                 Map<String, List<IFile>> map = items.stream().map(e -> (IFile) e)
                         .collect(Collectors.groupingBy(IFile::getBelong));
                 map.forEach((dir, list) -> {
-                    center.addFileBox(dir, center);
-                    list.forEach(file -> center.addFileBox(file, center));
+                    CollapsiblePanel collapsiblePanel = new CollapsiblePanel();
+                    FileBox dirRow = new FileBox(new IFile(dir), center);
+                    collapsiblePanel.addTitile(dirRow);
+                    list.forEach(file -> {
+                        FileBox fileRow = new FileBox(file, center);
+                        collapsiblePanel.addCentent(fileRow);
+                    });
+                    center.add(collapsiblePanel);
                 });
             } else if (items.get(0) instanceof ITag) {
                 // tags and keys

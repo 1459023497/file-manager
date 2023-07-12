@@ -3,15 +3,16 @@ package gui.component;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import entity.IFile;
 import entity.ITag;
+import gui.base.CollapsiblePanel;
 import gui.base.IPanel;
 import gui.base.RoundedBorder;
 import gui.window.Tag;
@@ -133,22 +134,21 @@ public class TagLabel extends JLabel implements MouseListener {
         if (e.getButton() == MouseEvent.BUTTON1) {
             // clicked left button to find files that belong to this tag
             if (event == 1) {
-                Map<String, Set<ITag>> fileMap = tagService.getFileMapByTag(tag);
-                Map<String, Set<IFile>> files = tagService.getFilesMapByTag(tag);
+                List<IFile> files = tagService.getFilesMapByTag(tag);
                 // show all
                 panel.removeAll();
-                files.forEach((dir, fileSet) -> {
-                    // folder
-                    IFile dirFile = new IFile();
-                    dirFile.setDirectory(true);
-                    dirFile.setPath(dir);
-                    panel.add(new FileBox(dirFile, panel, fileMap));
-                    panel.add(Box.createVerticalStrut(3));
-                    fileSet.forEach(file -> {
-                        FileBox row = new FileBox(file, panel, fileMap);
-                        panel.add(row);
-                        panel.add(Box.createVerticalStrut(3));
+                // folder ==> file + tags
+                Map<String, List<IFile>> map = files.stream()
+                        .collect(Collectors.groupingBy(IFile::getBelong));
+                map.forEach((dir, list) -> {
+                    CollapsiblePanel collapsiblePanel = new CollapsiblePanel();
+                    FileBox dirRow = new FileBox(new IFile(dir), panel);
+                    collapsiblePanel.addTitile(dirRow);
+                    list.forEach(file -> {
+                        FileBox fileRow = new FileBox(file, panel);
+                        collapsiblePanel.addCentent(fileRow);
                     });
+                    panel.add(collapsiblePanel);
                 });
                 panel.reload();
             } else if (event == 2) {

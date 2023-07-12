@@ -1,6 +1,7 @@
 package gui.component;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +29,8 @@ public class TreeSelect extends JButton {
 
     public TreeSelect(JTree tree) {
         super("请选择");
+        // fixed size for this button
+        setPreferredSize(new Dimension(70,23));
         this.tree = tree;
         button = this;
         window = new JWindow();
