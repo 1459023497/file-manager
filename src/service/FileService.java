@@ -51,16 +51,17 @@ public class FileService {
      * @param file
      */
     public void renameFile(IFile iFile) {
-        //rename the real file
+        // rename the real file
         File file = new File(iFile.getPath());
         File newFile = new File(file.getParent(), iFile.getName());
         file.renameTo(newFile);
 
-        //rename the file in the database 
+        // rename the file in the database
         String id = iFile.getId();
-        String sql = "UPDATE file SET name = '" + newFile.getName() + "',path='"+newFile.getPath()+"' WHERE id = '" + id + "';";
+        String sql = "UPDATE file SET name = '" + newFile.getName() + "',path='" + newFile.getPath() + "' WHERE id = '"
+                + id + "';";
         conn.update(sql);
-        //reset
+        // reset
         iFile.setPath(newFile.getPath());
     }
 
@@ -73,7 +74,8 @@ public class FileService {
         if (file.isDirectory()) {
             removeDir(file.getPath());
         } else {
-            String sql = "DELETE FROM file WHERE id = '" + file.getId() + "'; DELETE FROM file_tag WHERE file_id = '" + file.getId() + "';";
+            String sql = "DELETE FROM file WHERE id = '" + file.getId() + "'; DELETE FROM file_tag WHERE file_id = '"
+                    + file.getId() + "';";
             conn.update(sql);
         }
     }
@@ -84,7 +86,7 @@ public class FileService {
      * @param dir
      */
     public void removeDir(String dir) {
-        //delete relative tags first
+        // delete relative tags first
         String sql = "DELETE FROM file_tag WHERE file_id in (SELECT id FROM file WHERE belong = '" + dir + "');";
         String sql1 = "DELETE FROM file WHERE belong = '" + dir + "';";
         conn.update(sql);
@@ -131,23 +133,25 @@ public class FileService {
     /**
      * get all files with tags
      */
-    public List<IFile> getAllFiles(){
+    public List<IFile> getAllFiles() {
         String sql = "SELECT * FROM file;";
         return getFilesWithTags(sql);
     }
 
     /**
-     * fuzzy search
+     * fuzzy search, find file's name OR file's tag name like the input text
      */
     public List<IFile> search(String text) {
-        String sql = "SELECT * FROM file WHERE name LIKE '%" + text + "%';";
+        String sql = "SELECT * FROM file WHERE id in (SELECT DISTINCT file_id FROM file_tag LEFT JOIN tag ON file_tag.tag_id = tag.id WHERE tag.name LIKE '%"+text+"%') OR file.name LIKE '%"+text+"%';";
         return getFilesWithTags(sql);
-    }   
+    }
 
     /**
      * get all files with tags
+     * 
+     * @param sql select files sql
      */
-    private List<IFile> getFilesWithTags(String sql){
+    private List<IFile> getFilesWithTags(String sql) {
         ResultSet rs = conn.select(sql);
         Map<String, IFile> map = new HashMap<>();
         try {
@@ -204,8 +208,9 @@ public class FileService {
 
     public void updateFiles(List<IFile> files) {
         StringBuffer buffer = new StringBuffer();
-        files.forEach(file->{
-            String sql = "UPDATE file SET name = '"+ file.getName()+"',path='"+file.getPath()+"', belong = '"+file.getBelong()+"' WHERE id = '" + file.getId() + "';";
+        files.forEach(file -> {
+            String sql = "UPDATE file SET name = '" + file.getName() + "',path='" + file.getPath() + "', belong = '"
+                    + file.getBelong() + "' WHERE id = '" + file.getId() + "';";
             buffer.append(sql);
         });
         conn.update(buffer.toString());

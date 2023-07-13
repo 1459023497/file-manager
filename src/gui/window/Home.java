@@ -2,6 +2,7 @@ package gui.window;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -169,10 +170,12 @@ public class Home {
             // same size as repeat
             center.removeAll();
             repMap.forEach((size, list) -> {
+                IPanel temp = new IPanel(new FlowLayout(FlowLayout.LEFT));
                 JLabel label = new JLabel("【大小：" + FileUtils.getFileSizeString(size) + "】");
                 label.setOpaque(true);
                 label.setBackground(Color.GREEN);
-                center.add(label);
+                temp.add(label);
+                center.add(temp);
                 list.forEach(file -> {
                     center.addFileBox(file, center);
                 });

@@ -22,14 +22,14 @@ public class IDialog extends JWindow {
         setContentPane(panel);
         if (type == InfoType.INFO) {
             panel.setBackground(TagColor.GREEN.getColor());
-        }else if(type == InfoType.ERROR){
+        } else if (type == InfoType.ERROR) {
             panel.setBackground(TagColor.RED.getColor());
         }
         panel.setBorder(new RoundedBorder(Color.BLACK, 20));
         JLabel label = new JLabel(info);
         panel.add(label);
 
-        if (AppContext.UI_TRANSPARENT){
+        if (AppContext.UI_TRANSPARENT) {
             setOpacity(0.1f);
             setBackground(new Color(0, 0, 0, 0));
         }
@@ -38,19 +38,19 @@ public class IDialog extends JWindow {
 
         // position
         Point point = frame.getCenterPointOnScreen();
-        point.x = point.x - getWidth() / 2;
+        point.x = point.x - getWidth() / 2 + 15; // fix
         point.y = point.y - frame.getHeight() / 2 + 30;
         setLocation(point);
         // setLocationRelativeTo(frame);
         pack();
         setVisible(true);
-        
+
         // follow the frame's position changes
         frame.addComponentListener(new ComponentAdapter() {
             public void componentMoved(ComponentEvent e) {
                 // position
                 Point point = frame.getCenterPointOnScreen();
-                point.x = point.x - getWidth() / 2 + 15; // fix 
+                point.x = point.x - getWidth() / 2 + 5; // fix
                 point.y = point.y - frame.getHeight() / 2 + 30;
                 setLocation(point);
             }

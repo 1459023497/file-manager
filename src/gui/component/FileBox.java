@@ -1,6 +1,5 @@
 package gui.component;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +86,6 @@ public class FileBox extends Box {
     }
 
     private void init(IFile file, IPanel panel) {
-        this.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.setMaximumSize(new Dimension(3000, 20));
         // folder show path, file show size and tags
         isDir = file.isDirectory();

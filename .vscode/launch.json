@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ColoredText",
+            "request": "launch",
+            "mainClass": "test.ColoredText",
+            "projectName": "file-manager_13b5338b"
+        },
+        {
+            "type": "java",
             "name": "CollapsiblePanelExample",
             "request": "launch",
             "mainClass": "gui.base.CollapsiblePanelExample",

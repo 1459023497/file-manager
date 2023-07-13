@@ -1,6 +1,7 @@
 package gui.component;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -46,11 +47,14 @@ public class FileLabel extends JLabel implements MouseListener {
     // file and folder
     public FileLabel(IFile file, FileBox fileBox) {
         super();
-        if(file.isDirectory()){
-            setText("<--" + file.getPath() + "-->");
+        // set font size 
+        setFont(new Font("Arial", Font.PLAIN, 13));
+        // support html to change some characters color
+        if (file.isDirectory()) {
+            setText("<html>" + file.getPath() + "</html>");
             setForeground(Color.MAGENTA);// text color
-        }else{
-            setText(file.getName());
+        } else {
+            setText("<html>" + file.getName() + "</html>");
         }
         this.file = file;
         this.fileBox = fileBox;
@@ -64,7 +68,7 @@ public class FileLabel extends JLabel implements MouseListener {
     }
 
     /**
-     * highlighting the search characters 
+     * highlighting the search characters
      * 
      * @param text
      */
