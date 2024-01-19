@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import entity.IFile;
+import entity.ISpace;
 import entity.ITag;
 
 public class BeanUtils {
@@ -61,5 +62,11 @@ public class BeanUtils {
             throw new RuntimeException("查询结果集元数据出错：" + e);
         }
         return false;
+    }
+
+    public static ISpace setSpace(ResultSet rs) throws SQLException {
+        String id = rs.getString("id");
+        String name = rs.getString("name");
+        return new ISpace(id, name);
     }
 }

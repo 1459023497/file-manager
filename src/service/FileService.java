@@ -42,7 +42,7 @@ public class FileService {
         String path = file.getPath().replace('\'', ' ');
         String sql = "INSERT or ignore into file(id,name,path,size,belong) values('" + id.next() + "','"
                 + name + "','" + path + "','" + file.length() + "','" + belong + "');";
-        conn.update(sql);
+        conn.updateWithoutLog(sql);
     }
 
     /**
@@ -134,7 +134,8 @@ public class FileService {
      * get all files with tags
      */
     public List<IFile> getAllFiles() {
-        String sql = "SELECT * FROM file;";
+        //TODO: 后续做分页
+        String sql = "SELECT * FROM file limit 1000;";
         return getFilesWithTags(sql);
     }
 

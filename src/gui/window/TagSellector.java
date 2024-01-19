@@ -72,7 +72,7 @@ public class TagSellector {
             }
             tagService.tags(tags, file);
             //entermine focus window
-            Object currentFrame = AppContext.currentFrame;
+            Object currentFrame = AppContext.currentWin;
             if (currentFrame instanceof Home){
                 ((Home)currentFrame).queryAll();
             }else if (currentFrame instanceof Tag){

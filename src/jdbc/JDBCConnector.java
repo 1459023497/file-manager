@@ -39,7 +39,7 @@ public class JDBCConnector {
     /*
      * simple connection
      */
-    public JDBCConnector(int i){
+    public JDBCConnector(int i) {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:..\\file-manager\\src\\test.db");
@@ -56,8 +56,16 @@ public class JDBCConnector {
      */
     public void update(String sql) {
         logger.info("SQL语句: " + sql);
-        try {
-            connection = dataSource.getConnection();
+        excuteUpdate(sql);
+    }
+
+    public void updateWithoutLog(String sql) {
+        excuteUpdate(sql);
+    }
+
+    private void excuteUpdate(String sql) {
+        // try-with-resources to auto close the connection
+        try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             statement = connection.createStatement();
             statement.executeUpdate(sql);
@@ -81,6 +89,7 @@ public class JDBCConnector {
             statement = connection.createStatement();
             resultSet = statement.executeQuery(sql);
             connection.commit();
+            //connection can't be closed before returning results (it will be closed too), use list/map instead
             return resultSet;
         } catch (SQLException e) {
             throw new RuntimeException(e);

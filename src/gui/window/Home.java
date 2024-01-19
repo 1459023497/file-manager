@@ -49,6 +49,7 @@ public class Home {
     private String lastChoosePath;
 
     public Home() {
+        AppContext.currentWin = frame;
         fileService = new FileService();
         tagService = new TagService();
         starter = new Starter();
@@ -91,7 +92,8 @@ public class Home {
         // event listeners
         frame.addWindowListener(new WindowAdapter() {
             public void windowActivated(WindowEvent e) {
-                AppContext.currentFrame = Home.this;
+                AppContext.currentWin = Home.this;
+                AppContext.currentFrame = frame;
             }
         });
 
@@ -113,7 +115,7 @@ public class Home {
                 });
                 new IDialog(frame, "扫描完成", InfoType.INFO);
                 center.reload();
-                content.reload();
+                //content.reload();
             }
             bottom.setVisible(false);
         });

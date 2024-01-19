@@ -78,7 +78,8 @@ public class Tag {
 
         frame.addWindowListener(new WindowAdapter() {
             public void windowActivated(WindowEvent e) {
-                AppContext.currentFrame = Tag.this;
+                AppContext.currentWin = Tag.this;
+                AppContext.currentFrame = frame;
             }
         });
 

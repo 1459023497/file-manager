@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import common.AppContext;
 import entity.IFile;
 import entity.ITag;
@@ -70,7 +72,7 @@ public class IFrame extends JFrame {
      */
     public void showContents(List<?> items) {
         center.removeAll();
-        if (items.isEmpty()) {
+        if (CollectionUtils.isEmpty(items)) {
             center.add(new JLabel("无结果"));
         } else {
             if (items.get(0) instanceof IFile) {

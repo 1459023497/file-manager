@@ -86,9 +86,11 @@ public class Starter {
     public void init() {
         FileService service = new FileService();
         for (Map.Entry<String, Set<File>> entry : fileMap.entrySet()) {
+            logger.info("*****************开始写入***************");
             for (File file : entry.getValue()) {
                 service.addFile(file, entry.getKey());
             }
+            logger.info("*****************写入完成***************");
         }
     }
 

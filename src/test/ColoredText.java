@@ -8,6 +8,8 @@ import javax.swing.JTextPane;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import gui.component.SpaceBox;
+
 public class ColoredText {
 
   public static void main(String[] args) {
@@ -26,7 +28,10 @@ public class ColoredText {
 
     textPane.getStyledDocument().setCharacterAttributes(10, 4, keyWord, false);
 
-    frame.add(textPane);
+    SpaceBox box = new SpaceBox();
+    frame.add(box);
+
+    //frame.add(textPane);
     frame.setVisible(true);
   }
 }

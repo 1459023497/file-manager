@@ -31,12 +31,19 @@ public class FrameBar extends JPanel {
         btnMax.setBackground(Color.ORANGE);
         IButton btnClose = new IButton();
         btnClose.setBackground(Color.RED);
+
+        IPanel centerBar = new IPanel();
         IPanel leftBar = new IPanel();
+        SpaceBox comboBox = new SpaceBox();
+        leftBar.add(comboBox);
+    
         IPanel rightBar = new IPanel(new FlowLayout(FlowLayout.RIGHT));
         rightBar.add(btnMin);
         rightBar.add(btnMax);
         rightBar.add(btnClose);
-        add(leftBar, BorderLayout.CENTER);
+
+        add(leftBar, BorderLayout.WEST);
+        add(centerBar, BorderLayout.CENTER);
         add(rightBar, BorderLayout.EAST);
 
         btnMin.addActionListener(e -> {
@@ -101,9 +108,9 @@ public class FrameBar extends JPanel {
                 frame.setLocation(left, top);
             }
         };
-        leftBar.addMouseListener(ma);
+        centerBar.addMouseListener(ma);
         // listen for mouse moving
-        leftBar.addMouseMotionListener(ma);
+        centerBar.addMouseMotionListener(ma);
     }
 
 }
