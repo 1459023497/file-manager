@@ -1,28 +1,18 @@
 package gui.component;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.alibaba.druid.util.StringUtils;
-
 import common.AppContext;
 import entity.ISpace;
 import gui.base.IPanel;
 import gui.tool.ImageUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import service.SpaceService;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SpaceBox extends IPanel {
     private SpaceService spaceService;
@@ -42,7 +32,7 @@ public class SpaceBox extends IPanel {
         del = new JButton(delIcon);
         add.setPreferredSize(new Dimension(addIcon.getIconWidth(), addIcon.getIconHeight()));
         del.setPreferredSize(new Dimension(delIcon.getIconWidth(), delIcon.getIconHeight()));
-        comboBox = new JComboBox<String>(items.toArray(new String[0]));
+        comboBox = new JComboBox<>(items.toArray(new String[0]));
         if(CollectionUtils.isNotEmpty(spaceList)){
             comboBox.setSelectedIndex(0);
         }
@@ -52,29 +42,23 @@ public class SpaceBox extends IPanel {
         this.add(del);
 
         // events
-        add.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String input = JOptionPane.showInputDialog(AppContext.currentFrame, "新的空间");
-                if (!StringUtils.isEmpty(input) && !items.contains(input)) {
-                    spaceService.add(input);
-                    comboBox.addItem(input);
-                }
+        add.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(AppContext.currentFrame, "新的空间");
+            if (!StringUtils.isEmpty(input) && !items.contains(input)) {
+                spaceService.add(input);
+                comboBox.addItem(input);
             }
         });
 
-        del.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String input = JOptionPane.showInputDialog(AppContext.currentFrame, "删除空间涉及包括的文件，请输入666确认");
-                if (!StringUtils.isEmpty(input) && Objects.equals("666", input)) {
-                    // delete selected item
-                    String name = (String) comboBox.getSelectedItem();
-                    spaceService.deleteByName(name);
-                    int selectedIndex = comboBox.getSelectedIndex();
-                    if (selectedIndex != -1) {
-                        comboBox.removeItemAt(selectedIndex);
-                    }
+        del.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(AppContext.currentFrame, "删除空间涉及包括的文件，请输入666确认");
+            if (!StringUtils.isEmpty(input) && Objects.equals("666", input)) {
+                // delete selected item
+                String name = (String) comboBox.getSelectedItem();
+                spaceService.deleteByName(name);
+                int selectedIndex = comboBox.getSelectedIndex();
+                if (selectedIndex != -1) {
+                    comboBox.removeItemAt(selectedIndex);
                 }
             }
         });

@@ -1,18 +1,13 @@
 package gui.component;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import gui.base.IButton;
 import gui.base.IFrame;
 import gui.base.IPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class FrameBar extends JPanel {
     private int state = 0;
@@ -53,7 +48,7 @@ public class FrameBar extends JPanel {
 
         btnMax.addActionListener(e -> {
             if (state == JFrame.MAXIMIZED_BOTH) {
-                // nomal
+                // normal
                 frame.setExtendedState(JFrame.NORMAL);
                 state = JFrame.NORMAL;
 

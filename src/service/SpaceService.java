@@ -1,15 +1,14 @@
 package service;
 
+import common.tool.BeanUtils;
+import common.tool.IdGenerator;
+import entity.ISpace;
+import jdbc.JDBCConnector;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import common.tool.BeanUtils;
-import common.tool.IdGenerator;
-import jdbc.JDBCConnector;
-
-import entity.ISpace;
 
 public class SpaceService {
     private JDBCConnector conn;

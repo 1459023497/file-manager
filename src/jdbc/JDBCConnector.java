@@ -1,17 +1,12 @@
 package jdbc;
 
-import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
-import java.util.logging.Logger;
+import com.alibaba.druid.pool.DruidDataSourceFactory;
 
 import javax.sql.DataSource;
-
-import com.alibaba.druid.pool.DruidDataSourceFactory;
+import java.io.FileInputStream;
+import java.sql.*;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 public class JDBCConnector {
     private Connection connection;
