@@ -3,71 +3,86 @@ package gui.component;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import entity.IFile;
 import entity.ITag;
+import gui.base.CollapsiblePanel;
+import gui.base.IPanel;
+import gui.base.RoundedBorder;
 import gui.window.Tag;
 import service.TagService;
 
 public class TagLabel extends JLabel implements MouseListener {
-    private Tag tagWindow;//标签窗口
-    private IPanel panel;//绘制点击结果的面板
-    private int event;//点击事件值: 1,展示该标签的文件, 2,选择要给文件添加标签, 3,移除要添加的标签
-    private ITag tag;//关联的标签
-    private IFile file;//关联的文件
-    private int type;//标签类型：1，在标签菜单的标签 2，文件的标签
+    private Tag tagWindow;
+    private Color color;
+    private IPanel panel;
+    private int event;// Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
+    private ITag tag;
+    private IFile file;
+    private int type;// Label type: 1: label in the label menu; 2: file label
+    private FileBox fileBox;
 
     /**
-     * 带颜色的标签事件
+     * A colored event label
+     * 
      * @param tag
      * @param color
-     * @param panel
-     * @param event
+     * @param panel result panel
+     * @param event Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
      */
     public TagLabel(ITag tag, Color color, IPanel panel, int event) {
         super(tag.getName());
         this.tag = tag;
         this.panel = panel;
         this.event = event;
-        this.setOpaque(true);//背景不透明
+        this.color = color;
+        this.setOpaque(true);
         this.setBackground(color);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
         this.addMouseListener(this);
     }
 
     /**
-     * 带颜色的事件标签, 与文件相关联
+     * A colored event label associated with a file
+     * 
      * @param tag
      * @param color
-     * @param panel
-     * @param event
-     * @param file 
-    */
-    public TagLabel(ITag tag, Color color, IPanel panel, int event, IFile file) {
+     * @param panel result panel
+     * @param event Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
+     * @param file
+     */
+    public TagLabel(ITag tag, Color color, IPanel panel, int event, IFile file, FileBox fileBox) {
         super(tag.getName());
         this.tag = tag;
         this.panel = panel;
         this.event = event;
         this.file = file;
+        this.color = color;
         this.type = 2;
-        this.setOpaque(true);//背景不透明
+        this.fileBox = fileBox;
+        this.setOpaque(true);
         this.setBackground(color);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
+        if (tag.getIsMain()){
+            this.setForeground(Color.RED);
+        }
         this.addMouseListener(this);
     }
 
     /**
-     * 带颜色的事件标签,跟展示该标签的面板相关联，因为移除标签涉及到该面板的刷新
+     * The colored event label is associated with the panel that displays the label, because removing the label involves a refresh of the panel
      *
-     * @param tag 标签
-     * @param color 背景颜色
-     * @param panel 绘制结果的面板
-     * @param event 点击事件值: 1,展示该标签的文件, 2,选择要给文件添加标签, 3,移除要添加的标签
-     * @param tagWindow 标签的承载面板
+     * @param tag       tag
+     * @param color     background color
+     * @param panel     result panel
+     * @param event     Click the event value: 1 to show the file with the label, 2 to select the file to be tagged, and 3 to remove the label to be added
+     * @param tagWindow show window for this tag
      */
     public TagLabel(ITag tag, Color color, IPanel panel, int event, Tag tagWindow) {
         super(tag.getName());
@@ -76,85 +91,94 @@ public class TagLabel extends JLabel implements MouseListener {
         this.event = event;
         this.tagWindow = tagWindow;
         this.type = 1;
-        this.setOpaque(true);//背景不透明
+        this.setOpaque(true);
         this.setBackground(color);
+        this.color = color;
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
         this.addMouseListener(this);
     }
 
     /**
-     * 无事件标签
+     * no event tag
+     * 
      * @param text
      * @param color
      */
-    public  TagLabel(String text, Color color){
+    public TagLabel(String text, Color color) {
         super(text);
         this.setOpaque(true);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
+        this.setBackground(color);
+    }
+    
+    public TagLabel(ITag tag, Color color) {
+        super(tag.getName());
+        this.tag = tag;
+        this.setOpaque(true);
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
         this.setBackground(color);
     }
 
+    //set event type
     public void setEvent(int event) {
         this.event = event;
     }
 
+    public TagLabel clone(){
+        return new TagLabel(tag, color, panel, event);
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1){
-            //左键点击
-            if(event==1){
-                //打开数据库链接
-                TagService tagService = new TagService();
-                //找到标签下的文件
-                HashMap<String,Set<ITag>> fileMap = tagService.getFileMapByTag(tag);
-                HashMap<String, Set<IFile>> files = tagService.getFilesByTag(tag);
-                //显示结果
+        TagService tagService = new TagService();
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            // clicked left button to find files that belong to this tag
+            if (event == 1) {
+                List<IFile> files = tagService.getFilesMapByTag(tag);
+                // show all
                 panel.removeAll();
-                files.forEach((dir, fileSet) -> {
-                    panel.add(new FileLabel(dir));
-                    fileSet.forEach(file ->{
-                        FileBox row = new FileBox(file, panel);
-                        row.setMap(fileMap);
-                        panel.add(row);
+                // folder ==> file + tags
+                Map<String, List<IFile>> map = files.stream()
+                        .collect(Collectors.groupingBy(IFile::getBelong));
+                map.forEach((dir, list) -> {
+                    CollapsiblePanel collapsiblePanel = new CollapsiblePanel();
+                    FileBox dirRow = new FileBox(new IFile(dir), panel);
+                    collapsiblePanel.addTitile(dirRow);
+                    list.forEach(file -> {
+                        FileBox fileRow = new FileBox(file, panel);
+                        collapsiblePanel.addCentent(fileRow);
                     });
+                    panel.add(collapsiblePanel);
                 });
                 panel.reload();
-                //关闭链接
-                tagService.close();
-            }else if(event==2){
-                //将标签添加到待选列表
+            } else if (event == 2) {
+                // add to candidate list
+                if(panel.getTags().contains(tag)) return;
                 panel.getTags().add(tag);
-                this.setEvent(3);
-                panel.add(this);
+                // clone the tag you want to add, change the event type to remove, add to below, refresh
+                TagLabel copy = clone();
+                copy.setEvent(3);
+                panel.add(copy);
                 panel.reload();
-            }else if(event ==3){
-                //将标签从待选移除
+            } else if (event == 3) {
+                // remove it from candidate list
                 panel.getTags().remove(tag);
                 panel.remove(this);
                 panel.reload();
             }
-        }else if(e.getButton() == MouseEvent.BUTTON3){
-            //右键删除标签，提示信息
-            if(type == 1){
-                String tap = "你真的要删除["+ tag.getName() +"]标签吗?";
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
+            // clicked right button to delete
+            if (type == 1) {
+                String tap = "你真的要删除[" + tag.getName() + "]标签吗?";
                 int confirmDel = JOptionPane.showConfirmDialog(this, tap, "确认信息", JOptionPane.YES_NO_OPTION);
-                if (confirmDel == JOptionPane.YES_OPTION){
-                    TagService tagService = new TagService();
+                if (confirmDel == JOptionPane.YES_OPTION) {
                     tagService.deleteTag(tag);
-                    tagService.close();
-                    JOptionPane.showMessageDialog(this, "删除成功！");
-                    //页面信息重载
+                    // frame information reload
                     tagWindow.reloadGroups();
                     tagWindow.reloadTags();
                 }
-            }else if(type ==2 ){
-                String tap = "你真的要移除该文件的["+ tag.getName() +"]标签吗?";
-                int confirmDel = JOptionPane.showConfirmDialog(this, tap, "确认信息", JOptionPane.YES_NO_OPTION);
-                if (confirmDel == JOptionPane.YES_OPTION){
-                    TagService tagService = new TagService();
-                    tagService.removeTag(tag, file);
-                    tagService.close();
-                    JOptionPane.showMessageDialog(this, "移除成功！");
-                    this.setVisible(false);//先隐藏
-                }
+            } else if (type == 2) {
+                new TagMenu(tag, this, file, fileBox).show(this, e.getX(), e.getY());
             }
         }
     }
@@ -171,13 +195,20 @@ public class TagLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        //线条边框
-        this.setBorder(BorderFactory.createLineBorder(Color.red, 1, true));
+        this.setBorder(new RoundedBorder(Color.red, 5));
 
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        this.setBorder(BorderFactory.createEmptyBorder());
+        this.setBorder(new RoundedBorder(Color.BLACK, 5));
+    }
+
+    public void setMainTag(boolean isMain) {
+        if(isMain){
+            this.setForeground(Color.RED);
+        }else{
+            this.setForeground(Color.BLACK);
+        }
     }
 }

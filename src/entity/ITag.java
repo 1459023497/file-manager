@@ -1,15 +1,23 @@
 package entity;
 
+import java.util.List;
+
+import common.myenum.Status;
+
 public class ITag {
     private String id;
     private String name;
     private String group;
+    // the main tag of a file will be the folder where the file will be moved to
+    private int isMain;
+    private List<String> keys;
+    private int status = Status.BROWSE;
 
-    public ITag(String name){
+    public ITag(String name) {
         this.name = name;
     }
 
-    public ITag(String name, String group){
+    public ITag(String name, String group) {
         this.name = name;
         this.group = group;
     }
@@ -18,6 +26,13 @@ public class ITag {
         this.id = id;
         this.name = name;
         this.group = group;
+    }
+
+    public ITag(String id, String name, String group, int isMain) {
+        this.id = id;
+        this.name = name;
+        this.group = group;
+        this.isMain = isMain;
     }
 
     public ITag() {
@@ -47,11 +62,37 @@ public class ITag {
         this.group = group;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return name;
     }
 
-    
-    
+    public List<String> getKeys() {
+        return keys;
+    }
+
+    public void setKeys(List<String> keys) {
+        this.keys = keys;
+    }
+
+    /**
+     * judge it is main tag or not
+     * 
+     * @return true: it is main tag; false: it is not main tag
+     */
+    public boolean getIsMain() {
+        return isMain == 1 ? true : false;
+    }
+
+    public void setIsMain(int isMain) {
+        this.isMain = isMain;
+    }
 }

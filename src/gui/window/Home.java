@@ -1,146 +1,293 @@
 package gui.window;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import common.AppContext;
+import common.myenum.InfoType;
+import common.myenum.Status;
+import common.tool.FileUtils;
+import common.tool.StringUtils;
 import entity.IFile;
-import gui.component.FileBox;
+import entity.IFolder;
+import entity.ITag;
+import gui.base.IDialog;
+import gui.base.IFrame;
+import gui.base.IPanel;
 import gui.component.FileLabel;
-import gui.component.IPanel;
-import main.Starter;
 import service.FileService;
-import tool.FileUtils;
+import service.Starter;
+import service.TagService;
 
 public class Home {
-    private JFrame frame;
+    public final static String WIN_NAME = "Home";
+    private IFrame frame;
     private IPanel content;
+    private IPanel center;
+    private IPanel bottom;
     private Starter starter;
-
-    private Boolean firstClick = true;
+    private FileService fileService;
+    private TagService tagService;
+    private List<IFile> files;
+    private String lastChoosePath;
 
     public Home() {
-        //窗口，面版初始化
-        frame = new JFrame("文件管理");
-        content = new IPanel(new BorderLayout());
-        content.setBackground(new Color(142, 147, 147));
+        AppContext.currentWin = frame;
+        fileService = new FileService();
+        tagService = new TagService();
         starter = new Starter();
 
-        IPanel top = new IPanel(new Dimension(0, 80));
-        JLabel label = new JLabel("文件夹");
+        // menu buttons
+        IPanel top = new IPanel(new Dimension(0, 60));
+        JLabel l_path = new JLabel("请输入");
         JTextField textField = new JTextField(15);
-        JButton button = new JButton("扫描");
-        JButton all = new JButton("全部");
-        JButton button1 =new JButton("标签");
-        JLabel label1 = new JLabel("扫描成功");
-        label1.setVisible(false);
-        top.add(label);
+        JButton b_scan = new JButton("扫描");
+        JButton b_search = new JButton("搜索");
+        JButton b_all = new JButton("全部");
+        JButton b_tag = new JButton("标签");
+        JButton b_init = new JButton("写入文件");
+        JButton b_check = new JButton("查重");
+        JButton b_auto = new JButton("自动归类");
+        JButton b_bulid = new JButton("生成目录");
+        JButton b_move = new JButton("移动");
+        bottom = new IPanel();
+        JButton b_confirm = new JButton("确认");
+        JButton b_cancel = new JButton("取消");
+        bottom.add(b_confirm);
+        bottom.add(b_cancel);
+        bottom.setVisible(false);
+        top.add(l_path);
         top.add(textField);
-        top.add(button);
-        top.add(all);
-        top.add(button1);
-        top.add(label1);
-        content.add(top, BorderLayout.NORTH);
-        //创建结果滚动面板
-        IPanel center = new IPanel();
-        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-        JScrollPane scrollPane = new JScrollPane(center);
-        scrollPane.setOpaque(false);
-        content.add(scrollPane, BorderLayout.CENTER);
+        top.add(b_scan);
+        top.add(b_search);
+        top.add(b_all);
+        top.add(b_tag);
+        top.add(b_init);
+        top.add(b_check);
+        top.add(b_auto);
+        top.add(b_bulid);
+        top.add(b_move);
 
-        frame.setContentPane(content);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setSize(400, 500);
-        frame.setIconImage(new ImageIcon("src\\gui\\icon\\home.png").getImage());
-        frame.setLocationRelativeTo(null);//居中显示
-        frame.setVisible(true);
+        frame = new IFrame("文件管理", top);
+        center = frame.getCenter();
+        frame.setRoot(bottom);
 
-        //以下为事件处理
-        //扫描按钮点击事件
-        button.addActionListener(e -> {
-            //空路径
+        // event listeners
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowActivated(WindowEvent e) {
+                AppContext.currentWin = Home.this;
+                AppContext.currentFrame = frame;
+            }
+        });
+
+        b_scan.addActionListener(e -> {
+            // empty path
             if (textField.getText().equals("")) {
-                JOptionPane.showMessageDialog(frame, "输入错误", "提示", JOptionPane.ERROR_MESSAGE);
+                new IDialog(frame, "输入为空，请重试！", InfoType.INFO);
                 return;
             }
-            //添加操作按钮,只有第一次点击添加
-            label1.setVisible(true);
-            if (firstClick) {
-                firstClick = false;
-                //文件写入数据库
-                JButton button2 = new JButton("初始化");
-                button2.addActionListener(e1 -> {
-                    starter.init();
-                    label1.setText("写入完成");
-                });
-                //展示重复文件
-                JButton button3 = new JButton("查重");
-                button3.addActionListener(e1 -> {
-                    HashMap<String, Set<File>> refileMap = starter.getRefileMap();
-                    center.removeAll();
-                    refileMap.forEach((size, files) -> {
-                        center.add(new JLabel("大小：" + FileUtils.getFileSizeString(size)));
-                        files.forEach(file -> {
-                            center.add(new JLabel(file.getPath()));
-                        });
-                    });
-                    label1.setText("查重完成");
-                    center.reload();
-                });
-                top.add(label1);
-                top.add(button2);
-                top.add(button3);
-            }
-            //获取路径，开始扫描
-            center.removeAll();
+
             String path = textField.getText();
-            starter.scan(path);
-            HashMap<String, Set<File>> fileMap = starter.getFileMap();
-            //显示结果
-            fileMap.forEach((dir, files) -> {
-                center.add(new FileLabel(dir));
-                files.forEach(file -> center.add(new FileLabel(new IFile(file))));
-            });
-            label1.setText("扫描完成");
-            center.reload();
-            content.reload();
+            if (starter.scan(path)) {
+                // success, show result
+                center.removeAll();
+                HashMap<String, Set<File>> fileMap = starter.getFileMap();
+                fileMap.forEach((dir, files) -> {
+                    center.add(new FileLabel(dir));
+                    files.forEach(file -> center.add(new FileLabel(new IFile(file))));
+                });
+                new IDialog(frame, "扫描完成", InfoType.INFO);
+                center.reload();
+                //content.reload();
+            }
+            bottom.setVisible(false);
         });
 
-        //全部按钮点击事件，展示数据库全部文件
-        all.addActionListener(e -> {
-            // 获取所有文件，按文件夹：文件的方式输出，带上文件的标签
-            FileService fileService = new FileService();
-            HashMap<String, Set<IFile>> files = fileService.getAllFiles();
-            fileService.close();
+        b_auto.addActionListener(e -> {
+            autoTag();
+        });
+
+        b_confirm.addActionListener(e -> {
+            tagService.tag(files);
+            queryAll();
+            bottom.setVisible(false);
+        });
+
+        b_cancel.addActionListener(e -> {
+            queryAll();
+            bottom.setVisible(false);
+        });
+
+        // search for files
+        b_search.addActionListener(e -> {
+            String text = textField.getText();
+            if (text.equals("")) {
+                new IDialog(frame, "输入为空，请重试！", InfoType.INFO);
+                return;
+            } else {
+                search(text);
+            }
+            bottom.setVisible(false);
+        });
+
+        // show all files
+        b_all.addActionListener(e -> {
+            queryAll();
+            bottom.setVisible(false);
+        });
+
+        // open tag frame
+        b_tag.addActionListener(e -> {
+            AppContext.setKey(Tag.WIN_NAME, new Tag(frame));
+            bottom.setVisible(false);
+        });
+
+        // file data persistence
+        b_init.addActionListener(e1 -> {
+            starter.init();
+            new IDialog(frame, "写入完成", InfoType.INFO);
+            bottom.setVisible(false);
+        });
+
+        // show repeated files
+        b_check.addActionListener(e1 -> {
+            Map<String, List<IFile>> repMap = fileService.getRepeatMap();
+            // same size as repeat
             center.removeAll();
-            files.forEach((dir, set) -> {
-                FileBox dirRow = new FileBox(new IFile(dir), center);
-                center.add(dirRow);
-                set.forEach(file -> {
-                    // 文件行
-                    FileBox row = new FileBox(file, center);
-                    center.add(row);
+            repMap.forEach((size, list) -> {
+                IPanel temp = new IPanel(new FlowLayout(FlowLayout.LEFT));
+                JLabel label = new JLabel("【大小：" + FileUtils.getFileSizeString(size) + "】");
+                label.setOpaque(true);
+                label.setBackground(Color.GREEN);
+                temp.add(label);
+                center.add(temp);
+                list.forEach(file -> {
+                    center.addFileBox(file, center);
                 });
             });
+            new IDialog(frame, "查重完成", InfoType.INFO);
             center.reload();
+            bottom.setVisible(false);
         });
 
-        //标签按钮点击事件，打开标签面板
-        button1.addActionListener(e -> {
-            new Tag(frame);
+        // generate tag's diretory structure
+        b_bulid.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fileChooser.setCurrentDirectory(new File("D:/Downloads/test"));
+
+            int result = fileChooser.showOpenDialog(frame);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                lastChoosePath = file.getPath();
+                IFolder topFolder = tagService.getTagFolder(lastChoosePath);
+                topFolder.generate();
+                new IDialog(frame, "已生成文件目录！", InfoType.INFO);
+            }
         });
+
+        // move files to their own folder
+        b_move.addActionListener(e -> {
+            if (lastChoosePath == null) {
+                new IDialog(frame, "请先生成目录！", InfoType.ERROR);
+                return;
+            }
+            IFolder topFolder = tagService.getTagFolder(lastChoosePath);
+            List<String> result = new ArrayList<String>();
+            topFolder.moveFiles(result);
+            queryAll();
+            if (result.isEmpty()) {
+                new IDialog(frame, "全部移动完成！", InfoType.INFO);
+            } else {
+                new IDialog(frame, "以下文件移动失败：" + String.join(",", result), InfoType.WARN);
+            }
+        });
+    }
+
+    private void search(String text) {
+        List<IFile> files = fileService.search(text);
+        if (files != null) {
+            center.removeAll();
+            files.forEach(file -> {
+                center.addFileBox(file, center, text);
+            });
+            center.reload();
+        } else {
+            center.removeAll();
+            center.add(new JLabel("没有搜索到相关内容！"));
+            center.reload();
+        }
+        bottom.setVisible(false);
+
+    }
+
+    /**
+     * get this frame
+     * 
+     * @return
+     */
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public void queryAll() {
+        List<IFile> files = fileService.getAllFiles();
+        frame.showContents(files);
+    }
+
+    /**
+     * auto-tag for untagged files
+     */
+    public void autoTag() {
+        List<ITag> tags = tagService.getAllTagsWithKeys();
+        Map<String, List<ITag>> tagMap = new HashMap<>();
+        tags.forEach(tag -> {
+            List<String> keys = tag.getKeys();
+            // names and keys as indexes
+            tagMap.computeIfAbsent(tag.getName(), k -> new ArrayList<>()).add(tag);
+            keys.forEach(key -> {
+                tagMap.computeIfAbsent(key, k -> new ArrayList<>()).add(tag);
+            });
+        });
+        files = fileService.getUntaggedFiles();
+        // regular expression for matching files
+        String[] keywords = tagMap.keySet().toArray(new String[0]);
+        String patternString = "(" + String.join("|", keywords) + ")";
+        Pattern pattern = Pattern.compile(patternString);
+        for (IFile file : files) {
+            String name = StringUtils.RemoveSuffix(file.getName());
+            // Find index that may be included in the file name
+            Matcher matcher = pattern.matcher(name);
+            while (matcher.find()) {
+                // 直接group()会输出哈巴狗，在group()方法外再调用一次group(1)获取第一个捕获组的内容：哈巴狗->狗。
+                String tagName = matcher.group(1);
+                List<ITag> matchTags = tagMap.get(tagName);
+                if (matchTags != null) {
+                    matchTags.forEach(tag -> {
+                        tag.setStatus(Status.INSERT);
+                        file.add(tag);
+                    });
+                }
+            }
+        }
+        frame.showContents(files);
+        bottom.setVisible(true);
     }
 }
