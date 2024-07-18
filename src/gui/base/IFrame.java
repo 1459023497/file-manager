@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import gui.component.Pager;
 import org.apache.commons.collections4.CollectionUtils;
 
 import common.AppContext;
@@ -23,6 +24,7 @@ import gui.component.FrameBar;
 public class IFrame extends JFrame {
     private IPanel content;
     private IPanel center;
+    private Pager pager;
 
     public IFrame() {
         super();
@@ -41,16 +43,22 @@ public class IFrame extends JFrame {
         northPanel.add(top, BorderLayout.CENTER);
         content.add(northPanel, BorderLayout.NORTH);
 
-        // content scrollpane
+        IPanel temp = new IPanel(new BorderLayout());
         this.center = new IPanel();
-
-        // inner border
+        // content scrollpane
         center.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         JScrollPane scrollPane = new JScrollPane(center);
         scrollPane.setOpaque(false);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);// mouse' wheel speed
-        content.add(scrollPane, BorderLayout.CENTER);
+        // pager
+        this.pager = new Pager(20);
+        temp.add(scrollPane,BorderLayout.CENTER);
+        temp.add(pager,BorderLayout.SOUTH);
+
+
+        content.add(temp, BorderLayout.CENTER);
+
 
         setContentPane(content);
         // click close only close one window
@@ -136,4 +144,7 @@ public class IFrame extends JFrame {
         return new Point(screenCenterX, screenCenterY);
     }
 
+    public Pager getPager() {
+        return pager;
+    }
 }

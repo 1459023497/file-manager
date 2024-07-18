@@ -1,7 +1,5 @@
 package service;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.JTree;
 
+import common.AppContext;
 import org.apache.commons.collections4.CollectionUtils;
 
 import common.myenum.Status;
@@ -37,14 +36,13 @@ public class TagService {
     }
 
     public void newTag(ITag tag) {
-        conn.update("insert into tag values('" + idGenerator.next() + "','" + tag.getName() + "','" + tag.getGroup()
-                + "');");
+        String sql = String.format("insert into tag values ('%s','%s','%s','%s');",idGenerator.next() ,tag.getName(), tag.getGroup(), AppContext.currSpace);
+        conn.update(sql);
     }
 
     /**
      * delete tag ，notice：set sub-tags to no group，remove all file's tag
-     * 
-     * @param tag
+     *
      */
     public void deleteTag(ITag tag) {
         String sql = "DELETE FROM tag WHERE id = '" + tag.getId() + "';\n" +
@@ -58,18 +56,12 @@ public class TagService {
      * get all tags
      */
     public List<ITag> getAllTags() {
-        ResultSet rs = conn.select("select * from tag;");
+        List<Map<String, Object>> rs = conn.select("select * from tag;");
         ArrayList<ITag> tags = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                ITag tag = BeanUtils.setTag(rs);
-                tags.add(tag);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            ITag tag = BeanUtils.setTag(e);
+            tags.add(tag);
+        });
         return tags;
     }
 
@@ -78,20 +70,13 @@ public class TagService {
      *
      */
     public Map<String, ITag> getTagsMap() {
-        ResultSet rs = conn.select("select * from tag;");
+        List<Map<String, Object>> rs = conn.select("select * from tag;");
         HashMap<String, ITag> tagMap = new HashMap<>();
-        try {
-            while (rs.next()) {
-                ITag tag = BeanUtils.setTag(rs);
-                tagMap.put(tag.getId(), tag);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            ITag tag = BeanUtils.setTag(e);
+            tagMap.put(tag.getId(), tag);
+        });
         return tagMap;
-
     }
 
     /**
@@ -101,25 +86,18 @@ public class TagService {
     public Map<String, Set<ITag>> getFilesTagsMap() {
         HashMap<String, Set<ITag>> map = new HashMap<>();
         String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\" FROM file_tag as f join tag  as t ON f.tag_id = t.id; ";
-        ResultSet rs = conn.select(sql);
-        try {
-            while (rs.next()) {
-                String fileId = rs.getString("file_id");
-                ITag tag = BeanUtils.setTag(rs);
-                map.computeIfAbsent(fileId, k -> new HashSet<>()).add(tag);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        List<Map<String, Object>> rs = conn.select(sql);
+        rs.forEach(e->{
+            String fileId = (String) e.get("file_id");
+            ITag tag = BeanUtils.setTag(e);
+            map.computeIfAbsent(fileId, k -> new HashSet<>()).add(tag);
+        });
         return map;
     }
 
     /**
      * generates folders according to the tag structure
-     * 
-     * @return
+     *
      */
     public IFolder getTagFolder(String topPath) {
         IFolder topFolder = new IFolder(topPath);
@@ -229,50 +207,36 @@ public class TagService {
     /**
      * get file's tags map by a tag
      * 
-     * @param tag
      * @return map 【fileId,tags】
      */
     public Map<String, Set<ITag>> getFileTagMapByTag(ITag tag) {
         String sql = "SELECT f.file_id,f.tag_id as id,t.name,t.\"group\",is_main FROM file_tag as f join tag  as t ON f.tag_id = t.id WHERE f.file_id IN (\n"
                 + "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
-        ResultSet rs = conn.select(sql);
+        List<Map<String, Object>> rs = conn.select(sql);
         HashMap<String, Set<ITag>> map = new HashMap<>();
-        try {
-            while (rs.next()) {
-                String fileId = rs.getString("file_id");
-                ITag tag2 = BeanUtils.setTag(rs);
-                map.computeIfAbsent(fileId, key -> new HashSet<>()).add(tag2);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            String fileId = (String) e.get("file_id");
+            ITag tag2 = BeanUtils.setTag(e);
+            map.computeIfAbsent(fileId, key -> new HashSet<>()).add(tag2);
+        });
         return map;
     }
 
     /**
      * get file with tags by a specific tag
      *
-     * @param tag
      * @return map 【folder,files】
      */
     public List<IFile> getFilesMapByTag(ITag tag) {
         String sql = "SELECT * FROM file WHERE id IN (\n" +
                 "SELECT file_id FROM file_tag WHERE tag_id='" + tag.getId() + "');";
-        ResultSet rs = conn.select(sql);
+        List<Map<String, Object>> rs = conn.select(sql);
         // <id, file>
         Map<String, IFile> fileMap = new HashMap<>();
-        try {
-            while (rs.next()) {
-                IFile file = BeanUtils.setFile(rs);
-                fileMap.put(file.getId(), file);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            IFile file = BeanUtils.setFile(e);
+            fileMap.put(file.getId(), file);
+        });
         Map<String, Set<ITag>> tagMap = getFileTagMapByTag(tag);
         tagMap.forEach((k, v) -> {
             IFile file = fileMap.get(k);
@@ -286,23 +250,16 @@ public class TagService {
     /**
      * get file's tags
      *
-     * @param file
      */
     public Set<ITag> getTagsByFile(IFile file) {
         String sql = "SELECT * FROM tag WHERE id IN (\n" +
                 "SELECT tag_id FROM file_tag WHERE file_id='" + file.getId() + "');";
-        ResultSet rs = conn.select(sql);
+        List<Map<String, Object>> rs = conn.select(sql);
         HashSet<ITag> tags = new HashSet<>();
-        try {
-            while (rs.next()) {
-                ITag tag = BeanUtils.setTag(rs);
-                tags.add(tag);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            ITag tag = BeanUtils.setTag(e);
+            tags.add(tag);
+        });
         return tags;
     }
 
@@ -336,31 +293,23 @@ public class TagService {
      */
     public void tag(Collection<ITag> tags, String dir) {
         String sql = "SELECT id FROM file WHERE file.belong ='" + dir + "';";
-        ResultSet rs = conn.select(sql);
+        List<Map<String, Object>> rs = conn.select(sql);
 
         StringBuffer batch = new StringBuffer();
-        try {
-            while (rs.next()) {
-                String fileId = rs.getString("id");
-                tags.forEach(tag -> {
-                    batch.append("INSERT INTO file_tag VALUES ('" + idGenerator.next() + "','" + fileId + "','"
-                            + tag.getId() + "',(case when (select count(*) from file_tag where file_id = '" + fileId
-                            + "' and is_main = 1) > 0 then 0 else 1 end));");
-                });
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            String fileId = (String) e.get("id");
+            tags.forEach(tag -> {
+                batch.append("INSERT INTO file_tag VALUES ('" + idGenerator.next() + "','" + fileId + "','"
+                        + tag.getId() + "',(case when (select count(*) from file_tag where file_id = '" + fileId
+                        + "' and is_main = 1) > 0 then 0 else 1 end));");
+            });
+        });
         conn.update(batch.toString());
     }
 
     /**
      * deletes tag from files
      *
-     * @param tag
-     * @param files
      */
     public void removeTag(ITag tag, IFile... files) {
         for (IFile file : files) {
@@ -371,22 +320,18 @@ public class TagService {
 
     /**
      * add file's new tags if its status is inserted
-     * 
-     * @param files
+     *
      */
     public void tag(List<IFile> files) {
         for (IFile file : files) {
-            List<ITag> tags = file.getTags().stream().filter(e -> e.getStatus() == Status.INSERT)
-                    .collect(Collectors.toList());
+            List<ITag> tags = file.getTags().stream().filter(e -> e.getStatus() == Status.INSERT).collect(Collectors.toList());
             tags(tags, file);
         }
     }
 
     /**
      * add keys to tag
-     * 
-     * @param tagId
-     * @param keys
+     *
      */
     public void tagKeys(String tagId, String[] keys) {
         StringBuffer batch = new StringBuffer();
@@ -402,19 +347,13 @@ public class TagService {
      */
     public List<ITag> getAllTagsWithKeys() {
         // concat keys
-        ResultSet rs = conn.select(
+        List<Map<String, Object>> rs = conn.select(
                 "select t.id,t.name,t.'group', GROUP_CONCAT(tk.key) as key from tag t left join tag_key tk on t.id = tk.tag_id group by t.id;");
         List<ITag> tags = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                ITag tag = BeanUtils.setTagWithKey(rs);
-                tags.add(tag);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            ITag tag = BeanUtils.setTagWithKey(e);
+            tags.add(tag);
+        });
         return tags;
     }
 
@@ -428,18 +367,7 @@ public class TagService {
 
     public List<IFile> getFilesByTag(String tagId) {
         String sql = "SELECT * FROM file WHERE id IN (SELECT file_id FROM file_tag WHERE tag_id='" + tagId + "');";
-        ResultSet rs = conn.select(sql);
-        List<IFile> files = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                files.add(BeanUtils.setFile(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
-        return files;
+        return getFiles(sql);
     }
 
     public void renameTag(ITag tag) {
@@ -456,23 +384,18 @@ public class TagService {
 
     /**
      * return the files that its main tag is this tag
-     * 
-     * @param tagId
+     *
      */
     public List<IFile> getFilesByMainTag(String tagId) {
         String sql = "SELECT * FROM file WHERE id IN (SELECT file_id FROM file_tag WHERE tag_id='" + tagId
                 + "' and is_main = 1);";
-        ResultSet rs = conn.select(sql);
+        return getFiles(sql);
+    }
+
+    private List<IFile> getFiles(String sql) {
+        List<Map<String, Object>> rs = conn.select(sql);
         List<IFile> files = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                files.add(BeanUtils.setFile(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e-> files.add(BeanUtils.setFile(e)));
         return files;
     }
 }

@@ -5,40 +5,35 @@ import common.tool.IdGenerator;
 import entity.ISpace;
 import jdbc.JDBCConnector;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SpaceService {
     private JDBCConnector conn;
-    private IdGenerator id;
+    private IdGenerator idGenerator;
 
     public SpaceService() {
         conn = new JDBCConnector();
-        id = new IdGenerator();
+        idGenerator = new IdGenerator();
     }
 
     public List<ISpace> getAllSpaces() {
         String sql = "SELECT * FROM space;";
-        ResultSet rs = conn.select(sql);
+        List<Map<String, Object>> rs = conn.select(sql);
         List<ISpace> spaces = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                ISpace space = BeanUtils.setSpace(rs);
-                spaces.add(space);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            ISpace space = BeanUtils.setSpace(e);
+            spaces.add(space);
+        });
         return spaces;
     }
 
-    public void add(String name) {
-        String sql = String.format("INSERT into space(id,name) values('%s','%s');",id.next(), name);
+    public ISpace add(String name) {
+        String id = idGenerator.next();
+        String sql = String.format("INSERT into space(id,name) values('%s','%s');", id, name);
         conn.update(sql);
+        return getSpaceById(id);
     }
 
     public void deleteById(String id) {
@@ -48,18 +43,23 @@ public class SpaceService {
 
     public ISpace getSpaceByName(String name){
         String sql = String.format("SELECT * FROM space WHERE name = '%s';", name);
-        ResultSet rs = conn.select(sql);
+        List<Map<String, Object>> rs = conn.select(sql);
         List<ISpace> spaces = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                ISpace space = BeanUtils.setSpace(rs);
-                spaces.add(space);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conn.close();
-        }
+        rs.forEach(e->{
+            ISpace space = BeanUtils.setSpace(e);
+            spaces.add(space);
+        });
+        return spaces.isEmpty()? null : spaces.get(0);
+    }
+
+    public ISpace getSpaceById(String id){
+        String sql = String.format("SELECT * FROM space WHERE name = '%s';", id);
+        List<Map<String, Object>> rs = conn.select(sql);
+        List<ISpace> spaces = new ArrayList<>();
+        rs.forEach(e->{
+            ISpace space = BeanUtils.setSpace(e);
+            spaces.add(space);
+        });
         return spaces.isEmpty()? null : spaces.get(0);
     }
 

@@ -1,27 +1,12 @@
 package gui.window;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
 import common.AppContext;
+import common.model.event.FireEvent;
+import common.model.event.impl.PagerEvent;
+import common.model.observer.Observer;
+import common.myenum.EventType;
 import common.myenum.InfoType;
+import common.myenum.PageAction;
 import common.myenum.Status;
 import common.tool.FileUtils;
 import common.tool.StringUtils;
@@ -32,11 +17,23 @@ import gui.base.IDialog;
 import gui.base.IFrame;
 import gui.base.IPanel;
 import gui.component.FileLabel;
+import gui.component.Pager;
 import service.FileService;
 import service.Starter;
 import service.TagService;
 
-public class Home {
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+public class Home implements Observer {
     public final static String WIN_NAME = "Home";
     private IFrame frame;
     private IPanel content;
@@ -47,9 +44,13 @@ public class Home {
     private TagService tagService;
     private List<IFile> files;
     private String lastChoosePath;
+    private Pager pager;
+    /**
+     * 0: search, 1: check repeat
+     */
+    private int action = 0;
 
     public Home() {
-        AppContext.currentWin = frame;
         fileService = new FileService();
         tagService = new TagService();
         starter = new Starter();
@@ -85,12 +86,20 @@ public class Home {
         top.add(b_bulid);
         top.add(b_move);
 
+        //frame initialization
         frame = new IFrame("文件管理", top);
         center = frame.getCenter();
+        pager = frame.getPager();
+        int totalCount = fileService.totalCount();
+        pager.setTotalCount(totalCount);
+        pager.addObserver(this);
+
         frame.setRoot(bottom);
+        AppContext.currentWin = frame;
 
         // event listeners
         frame.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowActivated(WindowEvent e) {
                 AppContext.currentWin = Home.this;
                 AppContext.currentFrame = frame;
@@ -115,14 +124,11 @@ public class Home {
                 });
                 new IDialog(frame, "扫描完成", InfoType.INFO);
                 center.reload();
-                //content.reload();
             }
             bottom.setVisible(false);
         });
 
-        b_auto.addActionListener(e -> {
-            autoTag();
-        });
+        b_auto.addActionListener(e -> autoTag());
 
         b_confirm.addActionListener(e -> {
             tagService.tag(files);
@@ -137,6 +143,7 @@ public class Home {
 
         // search for files
         b_search.addActionListener(e -> {
+            action = 0;
             String text = textField.getText();
             if (text.equals("")) {
                 new IDialog(frame, "输入为空，请重试！", InfoType.INFO);
@@ -145,12 +152,15 @@ public class Home {
                 search(text);
             }
             bottom.setVisible(false);
+            pager.setVisible(true);
         });
 
         // show all files
         b_all.addActionListener(e -> {
+            action = 0;
             queryAll();
             bottom.setVisible(false);
+            pager.setVisible(true);
         });
 
         // open tag frame
@@ -168,23 +178,8 @@ public class Home {
 
         // show repeated files
         b_check.addActionListener(e1 -> {
-            Map<String, List<IFile>> repMap = fileService.getRepeatMap();
-            // same size as repeat
-            center.removeAll();
-            repMap.forEach((size, list) -> {
-                IPanel temp = new IPanel(new FlowLayout(FlowLayout.LEFT));
-                JLabel label = new JLabel("【大小：" + FileUtils.getFileSizeString(size) + "】");
-                label.setOpaque(true);
-                label.setBackground(Color.GREEN);
-                temp.add(label);
-                center.add(temp);
-                list.forEach(file -> {
-                    center.addFileBox(file, center);
-                });
-            });
-            new IDialog(frame, "查重完成", InfoType.INFO);
-            center.reload();
-            bottom.setVisible(false);
+            action = 1;
+            showRepeat();
         });
 
         // generate tag's diretory structure
@@ -223,24 +218,20 @@ public class Home {
 
     private void search(String text) {
         List<IFile> files = fileService.search(text);
+        center.removeAll();
         if (files != null) {
-            center.removeAll();
-            files.forEach(file -> {
-                center.addFileBox(file, center, text);
-            });
-            center.reload();
+            files.forEach(file -> center.addFileBox(file, center, text));
         } else {
-            center.removeAll();
             center.add(new JLabel("没有搜索到相关内容！"));
-            center.reload();
         }
+        center.reload();
         bottom.setVisible(false);
 
     }
 
     /**
      * get this frame
-     * 
+     *
      * @return
      */
     public JFrame getFrame() {
@@ -248,8 +239,7 @@ public class Home {
     }
 
     public void queryAll() {
-        List<IFile> files = fileService.getAllFiles();
-        frame.showContents(files);
+        queryByPage(pager.getPageSize(), pager.getPageNum());
     }
 
     /**
@@ -289,5 +279,55 @@ public class Home {
         }
         frame.showContents(files);
         bottom.setVisible(true);
+        pager.setVisible(false);
+    }
+
+    private void showRepeat(){
+        Map<String, List<IFile>> repMap = fileService.getRepeatMap(pager.getPageSize(),pager.getPageNum());
+        // same size as repeat
+        center.removeAll();
+        //sort by size, descending
+        List<String> keys = new ArrayList<>(repMap.keySet());
+        Collections.reverse(keys);
+        keys.forEach(size->{
+            List<IFile> list = repMap.get(size);
+            IPanel temp = new IPanel(new FlowLayout(FlowLayout.LEFT));
+            JLabel label = new JLabel("【大小：" + FileUtils.getFileSizeString(size) + "】");
+            label.setOpaque(true);
+            label.setBackground(Color.GREEN);
+            temp.add(label);
+            center.add(temp);
+            list.forEach(file -> center.addFileBox(file, center));
+
+        });
+        new IDialog(frame, "查重完成", InfoType.INFO);
+        center.reload();
+        bottom.setVisible(false);
+        int total = fileService.repeatTotalCount();
+        pager.setTotalCount(total);
+    }
+
+    /**
+     * listen to the events of pager changes and execute something
+     * @param event
+     */
+    @Override
+    public void update(FireEvent event) {
+        if (event.getEventType() == EventType.PAGE_EVENT){
+            PagerEvent pagerEvent = (PagerEvent) event;
+            //judge current action
+            if (action == 0){
+                queryByPage(pagerEvent.getPageSize(), pagerEvent.getPageNum());
+            }else if (action == 1){
+                showRepeat();
+            }
+        }
+    }
+
+    private void queryByPage(int pageSize, int pageNum) {
+        List<IFile> result = fileService.getFilesByPage(pageSize,pageNum);
+        frame.showContents(result);
+        int total = fileService.totalCount();
+        pager.setTotalCount(total);
     }
 }

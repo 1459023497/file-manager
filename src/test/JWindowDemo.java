@@ -1,20 +1,12 @@
 package test;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.JWindow;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class JWindowDemo {
     private static JLabel text;
@@ -22,23 +14,18 @@ public class JWindowDemo {
     public static void main(String[] args) {
         JFrame frame = new JFrame("窗口示例");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
         JButton button = new JButton("显示窗口");
         text = new JLabel("111");
-        
+
         window = new JWindow();
         window.setSize(200, 200);
         window.add(new JLabel("Hello"));
         window.add(createTreeScrollPane());
         window.setLocationRelativeTo(button);
-        
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                window.setVisible(true);
-            }
-        });
-        
+
+        button.addActionListener(e -> window.setVisible(true));
+
         frame.add(button, BorderLayout.CENTER);
         frame.add(text, BorderLayout.SOUTH);
         frame.setLocationRelativeTo(null);
@@ -80,7 +67,6 @@ public class JWindowDemo {
             }
         });
         // 创建滚动面板
-        JScrollPane scrollPane = new JScrollPane(tree);
-        return scrollPane;
+        return new JScrollPane(tree);
     }
 }

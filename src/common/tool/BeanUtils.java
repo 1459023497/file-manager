@@ -6,40 +6,42 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import entity.IFile;
 import entity.ISpace;
 import entity.ITag;
+import org.apache.commons.collections4.MapUtils;
 
 public class BeanUtils {
 
-    public static IFile setFile(ResultSet rs) throws SQLException {
-        String id = rs.getString("id");
-        String name = rs.getString("name");
-        String path = rs.getString("path");
-        String size = rs.getString("size");
-        String dir = rs.getString("belong");
+    public static IFile setFile(Map<String,Object> map){
+        String id = MapUtils.getString(map, "id");
+        String name = MapUtils.getString(map, "name");
+        String path = MapUtils.getString(map, "path");
+        String size = MapUtils.getString(map, "size");
+        String dir = MapUtils.getString(map, "belong");
         return new IFile(id, name, path, size, dir);
     }
 
-    public static ITag setTag(ResultSet rs) throws SQLException{
-        String id = rs.getString("id");
-        String name = rs.getString("name");
-        String group = rs.getString("group");
+    public static ITag setTag(Map<String,Object> map){
+        String id = MapUtils.getString(map, "id");
+        String name = MapUtils.getString(map, "name");
+        String group = MapUtils.getString(map, "group");
         int isMain = 0;
-        if(containsNameColumn(rs, "is_main")){
-            isMain = rs.getInt("is_main");
+        if(map.containsKey("is_main")){
+            isMain = MapUtils.getInteger(map, "is_main");
         }
         return new ITag(id, name, group, isMain);
     }
 
-    public static ITag setTagWithKey(ResultSet rs) throws SQLException{
-        String id = rs.getString("id");
-        String name = rs.getString("name");
-        String group = rs.getString("group");
-        String keys = rs.getString("key");
+    public static ITag setTagWithKey(Map<String,Object> map){
+        String id = MapUtils.getString(map, "id");
+        String name = MapUtils.getString(map, "name");
+        String group = MapUtils.getString(map, "group");
+        String keys = MapUtils.getString(map, "key");
         ITag tag = new ITag(id, name, group);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         if(keys != null){
             list = Arrays.asList(keys.split(","));
         }
@@ -64,9 +66,9 @@ public class BeanUtils {
         return false;
     }
 
-    public static ISpace setSpace(ResultSet rs) throws SQLException {
-        String id = rs.getString("id");
-        String name = rs.getString("name");
+    public static ISpace setSpace(Map<String,Object> map){
+        String id = MapUtils.getString(map, "id");
+        String name = MapUtils.getString(map, "name");
         return new ISpace(id, name);
     }
 }

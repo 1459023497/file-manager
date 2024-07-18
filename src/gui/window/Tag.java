@@ -1,21 +1,10 @@
 package gui.window;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-
 import common.AppContext;
+import common.model.event.FireEvent;
+import common.model.event.impl.PagerEvent;
+import common.model.observer.Observer;
+import common.myenum.EventType;
 import common.myenum.InfoType;
 import common.tool.TagColor;
 import entity.IFile;
@@ -24,12 +13,21 @@ import gui.base.IDialog;
 import gui.base.IFrame;
 import gui.base.IPanel;
 import gui.base.MyScrollPane;
+import gui.component.Pager;
 import gui.component.TagLabel;
 import gui.component.TreeSelect;
 import service.FileService;
 import service.TagService;
 
-public class Tag {
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class Tag implements Observer {
     public static final String WIN_NAME = "Tag";
     private IPanel subTop;
     private IPanel center;
@@ -37,6 +35,7 @@ public class Tag {
     private FileService fileService;
     private TagService tagService;
     private IFrame frame;
+    private Pager pager;
 
     public Tag(JFrame father) {
         fileService = new FileService();
@@ -47,6 +46,10 @@ public class Tag {
         top.setLayout(new BorderLayout());
         frame = new IFrame("标签管理", top);
         center = frame.getCenter();
+        pager = frame.getPager();
+        pager.setTotalCount(0);
+        pager.addObserver(this);
+
         frame.setLocationRelativeTo(father);
         IPanel menu = new IPanel();
         top.add(menu, BorderLayout.NORTH);
@@ -72,18 +75,18 @@ public class Tag {
         MyScrollPane scrollPane = new MyScrollPane(subTop);
         top.add(scrollPane, BorderLayout.CENTER);
         reloadTags();
-        all.addActionListener(e -> {
-            queryAll();
-        });
+
+        all.addActionListener(e -> queryByPage(pager.getPageSize(),pager.getPageNum()));
 
         frame.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowActivated(WindowEvent e) {
                 AppContext.currentWin = Tag.this;
                 AppContext.currentFrame = frame;
             }
         });
 
-        addTag.addActionListener((a) -> {
+        addTag.addActionListener(a -> {
             // get input name and group
             ITag selectedTag = (ITag) tagGroups.getSelectedItem();
             String name = newTag.getText();
@@ -91,29 +94,35 @@ public class Tag {
                 new IDialog(frame, "输入为空！", InfoType.ERROR);
                 return;
             }
-            String group = "全部";
+            String groupId = "全部";
+            String groupName = "全部";
             if (selectedTag != null){
-                group = selectedTag.getId();
+                groupId = selectedTag.getId();
+                groupName = selectedTag.getName();
             }
             // confirm message
-            String tap = "新建标签：" + name + "  分组：" + group + "?";
+            String tap = "新建标签：" + name + "  分组：" + groupName + "?";
             int confirm = JOptionPane.showConfirmDialog(frame, tap, "确认", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                tagService.newTag(new ITag(name, group));
+                tagService.newTag(new ITag(name, groupId));
                 reloadGroups();
                 reloadTags();
             }
         });
 
-        bindTag.addActionListener(e -> {
-            new TagBinder(frame);
-        });
+        bindTag.addActionListener(e -> new TagBinder(frame));
 
     }
 
-    public void queryAll() {
-        List<IFile> files = fileService.getAllFiles();
-        frame.showContents(files);
+    public void queryAll(){
+        queryByPage(pager.getPageSize(), pager.getPageNum());
+    }
+
+    private void queryByPage(int pageSize, int pageNum) {
+        List<IFile> result = fileService.getFilesByPage(pageSize,pageNum);
+        frame.showContents(result);
+        int total = fileService.totalCount();
+        pager.setTotalCount(total);
     }
 
     /**
@@ -154,5 +163,14 @@ public class Tag {
 
     public JFrame getFrame() {
         return frame;
+    }
+
+    @Override
+    public void update(FireEvent event) {
+        if (event.getEventType() == EventType.PAGE_EVENT){
+            PagerEvent pagerEvent = (PagerEvent) event;
+            queryByPage(pagerEvent.getPageSize(), pagerEvent.getPageNum());
+        }
+
     }
 }

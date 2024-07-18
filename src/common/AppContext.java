@@ -1,24 +1,26 @@
 package common;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import gui.base.IFrame;
 import gui.window.Home;
 import gui.window.Tag;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /*
  * application context
  */
 public class AppContext {
     // global settings
-    public static boolean UI_TRANSPARENT = false;
+    public static boolean UI_TRANSPARENT = true;
 
     private static Map<String, Object> map;
 
     public static Object currentWin;
 
     public static IFrame currentFrame;
+
+    public static String currSpace;
 
     public static void init() {
         map = new HashMap<String, Object>();
