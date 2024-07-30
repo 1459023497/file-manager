@@ -170,8 +170,6 @@ public class Pager extends JPanel {
                 }
                 pagePanel.revalidate();
                 pagePanel.repaint();
-            } else {
-                this.pageSize.set(20);
             }
             //notify
             PagerEvent event = new PagerEvent(PageAction.SIZE, currentPage, pageSize.get());

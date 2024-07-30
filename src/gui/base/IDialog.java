@@ -47,6 +47,7 @@ public class IDialog extends JWindow {
 
         // follow the frame's position changes
         frame.addComponentListener(new ComponentAdapter() {
+            @Override
             public void componentMoved(ComponentEvent e) {
                 // position
                 Point point = frame.getCenterPointOnScreen();
@@ -57,12 +58,7 @@ public class IDialog extends JWindow {
         });
 
         // dispose after 2 seconds
-        Timer timer = new Timer(2000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        Timer timer = new Timer(2000, e -> dispose());
         timer.setRepeats(false);
         timer.start();
     }

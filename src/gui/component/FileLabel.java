@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -70,22 +72,34 @@ public class FileLabel extends JLabel implements MouseListener {
     /**
      * highlighting the search characters
      * 
-     * @param text
+     * @param key
      */
-    public void setHighlight(String text) {
+    public void setHighlight(String key) {
         String s = getText();
-        int start_pos = s.indexOf(text);
-        int end_pos = start_pos + text.length();
-        // splice, highlight, concate
-        if (start_pos != -1) {
-            StringBuffer result = new StringBuffer("<html>");
-            result.append(s.substring(0, start_pos));
-            result.append("<font color='red'>");
-            result.append(s.substring(start_pos, end_pos));
-            result.append("</font>");
-            result.append(s.substring(end_pos));
-            result.append("</html>");
-            setText(result.toString());
+        //get the real text
+        Pattern pattern = Pattern.compile("<html>(.*?)</html>");
+        Matcher matcher = pattern.matcher(s);
+        if (matcher.find()) {
+            String text = matcher.group(1);
+            //only use file name, highlight the characters in the file name
+            int lastDotIndex = text.lastIndexOf(".");
+            String fileName = (lastDotIndex != -1) ? text.substring(0, lastDotIndex) : text;
+            if (fileName.contains(key)){
+                int startPos = s.indexOf(key);
+                int endPos = startPos + key.length();
+                // splice, highlight, concat
+                if (startPos != -1) {
+                    //StringBuffer result = new StringBuffer("<html>");
+                    StringBuffer result = new StringBuffer();
+                    result.append(s, 0, startPos);
+                    result.append("<font color='red'>");
+                    result.append(s, startPos, endPos);
+                    result.append("</font>");
+                    result.append(s.substring(endPos));
+                    //result.append("</html>");
+                    setText(result.toString());
+                }
+            }
         }
     }
 

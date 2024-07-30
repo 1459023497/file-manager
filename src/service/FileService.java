@@ -10,17 +10,23 @@ import jdbc.JDBCConnector;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class FileService {
-    private JDBCConnector conn;
-    private IdGenerator id;
+    private static final Logger logger = Logger.getLogger("FileService.class");
+    private final JDBCConnector conn;
+    private final IdGenerator idGenerator;
 
     public FileService() {
         conn = new JDBCConnector();
-        id = new IdGenerator();
+        idGenerator = new IdGenerator();
     }
 
     /**
@@ -32,8 +38,12 @@ public class FileService {
         // String regex = "/\''/g"; remove all '
         String name = file.getName().replace('\'', ' ');
         String path = file.getPath().replace('\'', ' ');
-        String sql = "INSERT or ignore into file(id,name,path,size,belong,space_id) values('" + id.next() + "','"
-                + name + "','" + path + "','" + file.length() + "','" + belong + "','"+AppContext.currSpace+"');";
+        // get last modified time
+        long lastModified = file.lastModified();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datetime = sdf.format(lastModified);
+        String sql = "INSERT or ignore into file(id,name,path,size,belong,modify_time,space_id) values('" + idGenerator.next() + "','"
+                + name + "','" + path + "','" + file.length() + "','" + belong + "','" + datetime + "','" + AppContext.currSpace + "');";
         conn.update(sql);
     }
 
@@ -48,8 +58,8 @@ public class FileService {
 
         // rename the file in the database
         String id = iFile.getId();
-        String sql = "UPDATE file SET name = '" + newFile.getName() + "',path='" + newFile.getPath() + "' WHERE id = '"
-                + id + "';";
+        String t = "UPDATE file SET name = '%s',path='%s' WHERE id = '%s';";
+        String sql = String.format(t,newFile.getName(),newFile.getPath(),id );
         conn.update(sql);
         // reset
         iFile.setPath(newFile.getPath());
@@ -62,8 +72,15 @@ public class FileService {
         if (file.isDirectory()) {
             removeDir(file.getPath());
         } else {
-            String sql = "DELETE FROM file WHERE id = '" + file.getId() + "'; DELETE FROM file_tag WHERE file_id = '"
-                    + file.getId() + "';";
+            Path path = Paths.get(file.getPath());
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                logger.info("删除文件失败：" + file.getName());
+                throw new RuntimeException(e);
+            }
+            String t = "DELETE FROM file WHERE id = '%s'; DELETE FROM file_tag WHERE file_id = '%s';";
+            String sql = String.format(t, file.getId(), file.getId());
             conn.update(sql);
         }
     }
@@ -106,7 +123,7 @@ public class FileService {
      */
     public Map<String, List<IFile>> getRepeatMap(int pageSize, int pageNum) {
         Map<String, List<IFile>> map = new HashMap<>();
-        List<IFile> files = getRepeatFiles(pageSize,pageNum);
+        List<IFile> files = getRepeatFiles(pageSize, pageNum);
         if (!files.isEmpty()) {
             map = files.stream().collect(Collectors.groupingBy(IFile::getSize));
         }
@@ -114,11 +131,11 @@ public class FileService {
     }
 
     public List<IFile> getRepeatFiles(int pageSize, int pageNum) {
-        int offset = (pageNum -1)*pageSize;
-        String sql  = String.format("SELECT * FROM file WHERE space_id='%s' AND size " +
+        int offset = (pageNum - 1) * pageSize;
+        String sql = String.format("SELECT * FROM file WHERE space_id='%s' AND size " +
                 "IN (SELECT size FROM file WHERE space_id='%s' GROUP BY size " +
-                "HAVING COUNT(*) > 1) ORDER BY size DESC LIMIT %s,%s;", AppContext.currSpace,AppContext.currSpace,offset,pageSize);
-        List<Map<String,Object>> rows = conn.select(sql);
+                "HAVING COUNT(*) > 1) ORDER BY size DESC LIMIT %s,%s;", AppContext.currSpace, AppContext.currSpace, offset, pageSize);
+        List<Map<String, Object>> rows = conn.select(sql);
         return rows.stream().map(BeanUtils::setFile).collect(Collectors.toList());
     }
 
@@ -128,14 +145,13 @@ public class FileService {
     public int totalCount() {
         String sql = String.format("SELECT COUNT(1) AS total FROM file WHERE space_id = '%s';", AppContext.currSpace);
         List<Map<String, Object>> rs = conn.select(sql);
-        return  rs.isEmpty()?0 : (int) rs.get(0).get("total");
+        return rs.isEmpty() ? 0 : (int) rs.get(0).get("total");
     }
 
     /**
      * get all files with tags
      */
     public List<IFile> getAllFiles() {
-        //TODO: 后续做分页
         String sql = String.format("SELECT * FROM file WHERE space_id = '%s' limit 1000;", AppContext.currSpace);
         return getFilesWithTags(sql);
     }
@@ -144,7 +160,7 @@ public class FileService {
      * fuzzy search, find file's name OR file's tag name like the input text
      */
     public List<IFile> search(String text) {
-        String sql = "SELECT * FROM file WHERE id in (SELECT DISTINCT file_id FROM file_tag LEFT JOIN tag ON file_tag.tag_id = tag.id WHERE tag.name LIKE '%" + text + "%') OR file.name LIKE '%" + text + "%';";
+        String sql = "SELECT * FROM file WHERE space_id ='" + AppContext.currSpace + "' and (id in (SELECT DISTINCT file_id FROM file_tag LEFT JOIN tag ON file_tag.tag_id = tag.id WHERE tag.name LIKE '%" + text + "%') OR file.name LIKE '%" + text + "%');";
         return getFilesWithTags(sql);
     }
 
@@ -154,9 +170,9 @@ public class FileService {
      * @param sql select files sql
      */
     private List<IFile> getFilesWithTags(String sql) {
-        List<Map<String,Object>> rs = conn.select(sql);
+        List<Map<String, Object>> rs = conn.select(sql);
         Map<String, IFile> map = new HashMap<>();
-        rs.forEach(e->{
+        rs.forEach(e -> {
             IFile file = BeanUtils.setFile(e);
             map.put(file.getId(), file);
         });
@@ -165,7 +181,7 @@ public class FileService {
             String sqlFormat = "SELECT ft.file_id, ft.tag_id as id, t.name, t.'group', ft.is_main FROM file_tag ft LEFT JOIN tag t ON ft.tag_id = t.id WHERE file_id in (%s);";
             String sql2 = String.format(sqlFormat, String.join(",", map.keySet()));
             List<Map<String, Object>> rs2 = conn.select(sql2);
-            rs2.forEach(e->{
+            rs2.forEach(e -> {
                 String fileId = (String) e.get("file_id");
                 ITag tag = BeanUtils.setTag(e);
                 map.get(fileId).add(tag);
@@ -183,7 +199,7 @@ public class FileService {
         String sql = String.format("SELECT * FROM file WHERE id not in (SELECT DISTINCT file_id FROM file_tag) AND space_id = '%s';", AppContext.currSpace);
         List<IFile> files = new ArrayList<>();
         List<Map<String, Object>> rs = conn.select(sql);
-        rs.forEach(e->{
+        rs.forEach(e -> {
             IFile file = BeanUtils.setFile(e);
             files.add(file);
         });
@@ -208,12 +224,18 @@ public class FileService {
 
     /**
      * count the number of files with same size
-     * @return
+     *
      */
     public int repeatTotalCount() {
         String sql = String.format("SELECT SUM(count) as total FROM (SELECT size, COUNT(1) AS count\n" +
                 "FROM file WHERE space_id='%s' GROUP BY size HAVING COUNT(1) > 1) as t;", AppContext.currSpace);
-        List<Map<String,Object>> rows = conn.select(sql);
-        return rows.isEmpty()? 0 : (int) rows.get(0).get("total");
+        List<Map<String, Object>> rows = conn.select(sql);
+        return rows.isEmpty() ? 0 : (int) rows.get(0).get("total");
+    }
+
+    public void removeFiles(List<IFile> list) {
+        for (IFile item : list) {
+            removeFile(item);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package service;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class Starter {
      * get scan files
      * @return map<folder，files>
      */
-    public HashMap<String, Set<File>> getFileMap() {
+    public Map<String, Set<File>> getFileMap() {
         return fileMap;
     }
 
@@ -106,11 +107,11 @@ public class Starter {
      * get repeat map<size，files>
      * @return
      */
-    public HashMap<String,Set<File>> getRefileMap(){
+    public Map<String,Set<File>> getRefileMap(){
         HashMap<String,Set<File>> result = new HashMap<>();
-        refileMap.entrySet().forEach(e->{
-            if(e.getValue().size()>1){
-                result.put(e.getKey(), e.getValue());
+        refileMap.forEach((key, value) -> {
+            if (value.size() > 1) {
+                result.put(key, value);
             }
         });
         return result;

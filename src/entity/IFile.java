@@ -12,16 +12,18 @@ public class IFile {
     private String path;
     private String size;
     private String belong;
+    private String modifiedTime;
     private boolean isDirectory = false;//default is folder
     private List<ITag> tags;
 
     public IFile(){
-        id = new String();
-        name = new String();
-        path = new String();
-        size = new String();
-        belong = new String();
-        tags = new ArrayList<ITag>();
+        id = "";
+        name = "";
+        path = "";
+        size = "";
+        belong = "";
+        modifiedTime = "";
+        tags = new ArrayList<>();
     }
 
     /**
@@ -41,13 +43,14 @@ public class IFile {
      * @param size
      * @param belong
      */
-    public IFile(String id, String name, String path, String size, String belong) {
+    public IFile(String id, String name, String path, String size, String belong, String modifiedTime) {
         this.id = id;
         this.name = name;
         this.path = path;
         this.size = size;
         this.belong = belong;
-        tags = new ArrayList<ITag>();
+        this.modifiedTime = modifiedTime;
+        tags = new ArrayList<>();
     }
 
     /**
@@ -121,15 +124,11 @@ public class IFile {
     }
 
     /**
-    * @param file
     * @return true if file exists, false otherwise
     */
    public boolean isExist() {
        File f = new File(path);
-       if (f.exists()){
-           return true;
-       }
-       return false;
+       return f.exists();
    }
 
    /**
@@ -146,5 +145,12 @@ public class IFile {
     }
     return true;
    }
-    
+
+    public String getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(String modifiedTime) {
+        this.modifiedTime = modifiedTime;
+    }
 }

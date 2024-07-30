@@ -21,7 +21,8 @@ public class BeanUtils {
         String path = MapUtils.getString(map, "path");
         String size = MapUtils.getString(map, "size");
         String dir = MapUtils.getString(map, "belong");
-        return new IFile(id, name, path, size, dir);
+        String modifiedTime = MapUtils.getString(map, "modify_time");
+        return new IFile(id, name, path, size, dir, modifiedTime);
     }
 
     public static ITag setTag(Map<String,Object> map){

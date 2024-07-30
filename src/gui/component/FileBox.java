@@ -31,7 +31,7 @@ public class FileBox extends Box {
     public FileBox(IFile file, IPanel panel, Map<String, Set<ITag>> fileMap) {
         // Align : horizontal, left; filename + size + tags + button
         super(BoxLayout.X_AXIS);
-        init(file, panel);
+        init(file);
         if (isDir) {
             return;
         }
@@ -63,7 +63,7 @@ public class FileBox extends Box {
     public FileBox(IFile file, IPanel panel) {
         // Align : horizontal, left; filename + size + tags + button
         super(BoxLayout.X_AXIS);
-        init(file, panel);
+        init(file);
         if (!isDir) {
             // show tags
             List<ITag> tags = file.getTags();
@@ -85,18 +85,22 @@ public class FileBox extends Box {
         this.add(addLabel);
     }
 
-    private void init(IFile file, IPanel panel) {
+    private void init(IFile file) {
         this.setMaximumSize(new Dimension(3000, 20));
         // folder show path, file show size and tags
         isDir = file.isDirectory();
         fileLabel = new FileLabel(file, this);
         this.add(fileLabel);
         this.add(Box.createHorizontalStrut(5));
-        // show size
+        // show size and time
         if (!isDir) {
             String fileSize = FileUtils.getFileSizeString(String.valueOf(file.getSize()));
             this.add(new TagLabel(fileSize, TagColor.GREY.getColor()));
             this.add(Box.createHorizontalStrut(5));
+            if(file.getModifiedTime() != null) {
+                this.add(new TagLabel(file.getModifiedTime(), TagColor.GREY.getColor()));
+                this.add(Box.createHorizontalStrut(5));
+            }
         }
     }
 
