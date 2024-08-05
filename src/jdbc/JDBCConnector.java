@@ -60,11 +60,11 @@ public class JDBCConnector {
 
     private void executeUpdate(String sql) {
         // try-with-resources to auto close the connection
-        try (Connection connection = dataSource.getConnection()) {
-            connection.setAutoCommit(false);
-            statement = connection.createStatement();
+        try (Connection sourceConnection = dataSource.getConnection()) {
+            sourceConnection.setAutoCommit(false);
+            statement = sourceConnection.createStatement();
             statement.executeUpdate(sql);
-            connection.commit();
+            sourceConnection.commit();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

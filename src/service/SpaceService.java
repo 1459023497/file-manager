@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SpaceService {
-    private JDBCConnector conn;
-    private IdGenerator idGenerator;
+    private final JDBCConnector conn;
+    private final IdGenerator idGenerator;
 
     public SpaceService() {
         conn = new JDBCConnector();
@@ -43,6 +43,10 @@ public class SpaceService {
 
     public ISpace getSpaceByName(String name){
         String sql = String.format("SELECT * FROM space WHERE name = '%s';", name);
+        return getSpace(sql);
+    }
+
+    private ISpace getSpace(String sql) {
         List<Map<String, Object>> rs = conn.select(sql);
         List<ISpace> spaces = new ArrayList<>();
         rs.forEach(e->{
@@ -53,14 +57,8 @@ public class SpaceService {
     }
 
     public ISpace getSpaceById(String id){
-        String sql = String.format("SELECT * FROM space WHERE name = '%s';", id);
-        List<Map<String, Object>> rs = conn.select(sql);
-        List<ISpace> spaces = new ArrayList<>();
-        rs.forEach(e->{
-            ISpace space = BeanUtils.setSpace(e);
-            spaces.add(space);
-        });
-        return spaces.isEmpty()? null : spaces.get(0);
+        String sql = String.format("SELECT * FROM space WHERE id = '%s';", id);
+        return getSpace(sql);
     }
 
     public void deleteByName(String name) {

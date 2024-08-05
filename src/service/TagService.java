@@ -24,8 +24,8 @@ import gui.base.TagTreeNode;
 import jdbc.JDBCConnector;
 
 public class TagService {
-    private JDBCConnector conn;
-    private IdGenerator idGenerator = new IdGenerator();
+    private final JDBCConnector conn;
+    private final IdGenerator idGenerator = new IdGenerator();
 
     public TagService() {
         conn = new JDBCConnector();

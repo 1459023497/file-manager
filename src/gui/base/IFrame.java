@@ -63,7 +63,7 @@ public class IFrame extends JFrame {
         setContentPane(content);
         // click close only close one window
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        // remove default menubar, set backgroud to transparent
+        // remove default menubar, set background to transparent
         setUndecorated(true);
         if (AppContext.UI_TRANSPARENT) {
             setOpacity(0.1f);
@@ -101,7 +101,7 @@ public class IFrame extends JFrame {
                 // tags and keys
                 items.forEach(e -> {
                     ITag tag = (ITag) e;
-                    center.addTagBox(tag, center);
+                    center.addTagBox(tag);
                 });
             }
         }

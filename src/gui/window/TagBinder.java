@@ -14,9 +14,9 @@ import gui.component.HintTextField;
 import service.TagService;
 
 public class TagBinder {
-    private IFrame frame;
-    private JComboBox<ITag> tagSellector;
-    private TagService tagService;
+    private final IFrame frame;
+    private final JComboBox<ITag> tagSellector;
+    private final TagService tagService;
 
     public TagBinder(IFrame father) {
         tagService = new TagService();
@@ -27,7 +27,7 @@ public class TagBinder {
         HintTextField input = new HintTextField("支持输入多个关键词，以空格分隔");
         input.setColumns(30);
         tagSellector = new JComboBox<>();
-        reloadSellector();
+        reloadSelector();
         JButton confirm  = new JButton("确认");
         JLabel hint = new JLabel("右键点击关键词可以删除");
         top.add(input);
@@ -43,7 +43,9 @@ public class TagBinder {
             if (text.length() == 0) return;
             String[] keys = text.split(" ");
             ITag tag = (ITag) tagSellector.getSelectedItem();
-            tagService.tagKeys(tag.getId(), keys);
+            if (tag != null) {
+                tagService.tagKeys(tag.getId(), keys);
+            }
             List<ITag> tags = tagService.getAllTagsWithKeys();
             frame.showContents(tags);
         });
@@ -52,12 +54,10 @@ public class TagBinder {
     /**
      * reload groups
      */
-    public void reloadSellector() {
+    public void reloadSelector() {
         tagSellector.removeAllItems();
         List<ITag> tags = tagService.getAllTags();
-        tags.forEach(tag -> {
-            tagSellector.addItem(tag);
-        });
+        tags.forEach(tagSellector::addItem);
     }
 
 }

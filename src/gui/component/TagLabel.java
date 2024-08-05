@@ -144,8 +144,8 @@ public class TagLabel extends JLabel implements MouseListener {
                     CollapsiblePanel collapsiblePanel = new CollapsiblePanel();
                     FileBox dirRow = new FileBox(new IFile(dir), panel);
                     collapsiblePanel.addTitile(dirRow);
-                    list.forEach(file -> {
-                        FileBox fileRow = new FileBox(file, panel);
+                    list.forEach(item -> {
+                        FileBox fileRow = new FileBox(item, panel);
                         collapsiblePanel.addCentent(fileRow);
                     });
                     panel.add(collapsiblePanel);

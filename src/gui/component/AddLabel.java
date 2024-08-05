@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import entity.IFile;
-import gui.window.TagSellector;
+import gui.window.TagSelector;
 
 public class AddLabel extends JLabel implements MouseListener {
     private IFile file;
@@ -36,7 +36,7 @@ public class AddLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        new TagSellector(file, this);
+        new TagSelector(file, this);
     }
 
     @Override

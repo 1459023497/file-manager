@@ -18,6 +18,7 @@ public class Main {
         }
         AppContext.init();
         Home home = new Home();
+        home.queryAll();
         //adding frame to context
         AppContext.setKey(Home.WIN_NAME, home);
     }

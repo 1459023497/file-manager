@@ -29,13 +29,13 @@ import java.util.Set;
 
 public class Tag implements Observer {
     public static final String WIN_NAME = "Tag";
-    private IPanel subTop;
-    private IPanel center;
-    private TreeSelect tagGroups;
-    private FileService fileService;
-    private TagService tagService;
-    private IFrame frame;
-    private Pager pager;
+    private final IPanel subTop;
+    private final IPanel center;
+    private final TreeSelect tagGroups;
+    private final FileService fileService;
+    private final TagService tagService;
+    private final IFrame frame;
+    private final Pager pager;
 
     public Tag(JFrame father) {
         fileService = new FileService();

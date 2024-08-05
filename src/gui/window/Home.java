@@ -37,15 +37,15 @@ import java.util.stream.Collectors;
 
 public class Home implements Observer {
     public static final String WIN_NAME = "Home";
-    private IFrame frame;
-    private IPanel center;
-    private IPanel bottom;
-    private Starter starter;
-    private FileService fileService;
-    private TagService tagService;
+    private final IFrame frame;
+    private final IPanel center;
+    private final IPanel bottom;
+    private final Starter starter;
+    private final FileService fileService;
+    private final TagService tagService;
     private List<IFile> files;
     private String lastChoosePath;
-    private Pager pager;
+    private final Pager pager;
     /**
      * 0: search, 1: check repeat
      */
@@ -133,9 +133,7 @@ public class Home implements Observer {
 
         bConfirm.addActionListener(e -> {
             tagService.tag(files);
-            queryAll();
-            bottom.setVisible(false);
-            pager.setVisible(true);
+            autoTag();
         });
 
         bCancel.addActionListener(e -> {

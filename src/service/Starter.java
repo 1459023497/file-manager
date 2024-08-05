@@ -1,22 +1,20 @@
 package service;
 
+import common.AppContext;
+
+import javax.swing.*;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
-
-import common.AppContext;
 public class Starter {
     public static final Logger logger = Logger.getLogger("Starter.class");
     // map<size，files>
-    private HashMap<String, Set<File>> refileMap = new HashMap<>();
+    private Map<String, Set<File>> refileMap = new HashMap<>();
     // map<folder，files>
-    private HashMap<String, Set<File>> fileMap = new HashMap<>();
+    private Map<String, Set<File>> fileMap = new HashMap<>();
 
     /**
      * only scan files in the specified directory

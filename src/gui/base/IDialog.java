@@ -1,19 +1,13 @@
 package gui.base;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
-import javax.swing.JLabel;
-import javax.swing.JWindow;
-import javax.swing.Timer;
-
 import common.AppContext;
 import common.myenum.InfoType;
 import common.tool.TagColor;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class IDialog extends JWindow {
     public IDialog(IFrame frame, String info, int type) {

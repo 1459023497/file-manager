@@ -1,21 +1,17 @@
 package gui.base;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.LayoutManager;
-import java.util.HashSet;
-
-import javax.swing.Box;
-import javax.swing.JPanel;
-
 import common.AppContext;
 import entity.IFile;
 import entity.ITag;
 import gui.component.FileBox;
 import gui.component.TagBox;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.Set;
+
 public class IPanel extends JPanel {
-    private HashSet<ITag> tags;
+    private Set<ITag> tags;
 
     /**
      * transparent panel
@@ -49,11 +45,11 @@ public class IPanel extends JPanel {
         this.repaint();
     }
 
-    public HashSet<ITag> getTags() {
+    public Set<ITag> getTags() {
         return tags;
     }
 
-    public void setTags(HashSet<ITag> tags) {
+    public void setTags(Set<ITag> tags) {
         this.tags = tags;
     }
 
@@ -65,7 +61,7 @@ public class IPanel extends JPanel {
     public void addFileBox(String dir, IPanel center) {
         FileBox dirRow = new FileBox(new IFile(dir), center);
         this.add(dirRow);
-        this.add(Box.createVerticalStrut(3));//vetical gap
+        this.add(Box.createVerticalStrut(3));//vertical gap
     }
 
     /**
@@ -86,7 +82,7 @@ public class IPanel extends JPanel {
         this.add(Box.createVerticalStrut(3));
     }
 
-    public void addTagBox(ITag tag, IPanel center) {
+    public void addTagBox(ITag tag) {
         TagBox dirRow = new TagBox(tag);
         this.add(dirRow);
         this.add(Box.createVerticalStrut(3));

@@ -61,17 +61,14 @@ public class TreeSelect extends JButton {
             }
         });
 
-        addActionListener(new ActionListener() {
-            // show tree
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Point point = button.getLocationOnScreen();
-                point.y = point.y + button.getHeight();
-                
-                window.setLocation(point);
-                window.setVisible(true);
-                window.toFront();
-            }
+        // show tree
+        addActionListener(e -> {
+            Point point = button.getLocationOnScreen();
+            point.y = point.y + button.getHeight();
+
+            window.setLocation(point);
+            window.setVisible(true);
+            window.toFront();
         });
     }
 
@@ -79,6 +76,7 @@ public class TreeSelect extends JButton {
         tree.setShowsRootHandles(true);
         // hide node icons
         TreeCellRenderer renderer = new DefaultTreeCellRenderer() {
+            @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value,
                     boolean sel, boolean expanded,
                     boolean leaf, int row, boolean hasFocus) {

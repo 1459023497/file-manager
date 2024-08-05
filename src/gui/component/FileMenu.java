@@ -1,18 +1,12 @@
 package gui.component;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-
 import com.alibaba.druid.util.StringUtils;
-
 import common.AppContext;
 import entity.IFile;
 import gui.window.Home;
 import service.FileService;
+
+import javax.swing.*;
 
 public class FileMenu extends JPopupMenu {
     /**

@@ -22,11 +22,11 @@ import gui.component.AddLabel;
 import gui.component.TagLabel;
 import service.TagService;
 
-public class TagSellector {
-    private TagService tagService;
+public class TagSelector {
+    private final TagService tagService;
 
     // adding tags frame
-    public TagSellector(IFile file, AddLabel addLabel) {
+    public TagSelector(IFile file, AddLabel addLabel) {
         // frame initialization
         JWindow window = new JWindow();
         IPanel content = new IPanel(new Dimension(210, 300));
@@ -38,7 +38,7 @@ public class TagSellector {
         }  
         window.pack();
         window.setSize(200, 300);
-        // get conponent's frame
+        // get component's frame
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(addLabel);
         window.setLocationRelativeTo(frame);
         window.setVisible(true);
@@ -46,7 +46,7 @@ public class TagSellector {
         // top panel show all tags
         IPanel top = new IPanel(new Dimension(200, 130));
         top.setBorder(BorderFactory.createLineBorder(Color.gray, 1, true));
-        // down panel show sellected tags
+        // down panel show selected tags
         IPanel down = new IPanel(new Dimension(200, 130));
         down.setBorder(BorderFactory.createLineBorder(Color.gray, 1, true));
         down.setTags(new HashSet<>());
@@ -66,25 +66,23 @@ public class TagSellector {
         JButton confirm = new JButton("确定");
         confirm.addActionListener(e -> {
             // get adding tags
-            HashSet<ITag> tags = down.getTags();
+            Set<ITag> tags = down.getTags();
             if (tags.isEmpty()) {
                 return;
             }
             tagService.tags(tags, file);
-            //entermine focus window
-            Object currentFrame = AppContext.currentWin;
-            if (currentFrame instanceof Home){
-                ((Home)currentFrame).queryAll();
-            }else if (currentFrame instanceof Tag){
-                ((Tag)currentFrame).queryAll();
+            //determine focus window
+            Object win = AppContext.currentWin;
+            if (win instanceof Home) {
+                ((Home)win).autoTag();
+            }else if (win instanceof Tag){
+                ((Tag)win).queryAll();
             }
             window.dispose();
         });
 
         JButton cancel = new JButton("取消");
-        cancel.addActionListener(e -> {
-            window.dispose();
-        });
+        cancel.addActionListener(e -> window.dispose());
 
         window.add(top);
         window.add(down);
